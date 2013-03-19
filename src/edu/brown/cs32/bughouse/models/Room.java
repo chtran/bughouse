@@ -55,4 +55,8 @@ public class Room extends Model {
 		return (this.currentState==RoomState.PLAYING);
 	}
 	
+	public int getId() {
+		return this.id;
+	}
+	
 }

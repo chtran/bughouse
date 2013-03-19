@@ -3,6 +3,7 @@ package edu.brown.cs32.bughouse.models;
 import edu.brown.cs32.bughouse.global.Model;
 
 public class ChessPiece extends Model {
+	private final int id;
 	private String name;
 	private static enum ChessPieceColor {
 		BLACK, WHITE
@@ -13,12 +14,64 @@ public class ChessPiece extends Model {
 	private final ChessPieceColor color;
 	private final ChessPieceType type;
 	
-	private ChessPiece(ChessPieceType type, ChessPieceColor color) {
-		this.type = type;
-		this.color = color;
+	private ChessPiece(Builder builder) {
+		this.id = builder.id;
+		this.type = builder.type;
+		this.color = builder.color;
 	}
 	
-
+	/****************************************************************************************************************
+	 * Builder
+	 * To get new piece do something like:
+	 * ChessPiece p = new ChessPiece.Builder(10).white().pawn().build();
+	 * - chtran
+	 ****************************************************************************************************************/ 
+	public static class Builder {
+		private ChessPieceColor color;
+		private ChessPieceType type;
+		private final int id;
+		
+		public Builder(int id) {
+			this.id = id;
+		}
+		
+		public Builder black() {
+			this.color = ChessPieceColor.BLACK;
+			return this;
+		}
+		public Builder white() {
+			this.color = ChessPieceColor.WHITE;
+			return this;
+		}
+		public Builder king() {
+			this.type = ChessPieceType.KING;
+			return this;
+		}
+		public Builder queen() {
+			this.type = ChessPieceType.QUEEN;
+			return this;
+		}
+		public Builder rook() {
+			this.type = ChessPieceType.ROOK;
+			return this;
+		}
+		public Builder bishop() {
+			this.type = ChessPieceType.BISHOP;
+			return this;
+		}
+		public Builder knight() {
+			this.type = ChessPieceType.KNIGHT;
+			return this;
+		}
+		public Builder pawn() {
+			this.type = ChessPieceType.PAWN;
+			return this;
+		}
+		public ChessPiece build() {
+			return new ChessPiece(this);
+		}
+	}
+	
 	public ChessPiece setName(String name) {
 		this.name = name;
 		return this;
@@ -28,59 +81,12 @@ public class ChessPiece extends Model {
 		return this.name;
 	}
 	
-	/****************************************************************************************************************
-	 * Factory methods
-	 ****************************************************************************************************************/ 
-	 
-	public static ChessPiece createWhiteKing() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.KING, ChessPieceColor.WHITE);
-		return toReturn;
+	public int getId() {
+		return this.id;
 	}
 	
-	public static ChessPiece createWhiteQueen() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.QUEEN, ChessPieceColor.WHITE);
-		return toReturn;
-	}
-	public static ChessPiece createWhiteRook() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.ROOK, ChessPieceColor.WHITE);
-		return toReturn;
-	}
-	public static ChessPiece createWhiteBishop() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.BISHOP, ChessPieceColor.WHITE);
-		return toReturn;
-	}
-	public static ChessPiece createWhiteKnight() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.KNIGHT, ChessPieceColor.WHITE);
-		return toReturn;
-	}
-	public static ChessPiece createWhitePawn() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.PAWN, ChessPieceColor.WHITE);
-		return toReturn;
+	public boolean isWhite() {
+		return (this.color==ChessPieceColor.WHITE);
 	}
 	
-	public static ChessPiece createBlackKing() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.KING, ChessPieceColor.BLACK);
-		return toReturn;
-	}
-	
-	public static ChessPiece createBlackQueen() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.QUEEN, ChessPieceColor.BLACK);
-		return toReturn;
-	}
-	public static ChessPiece createBlackRook() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.ROOK, ChessPieceColor.BLACK);
-		return toReturn;
-	}
-	public static ChessPiece createBlackBishop() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.BISHOP, ChessPieceColor.BLACK);
-		return toReturn;
-	}
-	public static ChessPiece createBlackKnight() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.KNIGHT, ChessPieceColor.BLACK);
-		return toReturn;
-	}
-	public static ChessPiece createBlackPawn() {
-		ChessPiece toReturn = new ChessPiece(ChessPieceType.PAWN, ChessPieceColor.BLACK);
-		return toReturn;
-	}
 }

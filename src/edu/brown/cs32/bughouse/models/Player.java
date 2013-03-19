@@ -1,7 +1,12 @@
 package edu.brown.cs32.bughouse.models;
 
 import edu.brown.cs32.bughouse.global.Model;
-
+/**
+ * belongsTo: ChessBoard, Room, Server
+ * hasMany: ChessPieces
+ * @author chtran
+ *
+ */
 public class Player extends Model {
 	private final int id;
 	private int currentRoomId;
@@ -23,5 +28,9 @@ public class Player extends Model {
 	
 	public String getName() {
 		return this.name;
+	}
+
+	public int getId() {
+		return this.id;
 	}
 }

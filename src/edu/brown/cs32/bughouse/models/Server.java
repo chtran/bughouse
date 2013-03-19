@@ -8,7 +8,7 @@ import java.util.Map;
 import edu.brown.cs32.bughouse.global.Model;
 /**
  * Describing a server.
- * Has many: Rooms
+ * hasMany: Rooms
  * @author chtran
  *
  */
@@ -26,5 +26,9 @@ public class Server extends Model {
 	
 	public List<Player> getAllPlayers() {
 		return new ArrayList<Player>(this.rooms.values());
+	}
+	
+	public int getId() {
+		return this.id;
 	}
 }
