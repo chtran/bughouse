@@ -9,7 +9,8 @@ import edu.brown.cs32.bughouse.global.Model;
 
 /**
  * Describing a chess room. I called it room instead of game because there're different states (waiting, playing..) - chtran
- * Has many: Players
+ * hasMany: Players, ChessBoards
+ * belongsTo: Server
  * @author chtran
  */
 
@@ -43,7 +44,7 @@ public class Room extends Model {
 		return this;
 	}
 	
-	public List<Player> getAllPlayers() {
+	public List<Player> getPlayers() {
 		return new ArrayList<Player>(this.players.values());
 	}
 	

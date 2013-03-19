@@ -1,7 +1,11 @@
 package edu.brown.cs32.bughouse.models;
 
 import edu.brown.cs32.bughouse.global.Model;
-
+/**
+ * belongsTo: ChessBoard, Player
+ * @author chtran
+ *
+ */
 public class ChessPiece extends Model {
 	private final int id;
 	private String name;
