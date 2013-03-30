@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.brown.cs32.bughouse.global.Model;
 
 /**
  * Describing a chess room. I called it room instead of game because there're different states (waiting, playing..) - chtran
@@ -14,19 +13,18 @@ import edu.brown.cs32.bughouse.global.Model;
  * @author chtran
  */
 
-public class Room extends Model {
-	private final int id;
+public class Game extends Model {
 	private Map<Integer,Player> players; //Be careful, never return players directly because it's mutable
 	ChessBoard[] chessBoards;
-	private static enum RoomState {
+	private static enum GameState {
 		WAITING, PLAYING
 	}
-	RoomState currentState;
+	GameState currentState;
 	
-	public Room(int id) {
-		this.id=id;
+	public Game(int id) {
+		super(id);
 		this.players = new HashMap<Integer, Player>();
-		this.currentState = RoomState.WAITING;
+		this.currentState = GameState.WAITING;
 		this.chessBoards = new ChessBoard[2];
 	}
 	
@@ -34,13 +32,13 @@ public class Room extends Model {
 		return players.get(playerId);
 	}
 	
-	public Room setStatePlaying() {
-		this.currentState = RoomState.PLAYING;
+	public Game setStatePlaying() {
+		this.currentState = GameState.PLAYING;
 		return this;
 	}
 	
-	public Room setStateWaiting() {
-		this.currentState = RoomState.WAITING;
+	public Game setStateWaiting() {
+		this.currentState = GameState.WAITING;
 		return this;
 	}
 	
@@ -49,15 +47,10 @@ public class Room extends Model {
 	}
 	
 	public boolean isWaiting() {
-		return (this.currentState==RoomState.WAITING);
+		return (this.currentState==GameState.WAITING);
 	}
 	
 	public boolean isPlaying() {
-		return (this.currentState==RoomState.PLAYING);
+		return (this.currentState==GameState.PLAYING);
 	}
-	
-	public int getId() {
-		return this.id;
-	}
-	
 }
