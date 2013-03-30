@@ -21,8 +21,8 @@ public class Game extends Model {
 	}
 	GameState currentState;
 	
-	public Game(int id) {
-		super(id);
+	public Game() {
+		super();
 		this.players = new HashMap<Integer, Player>();
 		this.currentState = GameState.WAITING;
 		this.chessBoards = new ChessBoard[2];

@@ -2,9 +2,10 @@ package edu.brown.cs32.bughouse.models;
 
 
 public class Position extends Model{
-
-	public Position(int id) {
-		super(id);
+	private int x;
+	private int y;
+	private Position() {
+		super();
 	}
-
+	
 }

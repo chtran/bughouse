@@ -10,8 +10,8 @@ public class Player extends Model {
 	private int currentRoomId;
 	private String name;
 	
-	public Player(int id) {
-		super(id);
+	public Player() {
+		super();
 	}
 	
 	/**
