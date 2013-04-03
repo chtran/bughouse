@@ -23,7 +23,9 @@ public class BughouseGUI extends JFrame {
 		this.setVisible(true);
 	}
 	
-	
+	/*
+	 * GameView - what the user sees when playing a game. 
+	 */
 	private JPanel setupGameView(){
 		JPanel game = new JPanel(new BorderLayout());
 		game.add(createBoard(),BorderLayout.CENTER);
