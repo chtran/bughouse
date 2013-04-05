@@ -1,5 +1,7 @@
 package edu.brown.cs32.bughouse.models;
 
+import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
+
 
 /**
  * hasMany: ChessPieces, Players
@@ -13,7 +15,60 @@ public class ChessBoard extends Model {
 	public ChessBoard() {
 		super();
 		this.board = new ChessPiece[8][8];
+		
 		//TODO: populate initial chess pieces
+	}
+	
+	private void populateBoard() {
+		board[0][0] = new ChessPiece.Builder().rook().white().build();
+		board[0][1] = new ChessPiece.Builder().knight().white().build();
+		board[0][2] = new ChessPiece.Builder().bishop().white().build();
+		board[0][3] = new ChessPiece.Builder().queen().white().build();
+		board[0][4] = new ChessPiece.Builder().king().white().build();
+		board[0][5] = new ChessPiece.Builder().bishop().white().build();
+		board[0][6] = new ChessPiece.Builder().knight().white().build();
+		board[0][7] = new ChessPiece.Builder().rook().white().build();
+		
+		board[7][0] = new ChessPiece.Builder().rook().black().build();
+		board[7][1] = new ChessPiece.Builder().knight().black().build();
+		board[7][2] = new ChessPiece.Builder().bishop().black().build();
+		board[7][3] = new ChessPiece.Builder().queen().black().build();
+		board[7][4] = new ChessPiece.Builder().king().black().build();
+		board[7][5] = new ChessPiece.Builder().bishop().black().build();
+		board[7][6] = new ChessPiece.Builder().knight().black().build();
+		board[7][7] = new ChessPiece.Builder().rook().black().build();
+		for (int i =0; i<8; i++) {
+			board[1][i] = new ChessPiece.Builder().pawn().white().build();
+			board[6][i] = new ChessPiece.Builder().pawn().black().build();
+		}
+
+	}
+	
+	public boolean isOccupied(int x, int y) {
+		return (this.board[x][y]!=null);
+	}
+	
+	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException {
+		if (isOccupied(to_x, to_y) || !isOccupied(from_x, from_y)) throw new IllegalMoveException();
+		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y)) throw new IllegalMoveException();
+		board[to_x][to_y] = board[from_x][from_y];
+		board[from_x][from_y]=null;
+	}
+	
+	public ChessBoard getView(boolean isWhite) {
+		if (isWhite) return this;
+		ChessBoard flipped = new ChessBoard();
+		for (int i=0; i<8; i++) {
+			ChessPiece temp;
+			temp = flipped.board[0][i];
+			flipped.board[0][i] = flipped.board[7][i];
+			flipped.board[7][i] = temp;
+			
+			temp = board[1][i];
+			flipped.board[1][i] = flipped.board[6][i];
+			flipped.board[6][i] = temp;
+		}
+		return flipped;
 	}
 
 }

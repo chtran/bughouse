@@ -16,7 +16,7 @@ public interface BackEnd {
 	 * @return
 	 * @throws IllegalMoveException
 	 */
-	public ChessBoard[] move(ChessPiece piece, Position destination) throws IllegalMoveException;
+	public ChessBoard[] move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException;
 	/**
 	 * Check if the game is over
 	 * @return the 2 winning players
@@ -30,7 +30,7 @@ public interface BackEnd {
 	 * @return
 	 * @throws IllegalMoveException
 	 */
-	public ChessBoard[] put(ChessPiece piece, Position destination) throws IllegalPlacementException;
+	public ChessBoard[] put(ChessPiece piece, int x, int y) throws IllegalPlacementException;
 	
 	/**
 	 * Quit the game
