@@ -43,4 +43,6 @@ public interface BackEnd {
 	 * @return
 	 */
 	public boolean isWhite(Player p);
+	
+	public Client getClient();
 }

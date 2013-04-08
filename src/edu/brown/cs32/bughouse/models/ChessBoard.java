@@ -48,11 +48,18 @@ public class ChessBoard extends Model {
 		return (this.board[x][y]!=null);
 	}
 	
-	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException {
-		if (isOccupied(to_x, to_y) || !isOccupied(from_x, from_y)) throw new IllegalMoveException();
+	public ChessPiece move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException {
+		if (!isOccupied(from_x, from_y)) throw new IllegalMoveException();
+		if (isOccupied(to_x,to_y)) {
+			if (board[from_x][from_y].isWhite()==board[to_x][to_y].isWhite()) {
+				throw new IllegalMoveException();
+			}
+		}
 		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y)) throw new IllegalMoveException();
+		ChessPiece captured = board[to_x][to_y];
 		board[to_x][to_y] = board[from_x][from_y];
 		board[from_x][from_y]=null;
+		return captured;
 	}
 	
 	public ChessBoard getView(boolean isWhite) {

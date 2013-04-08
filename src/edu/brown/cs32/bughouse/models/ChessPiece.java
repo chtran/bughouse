@@ -85,13 +85,22 @@ public class ChessPiece extends Model {
 				return (from_x==to_x) && (to_y==from_y+1 || to_y==from_y-1);
 			case KNIGHT:
 				return true;
+			case BISHOP:
+				return true;
+			case ROOK:
+				return true;
+			case QUEEN:
+				return true;
+			case KING:
+				return true;
 			default:
 				return false;
 			
 		}
-		
 	}
-	
+	public boolean isKing() {
+		return (this.type==KING);
+	}
 
 	
 }
