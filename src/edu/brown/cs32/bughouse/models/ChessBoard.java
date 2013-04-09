@@ -1,6 +1,7 @@
 package edu.brown.cs32.bughouse.models;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
+import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 
 
 /**
@@ -11,12 +12,13 @@ import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
  */
 public class ChessBoard extends Model {
 	private ChessPiece[][] board;
+	private Player white;
+	private Player black;
 	
 	public ChessBoard() {
 		super();
 		this.board = new ChessPiece[8][8];
-		
-		//TODO: populate initial chess pieces
+		populateBoard();
 	}
 	
 	private void populateBoard() {
@@ -61,7 +63,11 @@ public class ChessBoard extends Model {
 		board[from_x][from_y]=null;
 		return captured;
 	}
-	
+	public void put(ChessPiece piece, int x, int y) throws IllegalPlacementException {
+		if (board[x][y]!=null) throw new IllegalPlacementException();
+		board[x][y]=piece;
+		
+	}
 	public ChessBoard getView(boolean isWhite) {
 		if (isWhite) return this;
 		ChessBoard flipped = new ChessBoard();
@@ -77,5 +83,11 @@ public class ChessBoard extends Model {
 		}
 		return flipped;
 	}
-
+	
+	public Player getWhitePlayer() {
+		return this.white;
+	}
+	public Player getBlackPlayer() {
+		return this.black;
+	}
 }

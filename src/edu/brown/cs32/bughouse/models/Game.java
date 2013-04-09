@@ -3,7 +3,6 @@ package edu.brown.cs32.bughouse.models;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -14,7 +13,8 @@ import java.util.Map;
  */
 
 public class Game extends Model {
-	private Map<Integer,Player> players; //Be careful, never return players directly because it's mutable
+	private List<Player> team1;
+	private List<Player> team2;
 	ChessBoard[] chessBoards;
 	private static enum GameState {
 		WAITING, PLAYING
@@ -23,13 +23,12 @@ public class Game extends Model {
 	
 	public Game() {
 		super();
-		this.players = new HashMap<Integer, Player>();
+		this.team1 = new ArrayList<Player>();
+		this.team2 = new ArrayList<Player>();
 		this.currentState = GameState.WAITING;
 		this.chessBoards = new ChessBoard[2];
-	}
-	
-	public Player getPlayerById(int playerId) {
-		return players.get(playerId);
+		chessBoards[0] = new ChessBoard();
+		chessBoards[1] = new ChessBoard();
 	}
 	
 	public Game setStatePlaying() {
@@ -43,9 +42,20 @@ public class Game extends Model {
 	}
 	
 	public List<Player> getPlayers() {
-		return new ArrayList<Player>(this.players.values());
+		List<Player> toReturn = new ArrayList<Player>();
+		toReturn.addAll(team1);
+		toReturn.addAll(team2);
+		return toReturn;
 	}
 	
+	public List<Player> getTeam1() {
+		List<Player> toReturn = new ArrayList<Player>(team1);
+		return toReturn;
+	}
+	public List<Player> getTeam2() {
+		List<Player> toReturn = new ArrayList<Player>(team2);
+		return toReturn;
+	}
 	public boolean isWaiting() {
 		return (this.currentState==GameState.WAITING);
 	}
@@ -53,4 +63,5 @@ public class Game extends Model {
 	public boolean isPlaying() {
 		return (this.currentState==GameState.PLAYING);
 	}
+	
 }

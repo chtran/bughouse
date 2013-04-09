@@ -17,33 +17,15 @@ public class BughouseBackEnd implements BackEnd {
 	private String host;
 	private String port;
 	private Client client;
+	private Player me;
 
-	private ChessBoard currentBoard;
-	private ChessBoard otherBoard;
-	private List<ChessPiece> prisoners;
-	private boolean isGameOver;
-	private Player[] teammates;
-	private Player[] opponents;
-	private boolean isWhite;
 	
 	public BughouseBackEnd(String host, int port) throws UnknownHostException, IOException {
-		this.prisoners = new ArrayList<ChessPiece>();
 		this.client = new BughouseClient(host,port);
 	}
 	
 	@Override
-	public ChessBoard[] getInitialBoard() {
-		ChessBoard left = new ChessBoard();
-		ChessBoard right = new ChessBoard();
-		currentBoard = left;
-		ChessBoard[] toReturn = new ChessBoard[2];
-		toReturn[0] = left.getView(isWhite);
-		toReturn[1] = right.getView(!isWhite);
-		return toReturn;
-	}
-
-	@Override
-	public ChessBoard[] move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException {
+	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException {
 		to_y = (isWhite) ? to_y :7-to_y;
 		from_y = (isWhite) ? from_y :7-from_y;
 
