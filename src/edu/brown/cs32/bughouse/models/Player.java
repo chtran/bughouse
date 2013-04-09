@@ -13,7 +13,7 @@ import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
  */
 public class Player extends Model {
 	private Game currentGame;
-	private String name;
+	private final String name;
 	private Set<ChessPiece> prisoners;
 	private Player teammate;
 	private ChessBoard currentBoard;
@@ -25,15 +25,6 @@ public class Player extends Model {
 		this.prisoners = new HashSet<ChessPiece>();
 	}
 	
-	/**
-	 * 
-	 * @param name
-	 * @return this player (to enable cascading)
-	 */
-	public Player setName(String name) {
-		this.name = name;
-		return this;
-	}
 	
 	public String getName() {
 		return this.name;
@@ -49,6 +40,12 @@ public class Player extends Model {
 	}
 	public boolean isWhite() {
 		return isWhite;
+	}
+	public void setWhite() {
+		this.isWhite = true;
+	}
+	public void setBlack() {
+		this.isWhite = false;
 	}
 	public void put(ChessPiece piece, int x, int y) throws IllegalPlacementException {
 		if (prisoners.contains(piece)) throw new IllegalPlacementException();

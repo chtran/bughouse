@@ -15,20 +15,28 @@ import java.util.List;
 public class Game extends Model {
 	private List<Player> team1;
 	private List<Player> team2;
-	ChessBoard[] chessBoards;
+	private int ownerId;
+	List<ChessBoard> chessBoards;
 
-	private int currentState;
 	
 	public Game(int id) {
 		super(id);
 		this.team1 = new ArrayList<Player>();
 		this.team2 = new ArrayList<Player>();
-		this.chessBoards = new ChessBoard[2];
-		chessBoards[0] = new ChessBoard();
-		chessBoards[1] = new ChessBoard();
+		this.chessBoards = new ArrayList<ChessBoard>();
 	}
 	
+	public void addBoard(ChessBoard board) {
+		this.chessBoards.add(board);
+	}
+	
+	public void setOwnerId(int ownerId) {
+		this.ownerId = ownerId;
+	}
 
+	public int getOwnerId() {
+		return ownerId;
+	}
 	
 	public List<Player> getPlayers() {
 		List<Player> toReturn = new ArrayList<Player>();

@@ -4,7 +4,9 @@ import java.awt.*;
 
 import javax.swing.*;
 
-public class BughouseGUI extends JFrame {
+import edu.brown.cs32.bughouse.interfaces.FrontEnd;
+
+public class BughouseGUI extends JFrame implements FrontEnd{
 	
 	/**
 	 * 
@@ -66,6 +68,12 @@ public class BughouseGUI extends JFrame {
 	
 	public static void main (String[] argv){
 		new BughouseGUI();
+	}
+
+	@Override
+	public void showEndGameMessage() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

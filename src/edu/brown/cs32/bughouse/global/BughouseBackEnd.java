@@ -9,21 +9,17 @@ import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
+import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 import edu.brown.cs32.bughouse.models.Game;
 import edu.brown.cs32.bughouse.models.Player;
 
 public class BughouseBackEnd implements BackEnd {
-	@SuppressWarnings("unused")
-	private String host;
-	@SuppressWarnings("unused")
-	private String port;
 	private Client client;
 	private Player me;
 	private FrontEnd frontEnd;
 	
-	public BughouseBackEnd(String host, int port, FrontEnd frontEnd) throws UnknownHostException, IOException {
-		this.client = new BughouseClient(host,port);
+	public BughouseBackEnd(FrontEnd frontEnd) {
 		this.frontEnd = frontEnd;
 	}
 	
@@ -49,9 +45,11 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public Player joinServer(String host, int port) {
-		// TODO Auto-generated method stub
-		return null;
+	public Player joinServer(String host, int port, String name) throws UnknownHostException, IOException {
+		this.client = new BughouseClient(host,port);
+		int playerId = client.addNewPlayer(name);
+		this.me = new Player(playerId,name);
+		return me;
 	}
 
 	@Override
@@ -60,6 +58,7 @@ public class BughouseBackEnd implements BackEnd {
 		List<Integer> gameIds = client.getGames();
 		for (Integer gameId: gameIds) {
 			if (!client.gameIsActive(gameId)) continue;
+			
 			Game g = new Game(gameId);
 			List<Integer> playerIds = client.getPlayers(gameId);
 			for (int playerId: playerIds) {
@@ -67,6 +66,7 @@ public class BughouseBackEnd implements BackEnd {
 				Player p = new Player(playerId,name);
 				addPlayerToGame(p, g);
 			}
+			g.setOwnerId(client.getOwnerId(gameId));
 			games.add(g);
 		}
 		return games;
@@ -91,13 +91,27 @@ public class BughouseBackEnd implements BackEnd {
 	public void createGame() {
 		int gameId = client.createGame();
 		Game g = new Game(gameId);
+		g.setOwnerId(me.getId());
 		addPlayerToGame(me, g);
 		me.setCurrentGame(g);
 	}
 
 	@Override
 	public void startGame() {
-		// TODO Auto-generated method stub
-		
+		//TODO
+		Game game = me.getCurrentGame();
+		if (me.getId()==game.getOwnerId()) {
+			//Is owner
+		} else {
+			List<Integer> chessBoardIds = client.getBoards(game.getId());
+			for (int chessBoardId: chessBoardIds) {
+				ChessBoard board = new ChessBoard(chessBoardId);
+			}
+			for (Player p: me.getCurrentGame().getPlayers()) {
+				if (client.isWhite(p.getId())) p.setWhite();
+				else p.setBlack();
+			}
+			
+		}
 	}
 }

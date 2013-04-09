@@ -64,4 +64,10 @@ public class BughouseClient implements Client{
 		return 0;
 	}
 
+	@Override
+	public int addNewPlayer(String name) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

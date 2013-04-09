@@ -15,8 +15,8 @@ public class ChessBoard extends Model {
 	private Player white;
 	private Player black;
 	
-	public ChessBoard() {
-		super();
+	public ChessBoard(int id) {
+		super(id);
 		this.board = new ChessPiece[8][8];
 		populateBoard();
 	}
@@ -68,9 +68,9 @@ public class ChessBoard extends Model {
 		board[x][y]=piece;
 		
 	}
-	public ChessBoard getView(boolean isWhite) {
+/*	public ChessBoard getView(boolean isWhite) {
 		if (isWhite) return this;
-		ChessBoard flipped = new ChessBoard();
+		ChessBoard flipped = new ChessBoard(this.getId());
 		for (int i=0; i<8; i++) {
 			ChessPiece temp;
 			temp = flipped.board[0][i];
@@ -82,7 +82,7 @@ public class ChessBoard extends Model {
 			flipped.board[6][i] = temp;
 		}
 		return flipped;
-	}
+	}*/
 	
 	public Player getWhitePlayer() {
 		return this.white;
