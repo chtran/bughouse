@@ -16,30 +16,19 @@ public class Game extends Model {
 	private List<Player> team1;
 	private List<Player> team2;
 	ChessBoard[] chessBoards;
-	private static enum GameState {
-		WAITING, PLAYING
-	}
-	GameState currentState;
+
+	private int currentState;
 	
-	public Game() {
-		super();
+	public Game(int id) {
+		super(id);
 		this.team1 = new ArrayList<Player>();
 		this.team2 = new ArrayList<Player>();
-		this.currentState = GameState.WAITING;
 		this.chessBoards = new ChessBoard[2];
 		chessBoards[0] = new ChessBoard();
 		chessBoards[1] = new ChessBoard();
 	}
 	
-	public Game setStatePlaying() {
-		this.currentState = GameState.PLAYING;
-		return this;
-	}
-	
-	public Game setStateWaiting() {
-		this.currentState = GameState.WAITING;
-		return this;
-	}
+
 	
 	public List<Player> getPlayers() {
 		List<Player> toReturn = new ArrayList<Player>();
@@ -56,12 +45,10 @@ public class Game extends Model {
 		List<Player> toReturn = new ArrayList<Player>(team2);
 		return toReturn;
 	}
-	public boolean isWaiting() {
-		return (this.currentState==GameState.WAITING);
+	public void addToTeam1(Player p) {
+		team1.add(p);
 	}
-	
-	public boolean isPlaying() {
-		return (this.currentState==GameState.PLAYING);
+	public void addToTeam2(Player p) {
+		team2.add(p);
 	}
-	
 }

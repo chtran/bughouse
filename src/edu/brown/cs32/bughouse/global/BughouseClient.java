@@ -16,21 +16,21 @@ public class BughouseClient implements Client{
 	}
 	
 	@Override
-	public boolean joinGame(int gameId) {
+	public boolean joinGame(int playerId, int gameId) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean createGame(int gameId) {
+	public void updateBoards(ChessBoard[] boards) {
 		// TODO Auto-generated method stub
-		return false;
+		
 	}
 
 	@Override
-	public List<Integer> getPlayers(int gameId) {
+	public int createGame() {
 		// TODO Auto-generated method stub
-		return null;
+		return 0;
 	}
 
 	@Override
@@ -40,9 +40,28 @@ public class BughouseClient implements Client{
 	}
 
 	@Override
-	public void updateBoards(ChessBoard[] boards) {
+	public boolean gameIsActive(int gameId) {
 		// TODO Auto-generated method stub
-		
+		return false;
+	}
+
+
+	@Override
+	public String getName(int playerId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Integer> getPlayers(int gameId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getCurrentTeam(int playerId) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
