@@ -17,6 +17,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	private static final long serialVersionUID = 1L;
 	private Board userBoard_, otherBoard_;
+	private JTextArea messageBox_,clock_;
 
 	public BughouseGUI(){
 		super("Bughouse Chess");
@@ -60,7 +61,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private JPanel setupGameView(){
 		JPanel game = new JPanel(new BorderLayout());
 		game.add(createBoard(),BorderLayout.CENTER);
-		game.add(new JLabel(" This is the options panel showing information"), BorderLayout.EAST);
+		game.add(createOptionMenu(), BorderLayout.EAST);
 		game.add(new JLabel("This is to show pieces that are available to the player to put down"), BorderLayout.SOUTH);
 		return game;
 	}
@@ -80,6 +81,22 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		return boardContainer;
 	}
 	
+	private JComponent createOptionMenu(){
+		JPanel options = new JPanel();
+		options.setPreferredSize(new Dimension(250,190));
+		clock_ = new JTextArea();
+		clock_.setPreferredSize(new Dimension(200,50));
+		clock_.setEditable(false);
+		clock_.setText("Time is ticking....");
+		messageBox_ = new JTextArea();
+		messageBox_.setPreferredSize(new Dimension(200,190));
+		messageBox_.setEditable(false);
+		messageBox_.setText("Template text");
+		options.add(clock_);
+		options.add(messageBox_);
+		return options;
+	}
+	
 	public static void main (String[] argv){
 		new BughouseGUI();
 	}
@@ -93,7 +110,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 *	Board class which graphically represents the a current 
 	 *	game with pieces and players. A private class since no 
 	 *	other class except BughouseGUI needs to know about it - might be implemented
-	 *	as its own class in the future for separation between JFrame and its content
+	 *	as its own class which is package private in 
+	 *	the future for separation between BughouseGUI and its content
 	 */
 	
 	private class Board extends JPanel {
