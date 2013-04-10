@@ -30,8 +30,32 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setVisible(true);
 	}
 	
+	
 	/*
-	 * GameView - what the user sees when playing a game. 
+	 * (non-Javadoc)
+	 * @see edu.brown.cs32.bughouse.interfaces.FrontEnd#notifyUserTurn()
+	 *  Notifies this user that it is his/her turn
+	 */
+	@Override
+	public void notifyUserTurn() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see edu.brown.cs32.bughouse.interfaces.FrontEnd#showEndGameMessage()
+	 * notifies the user in the information box that the game has ended.
+	 */
+	@Override
+	public void showEndGameMessage() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	/*
+	 * sets up the game view for the user.
 	 */
 	private JPanel setupGameView(){
 		JPanel game = new JPanel(new BorderLayout());
@@ -41,6 +65,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		return game;
 	}
 	
+	
+	/*
+	 * creates the initial board for both the user's game and the user's team
+	 * mate's game. Since the initial state of both boards' are equal there is
+	 * no need to wait for the server to provide information
+	 */
 	private JComponent createBoard(){
 		JTabbedPane boardContainer = new JTabbedPane();
 		userBoard_ = new Board();
@@ -54,11 +84,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		new BughouseGUI();
 	}
 
-	@Override
-	public void showEndGameMessage() {
-		// TODO Auto-generated method stub
-		
-	}
+	
 	
 	
 	/**
@@ -103,6 +129,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		}
 		
 	}
-	
+
+
 
 }
