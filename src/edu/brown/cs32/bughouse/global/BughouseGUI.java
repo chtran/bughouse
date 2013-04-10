@@ -23,8 +23,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		super("Bughouse Chess");
 		Container content = this.getContentPane();
 		this.setLayout(new CardLayout());
-		this.setPreferredSize(new Dimension(800,600));
-		this.setResizable(false);
+		this.setPreferredSize(new Dimension(800,700));
+		this.setResizable(true);
 		content.add(setupGameView());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
@@ -62,7 +62,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		JPanel game = new JPanel(new BorderLayout());
 		game.add(createBoard(),BorderLayout.CENTER);
 		game.add(createOptionMenu(), BorderLayout.EAST);
-		game.add(new JLabel("This is to show pieces that are available to the player to put down"), BorderLayout.SOUTH);
+		game.add(createPieceHolder(), BorderLayout.SOUTH);
 		return game;
 	}
 	
@@ -81,6 +81,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		return boardContainer;
 	}
 	
+	/*
+	 * sets up the option menu for users where information gets 
+	 * displayed
+	 */
 	private JComponent createOptionMenu(){
 		JPanel options = new JPanel();
 		options.setPreferredSize(new Dimension(250,190));
@@ -92,9 +96,19 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		messageBox_.setPreferredSize(new Dimension(200,190));
 		messageBox_.setEditable(false);
 		messageBox_.setText("Template text");
+		JButton quit  = new JButton("Click me!");
+		quit.setPreferredSize(new Dimension(100,60));
 		options.add(clock_);
 		options.add(messageBox_);
+		options.add(quit);
 		return options;
+	}
+	
+	private JComponent createPieceHolder(){
+		JScrollPane pieceHolderPanel = new JScrollPane();
+		pieceHolderPanel.setPreferredSize(new Dimension(200,110));
+		pieceHolderPanel.setBackground(Color.YELLOW);
+		return pieceHolderPanel;
 	}
 	
 	public static void main (String[] argv){
