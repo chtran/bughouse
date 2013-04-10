@@ -11,7 +11,6 @@ import edu.brown.cs32.bughouse.models.Game;
  *
  */
 public interface Client {
-
 	
 	public int createGame();
 	public List<Integer> getGames();
@@ -20,6 +19,8 @@ public interface Client {
 	public int getOwnerId(int gameId);
 	public List<Integer> createBoards(int gameId);
 	public List<Integer> getBoards(int gameId);
+	public int createChessBoard(int gameId);
+	public void startGame(int gameId);
 	
 	public int addNewPlayer(String name);
 	public String getName(int playerId);
@@ -28,5 +29,5 @@ public interface Client {
 	public boolean joinGame(int playerId, int gameId);
 	public boolean getBoardId(int playerId);
 	
-	public void updateBoards(ChessBoard[] boards);
+	public void broadcastMove(int boardId, int from_x, int from_y, int to_x, int to_y);
 }

@@ -84,6 +84,12 @@ public class ChessBoard extends Model {
 		return flipped;
 	}*/
 	
+	public void setWhitePlayer(Player p) {
+		this.white = p;
+	}
+	public void setBlackPlayer(Player p) {
+		this.black = p;
+	}
 	public Player getWhitePlayer() {
 		return this.white;
 	}

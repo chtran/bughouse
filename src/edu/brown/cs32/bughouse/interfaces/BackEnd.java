@@ -18,4 +18,7 @@ public interface BackEnd {
 	public void createGame();
 
 	public void quit();
+	public void updateGame();
+	public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y);
+	public void updatePlayer();
 }

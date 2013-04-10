@@ -3,7 +3,11 @@ package edu.brown.cs32.bughouse.global;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
@@ -18,7 +22,6 @@ public class BughouseBackEnd implements BackEnd {
 	private Client client;
 	private Player me;
 	private FrontEnd frontEnd;
-	
 	public BughouseBackEnd(FrontEnd frontEnd) {
 		this.frontEnd = frontEnd;
 	}
@@ -60,31 +63,20 @@ public class BughouseBackEnd implements BackEnd {
 			if (!client.gameIsActive(gameId)) continue;
 			
 			Game g = new Game(gameId);
-			List<Integer> playerIds = client.getPlayers(gameId);
-			for (int playerId: playerIds) {
-				String name = client.getName(playerId);
-				Player p = new Player(playerId,name);
-				addPlayerToGame(p, g);
-			}
+			updateGame(g);
 			g.setOwnerId(client.getOwnerId(gameId));
 			games.add(g);
 		}
 		return games;
 	}
-	private void addPlayerToGame(Player p, Game g) {
-		if (client.getCurrentTeam(p.getId())==1) {
-			g.addToTeam1(p);
-		} else {
-			g.addToTeam2(p);
-		}
-	}
 	
+
 	@Override
 	public void joinGame(Game g) {
 		client.joinGame(me.getId(), g.getId());
 		me.setCurrentGame(g);
-		addPlayerToGame(me, g);
-		
+		g.addPlayerToTeam(client.getCurrentTeam(me.getId()), me);
+
 	}
 
 	@Override
@@ -92,7 +84,7 @@ public class BughouseBackEnd implements BackEnd {
 		int gameId = client.createGame();
 		Game g = new Game(gameId);
 		g.setOwnerId(me.getId());
-		addPlayerToGame(me, g);
+		g.addPlayerToTeam(client.getCurrentTeam(me.getId()), me);
 		me.setCurrentGame(g);
 	}
 
@@ -101,17 +93,53 @@ public class BughouseBackEnd implements BackEnd {
 		//TODO
 		Game game = me.getCurrentGame();
 		if (me.getId()==game.getOwnerId()) {
-			//Is owner
-		} else {
-			List<Integer> chessBoardIds = client.getBoards(game.getId());
-			for (int chessBoardId: chessBoardIds) {
-				ChessBoard board = new ChessBoard(chessBoardId);
-			}
-			for (Player p: me.getCurrentGame().getPlayers()) {
-				if (client.isWhite(p.getId())) p.setWhite();
-				else p.setBlack();
-			}
-			
+			client.startGame(game.getId());
 		}
+		List<Integer> chessBoardIds = client.getBoards(game.getId());
+		Map<Integer, ChessBoard> boards = new HashMap<Integer,ChessBoard>();
+		for (int chessBoardId: chessBoardIds) {
+			ChessBoard board = new ChessBoard(chessBoardId);
+			game.addBoard(board);
+			boards.put(chessBoardId, board);
+		}
+		for (Player p: game.getPlayers()) {
+			if (client.isWhite(p.getId())) {
+				p.setWhite();
+				boards.get(client.getBoardId(p.getId())).setWhitePlayer(p);
+			} else {
+				p.setBlack();
+				boards.get(client.getBoardId(p.getId())).setBlackPlayer(p);
+			}
+		}
+		
+	}
+	private void updateGame(Game g) {
+		List<Integer> playerIds = client.getPlayers(g.getId());
+		g.clearPlayers();
+		for (int playerId: playerIds) {
+			String name = client.getName(playerId);
+			Player p = new Player(playerId,name);
+			g.addPlayerToTeam(client.getCurrentTeam(playerId), p);
+		}
+		g.setOwnerId(client.getOwnerId(g.getId()));
+	}
+	@Override
+	public void updateGame() {
+		updateGame(me.getCurrentGame());
+	}
+
+	@Override
+	public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y) {
+		try {
+			me.getCurrentGame().getBoard(boardId).move(from_x, from_y, to_x, to_y);
+		} catch (IllegalMoveException e) {
+			System.out.println("ERROR: Illegal move");
+		}
+	}
+
+	@Override
+	public void updatePlayer() {
+		// TODO Auto-generated method stub
+		
 	}
 }

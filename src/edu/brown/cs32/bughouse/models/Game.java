@@ -1,8 +1,12 @@
 package edu.brown.cs32.bughouse.models;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 
 
 /**
@@ -13,23 +17,27 @@ import java.util.List;
  */
 
 public class Game extends Model {
-	private List<Player> team1;
-	private List<Player> team2;
+	private Map<Integer, Map<Integer, Player>> players;
 	private int ownerId;
-	List<ChessBoard> chessBoards;
+	Map<Integer,ChessBoard> chessBoards;
 
 	
 	public Game(int id) {
 		super(id);
-		this.team1 = new ArrayList<Player>();
-		this.team2 = new ArrayList<Player>();
-		this.chessBoards = new ArrayList<ChessBoard>();
+		this.players = new HashMap<Integer, Map<Integer, Player>>();
+		this.players.put(1, new HashMap<Integer, Player>());
+		this.players.put(2, new HashMap<Integer, Player>());
+
+		this.chessBoards = new HashMap<Integer,ChessBoard>();
 	}
 	
 	public void addBoard(ChessBoard board) {
-		this.chessBoards.add(board);
+		this.chessBoards.put(board.getId(),board);
 	}
 	
+	public ChessBoard getBoard(int boardId) {
+		return chessBoards.get(boardId);
+	}
 	public void setOwnerId(int ownerId) {
 		this.ownerId = ownerId;
 	}
@@ -40,23 +48,17 @@ public class Game extends Model {
 	
 	public List<Player> getPlayers() {
 		List<Player> toReturn = new ArrayList<Player>();
-		toReturn.addAll(team1);
-		toReturn.addAll(team2);
+		toReturn.addAll(players.get(1).values());
+		toReturn.addAll(players.get(2).values());
 		return toReturn;
 	}
-	
-	public List<Player> getTeam1() {
-		List<Player> toReturn = new ArrayList<Player>(team1);
-		return toReturn;
+	public Collection<Player> getPlayerByTeam(int team) {
+		return players.get(team).values();
 	}
-	public List<Player> getTeam2() {
-		List<Player> toReturn = new ArrayList<Player>(team2);
-		return toReturn;
+	public void addPlayerToTeam(int team, Player p) {
+		players.get(team).put(p.getId(),p);
 	}
-	public void addToTeam1(Player p) {
-		team1.add(p);
-	}
-	public void addToTeam2(Player p) {
-		team2.add(p);
+	public void clearPlayers() {
+		players.clear();
 	}
 }

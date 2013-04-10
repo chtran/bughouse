@@ -7,6 +7,8 @@ public interface Server {
 	
 	void addPlayer(int playerId, int gameId);
 	
+	void startGame(int gameId);
+	
 	void notifyTurn(Socket s);
 	
 	void sendGameList(Socket s);

@@ -22,12 +22,6 @@ public class BughouseClient implements Client{
 	}
 
 	@Override
-	public void updateBoards(ChessBoard[] boards) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public int createGame() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -68,6 +62,55 @@ public class BughouseClient implements Client{
 	public int addNewPlayer(String name) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public int getOwnerId(int gameId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<Integer> createBoards(int gameId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Integer> getBoards(int gameId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isWhite(int playerId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean getBoardId(int playerId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int createChessBoard(int gameId) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void startGame(int gameId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void broadcastMove(int boardId, int from_x, int from_y, int to_x,
+			int to_y) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
