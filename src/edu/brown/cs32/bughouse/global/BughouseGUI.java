@@ -31,15 +31,16 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private JPanel setupGameView(){
 		JPanel game = new JPanel(new BorderLayout());
 		game.add(createBoard(),BorderLayout.CENTER);
-		game.add(new JLabel(" "), BorderLayout.EAST);
-		game.add(new JLabel(" "), BorderLayout.SOUTH);
-		game.add(new JLabel(" "), BorderLayout.NORTH);
+		game.add(new JLabel(" This is the options panel showing information"), BorderLayout.EAST);
+		game.add(new JLabel("This is to show pieces that are available to the player to put down"), BorderLayout.SOUTH);
+		//game.add(new JLabel(" "), BorderLayout.NORTH);
 		return game;
 	}
 	
-	private JPanel createBoard(){
+	private JComponent createBoard(){
+		JTabbedPane boardContainer = new JTabbedPane();
 		JPanel board = new JPanel(new GridLayout(8,8,1,0));
-		board.setPreferredSize(new Dimension(300,300));
+		board.setPreferredSize(new Dimension(400,400));
 		Color current = Color.GRAY;
 		for (int i = 0; i<8;i++){
 			for (int j = 0; j<8;j++){
@@ -63,7 +64,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			}
 			
 		}
-		return board;
+		boardContainer.addTab("Your Game", board);
+		boardContainer.addTab("Other Game", new JLabel("This is the other board"));
+		return boardContainer;
 	}
 	
 	public static void main (String[] argv){
