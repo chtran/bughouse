@@ -69,8 +69,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	
 	/*
 	 * creates the initial board for both the user's game and the user's team
-	 * mate's game. Since the initial state of both boards' are equal there is
-	 * no need to wait for the server to provide information
+	 * mate's game. Needs to check what color the player is playing as to get 
+	 * the correct board
 	 */
 	private JComponent createBoard(){
 		JTabbedPane boardContainer = new JTabbedPane();
