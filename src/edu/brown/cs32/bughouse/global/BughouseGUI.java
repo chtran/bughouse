@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.TransferHandler;
 
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
@@ -186,40 +187,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			for (int i = 0; i<8;i++){
 				for (int j = 0; j<8;j++){
 					JPanel box = new JPanel();
-					box.addMouseListener(new MouseListener(){
-
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							// TODO Stick image to mouse cursor
-							
-							
-							
-						}
-
-						@Override
-						public void mousePressed(MouseEvent e) {
-							// TODO Auto-generated method stub
-					
-						}
-
-						@Override
-						public void mouseReleased(MouseEvent e) {
-							// TODO Auto-generated method stub
-						}
-
-						@Override
-						public void mouseEntered(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void mouseExited(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
-						
-					});
 					if (current == Color.GRAY){
 						box.setBackground(Color.WHITE);
 						current = Color.WHITE;
@@ -249,6 +216,43 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 		private JComponent createPiece(int row, int col){
 			JLabel piece = new JLabel();	
+			piece.setTransferHandler(new TransferHandler("icon"));
+			piece.addMouseListener(new MouseListener(){
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Auto-generated method stub
+					System.out.println("PRessed");
+					JComponent source = (JComponent) e.getSource();
+					TransferHandler dd = source.getTransferHandler();
+					dd.exportAsDrag(source, e,TransferHandler.COPY);
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+			});
 			if (row == 6){
 					piece.setIcon(new ImageIcon(W_PAWN,"pawn"));	
 					return piece;
@@ -293,6 +297,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 				case 4: 
 					if (row ==7){
 						piece.setIcon(new ImageIcon(W_KING,"king")); 
+						return piece;
 					}
 					piece.setIcon(new ImageIcon(B_KING,"king")); // add king sprite
 					break;
