@@ -1,7 +1,29 @@
 package edu.brown.cs32.bughouse.global;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+
+import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 
 /**
@@ -18,9 +40,11 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private static final long serialVersionUID = 1L;
 	private Board userBoard_, otherBoard_;
 	private JTextArea messageBox_,clock_;
+	private BackEnd backend_;
 
 	public BughouseGUI(){
 		super("Bughouse Chess");
+	//	this.backend_ = backend;
 		Container content = this.getContentPane();
 		this.setLayout(new CardLayout());
 		this.setPreferredSize(new Dimension(800,700));
@@ -60,7 +84,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	private JPanel setupGameView(){
 		JPanel game = new JPanel(new BorderLayout());
-		game.add(createBoard(),BorderLayout.CENTER);
+		game.add(createBoard(),BorderLayout.CENTER); 
+		//game.add(createBoard(backend)),BorderLayout.CENTER);
 		game.add(createOptionMenu(), BorderLayout.EAST);
 		game.add(createPieceHolder(), BorderLayout.SOUTH);
 		return game;
@@ -81,7 +106,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		return boardContainer;
 	}
 	
-	/*
+	/*l
 	 * sets up the option menu for users where information gets 
 	 * displayed
 	 */
@@ -97,6 +122,15 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		messageBox_.setEditable(false);
 		messageBox_.setText("Template text");
 		JButton quit  = new JButton("Click me!");
+		quit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO call backend.quit();
+				
+			}
+			
+		});
 		quit.setPreferredSize(new Dimension(100,60));
 		options.add(clock_);
 		options.add(messageBox_);
@@ -133,12 +167,50 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		private static final long serialVersionUID = 1L;
 
 		public Board() {
+			//To DO: get a reference to the backend
 			super(new GridLayout(8,8,1,0));
 			this.setPreferredSize(new Dimension(400,400));
 			Color current = Color.GRAY;
 			for (int i = 0; i<8;i++){
 				for (int j = 0; j<8;j++){
 					JPanel box = new JPanel();
+					if (i<2 || i>5){
+						box.add(createPiece(i,j,0));
+					}
+					box.addMouseListener(new MouseListener(){
+
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							// TODO Stick image to mouse cursor
+							
+							
+							
+						}
+
+						@Override
+						public void mousePressed(MouseEvent e) {
+							// TODO Auto-generated method stub
+					
+						}
+
+						@Override
+						public void mouseReleased(MouseEvent e) {
+							// TODO Auto-generated method stub
+						}
+
+						@Override
+						public void mouseEntered(MouseEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+
+						@Override
+						public void mouseExited(MouseEvent e) {
+							// TODO Auto-generated method stub
+							
+						}
+						
+					});
 					if (current == Color.GRAY){
 						box.setBackground(Color.WHITE);
 						current = Color.WHITE;
@@ -158,6 +230,35 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 				}
 				
 			}
+		}
+		
+		private JComponent createPiece(int row, int col, int color){
+			//TO DO: get the color from the backend to decide which sprite to use
+			JLabel piece = new JLabel();
+			if (row < 1 || row>6){
+				System.out.println("Printing a black sprite");
+				piece.setIcon(new ImageIcon("../../../../img/bughousePNG/48/bb.png")); // add pawn sprite
+			}
+			else {
+				switch(col){
+				case 0: case 7:
+					piece.setIcon(null); // add rook sprite
+				
+				case 1: case 6:
+					piece.setIcon(null); // add knight sprite
+					
+				case 2: case 5:
+					piece.setIcon(null); // add bishop sprite
+					
+				case 3:
+					piece.setIcon(null); // add queen sprite
+				case 4: 
+					piece.setIcon(null); // add king sprite
+				}
+			}
+			return piece;
+				
+			
 		}
 		
 	}
