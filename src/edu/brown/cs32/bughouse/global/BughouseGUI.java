@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -235,7 +236,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			//TO DO: get the color from the backend to decide which sprite to use
 			JLabel piece = new JLabel();
 			if (row < 1 || row>6){
-				piece.setIcon(null); // add pawn sprite
+				System.out.println("Printing a black sprite");
+				piece.setIcon(new ImageIcon("../../../../img/bughousePNG/48/bb.png")); // add pawn sprite
 			}
 			else {
 				switch(col){
