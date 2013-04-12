@@ -165,6 +165,18 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private class Board extends JPanel {
 		
 		private static final long serialVersionUID = 1L;
+		private final java.net.URL W_PAWN = getClass().getResource("img/48/wp.png");
+		private final java.net.URL W_KNIGHT = getClass().getResource("img/48/wn.png");
+		private final java.net.URL W_BISHOP = getClass().getResource("img/48/wb.png");
+		private final java.net.URL W_ROOK = getClass().getResource("img/48/wr.png");
+		private final java.net.URL W_KING = getClass().getResource("img/48/wk.png");
+		private final java.net.URL W_QUEEN = getClass().getResource("img/48/wq.png");
+		private final java.net.URL B_PAWN = getClass().getResource("img/48/bp.png");
+		private final java.net.URL B_KNIGHT = getClass().getResource("img/48/bn.png");
+		private final java.net.URL B_BISHOP = getClass().getResource("img/48/bb.png");
+		private final java.net.URL B_ROOK = getClass().getResource("img/48/br.png");
+		private final java.net.URL B_KING = getClass().getResource("img/48/bk.png");
+		private final java.net.URL B_QUEEN = getClass().getResource("img/48/bq.png");
 
 		public Board() {
 			//To DO: get a reference to the backend
@@ -174,9 +186,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			for (int i = 0; i<8;i++){
 				for (int j = 0; j<8;j++){
 					JPanel box = new JPanel();
-					if (i<2 || i>5){
-						box.add(createPiece(i,j,0));
-					}
 					box.addMouseListener(new MouseListener(){
 
 						@Override
@@ -220,6 +229,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 						current = Color.GRAY;
 					}
 					box.setBorder(null);
+					if (i<2 || i>5){
+						box.add(createPiece(i,j));
+					}
 					this.add(box);
 				}
 				if (current == Color.GRAY){
@@ -232,35 +244,64 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			}
 		}
 		
-		private JComponent createPiece(int row, int col, int color){
-			//TO DO: get the color from the backend to decide which sprite to use
-			JLabel piece = new JLabel();
-			if (row < 1 || row>6){
-				System.out.println("Printing a black sprite");
-				piece.setIcon(new ImageIcon("../../../../img/bughousePNG/48/bb.png")); // add pawn sprite
+	/*
+	 * Helper method which sets up the pieces at the start of the game;
+	 */
+		private JComponent createPiece(int row, int col){
+			JLabel piece = new JLabel();	
+			if (row == 6){
+					piece.setIcon(new ImageIcon(W_PAWN,"pawn"));	
+					return piece;
+			}
+			if (row == 1){
+				piece.setIcon(new ImageIcon(B_PAWN,"pawn"));	
+				return piece;
 			}
 			else {
 				switch(col){
 				case 0: case 7:
-					piece.setIcon(null); // add rook sprite
+					if (row ==7){
+						piece.setIcon(new ImageIcon(W_ROOK,"rook"));
+						return piece;
+					}
+					piece.setIcon(new ImageIcon(B_ROOK,"rook")); // add rook sprite
+					break;
 				
 				case 1: case 6:
-					piece.setIcon(null); // add knight sprite
+					if (row ==7){
+						piece.setIcon(new ImageIcon(W_KNIGHT,"knight"));
+						return piece;
+					}
+					piece.setIcon(new ImageIcon(B_KNIGHT,"knight")); // add knight sprite
+					break;
 					
 				case 2: case 5:
-					piece.setIcon(null); // add bishop sprite
+					if (row ==7){
+						piece.setIcon(new ImageIcon(W_BISHOP,"bishop")); 
+						return piece;
+					}
+					piece.setIcon(new ImageIcon(B_BISHOP,"bishop")); // add bishop sprite
+					break;
 					
 				case 3:
-					piece.setIcon(null); // add queen sprite
+					if (row ==7){
+						piece.setIcon(new ImageIcon(W_QUEEN,"queen"));
+						return piece;
+					}
+					piece.setIcon(new ImageIcon(B_QUEEN,"queen")); // add queen sprite
+					break;
 				case 4: 
-					piece.setIcon(null); // add king sprite
+					if (row ==7){
+						piece.setIcon(new ImageIcon(W_KING,"king")); 
+					}
+					piece.setIcon(new ImageIcon(B_KING,"king")); // add king sprite
+					break;
 				}
 			}
+					
 			return piece;
-				
-			
-		}
 		
+		}
 	}
 
 
