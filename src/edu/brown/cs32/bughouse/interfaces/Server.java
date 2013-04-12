@@ -5,7 +5,7 @@ import java.net.Socket;
 public interface Server {
 	boolean sendMessage(Socket s, long messgae);
 	
-	void addPlayer(int playerId, int gameId);
+	void addPlayerToGame(int playerId, int gameId, int teamNum);
 	
 	void startGame(int gameId);
 	
@@ -16,4 +16,8 @@ public interface Server {
 	void sendPlayerList(Socket s, int gameId);
 	
 	void sendBoard(Socket s, int gameId);
+
+	void addGame(int ownerId);
+
+	void addPlayer(String name);
 }
