@@ -196,9 +196,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 						current = Color.GRAY;
 					}
 					box.setBorder(null);
-					if (i<2 || i>5){
-						box.add(createPiece(i,j));
-					}
+					box.add(createPiece(i, j));
 					this.add(box);
 				}
 				if (current == Color.GRAY){
@@ -261,7 +259,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 				piece.setIcon(new ImageIcon(B_PAWN,"pawn"));	
 				return piece;
 			}
-			else {
+			if (row == 0 || row == 7) {
 				switch(col){
 				case 0: case 7:
 					if (row ==7){
