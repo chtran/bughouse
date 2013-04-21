@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.brown.cs32.bughouse.exceptions.TeamFullException;
-
 
 /**
  * Describing a chess room. I called it room instead of game because there're different states (waiting, playing..) - chtran

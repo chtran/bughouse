@@ -1,4 +1,4 @@
-package edu.brown.cs32.bughouse.global;
+package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -26,7 +26,6 @@ import javax.swing.TransferHandler;
 
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
-import edu.brown.cs32.bughouse.ui.BughouseBoard;
 
 /**
  * 

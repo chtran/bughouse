@@ -1,4 +1,4 @@
-package edu.brown.cs32.bughouse.global;
+package edu.brown.cs32.bughouse.client;
 
 import java.io.IOException;
 import java.net.Socket;
