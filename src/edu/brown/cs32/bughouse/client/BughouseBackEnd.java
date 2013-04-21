@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
@@ -30,6 +32,7 @@ public class BughouseBackEnd implements BackEnd {
 		//from_y = (me.isWhite()) ? from_y :7-from_y;
 
 		ChessPiece captured = me.getCurrentBoard().move(from_x, from_y, to_x, to_y);
+		client.broadcastMove(me.getCurrentBoard().getId(), from_x, from_y, to_x, to_y);
 		if (captured!=null) {
 			me.getTeammate().addPrisoner(captured);
 			if (captured.isKing()) {
@@ -42,19 +45,19 @@ public class BughouseBackEnd implements BackEnd {
 	@Override
 	public void quit() {
 		me.setCurrentGame(null);
-		client.joinGame(me.getId(), 0);
+		client.quit(me.getId());
 	}
 
 	@Override
-	public Player joinServer(String host, int port, String name) throws UnknownHostException, IOException {
-		this.client = new BughouseClient(host,port);
+	public Player joinServer(String host, int port, String name) throws UnknownHostException, IOException, RequestTimedOutException {
+		this.client = new BughouseClient(host,port,this);
 		int playerId = client.addNewPlayer(name);
 		this.me = new Player(playerId,name);
 		return me;
 	}
 
 	@Override
-	public List<Game> getActiveGames() {
+	public List<Game> getActiveGames() throws IOException, RequestTimedOutException {
 		List<Game> games = new ArrayList<Game>();
 		List<Integer> gameIds = client.getGames();
 		for (Integer gameId: gameIds) {
@@ -70,7 +73,7 @@ public class BughouseBackEnd implements BackEnd {
 	
 
 	@Override
-	public void joinGame(Game g) {
+	public void joinGame(Game g) throws IOException, RequestTimedOutException {
 		client.joinGame(me.getId(), g.getId());
 		me.setCurrentGame(g);
 		g.addPlayerToTeam(client.getCurrentTeam(me.getId()), me);
@@ -78,17 +81,16 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public void createGame() {
-		int gameId = client.createGame();
+	public void createGame() throws IOException, RequestTimedOutException {
+		int gameId = client.createGame(me.getId());
 		Game g = new Game(gameId);
 		g.setOwnerId(me.getId());
-		g.addPlayerToTeam(client.getCurrentTeam(me.getId()), me);
+		g.addPlayerToTeam(1, me);
 		me.setCurrentGame(g);
 	}
 
 	@Override
-	public void startGame() {
-		//TODO
+	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
 		Game game = me.getCurrentGame();
 		if (me.getId()==game.getOwnerId()) {
 			client.startGame(game.getId());
@@ -111,7 +113,7 @@ public class BughouseBackEnd implements BackEnd {
 		}
 		
 	}
-	private void updateGame(Game g) {
+	private void updateGame(Game g) throws IOException, RequestTimedOutException {
 		List<Integer> playerIds = client.getPlayers(g.getId());
 		g.clearPlayers();
 		for (int playerId: playerIds) {
@@ -122,7 +124,7 @@ public class BughouseBackEnd implements BackEnd {
 		g.setOwnerId(client.getOwnerId(g.getId()));
 	}
 	@Override
-	public void updateGame() {
+	public void updateGame() throws IOException, RequestTimedOutException {
 		updateGame(me.getCurrentGame());
 	}
 

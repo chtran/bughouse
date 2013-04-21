@@ -7,16 +7,16 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import edu.brown.cs32.bughouse.interfaces.BackEnd;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+
 
 /**
  * The class that communicates with the Server to get map data
  * @author chtran
  *
  */
-public class Client {
+public class ClientSocket{
 	private Socket socket;
-	private BughouseBackEnd backend;
 	private BufferedReader input;
 	private PrintWriter output;
 	private boolean running;
@@ -24,12 +24,11 @@ public class Client {
 	private ResponseReader foreground; //The stream that reads the response from server when the client sends a request
 	private ResponseReader background; //The stream that reads traffic data from server
 
-	public Client(String hostname, int port, BughouseBackEnd backend) throws UnknownHostException, IOException, 
+	public ClientSocket(String hostname, int port) throws UnknownHostException, IOException, 
 	IllegalArgumentException {
 
 		this.socket  = new Socket(hostname, port);
 		System.out.println("Connected to "+hostname+" at "+port);
-		this.backend = backend;
 		this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.output = new PrintWriter(socket.getOutputStream());
 		this.running = true;

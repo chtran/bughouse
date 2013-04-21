@@ -1,0 +1,73 @@
+I. Client requests
+NOTE: All requests and responses are ended by the new line character.
+
+createGame: create new game
+    + Request: createGame\t[userId]\n
+    + Action: 
+        - Create a new game in the server
+        - Set the owner of the game to user_id
+        - Set the current team of user_id to 1
+    + Response: [id]\n
+        the id of the newly created game
+
+getGames: get the list of all the games
+    + Request: getGames\n
+    + Action: None
+    + Response: [gameId1]\n[gameId2]\n....
+
+gameIsActive: check if a game is active
+    + Request: gameIsActive\t[gameId]\n
+    + Action: None
+    + Response: true\n if active, false\n otherwise
+
+getPlayers: get the list of players in a game
+    + Request: getPlayers\t[gameId]\n
+    + Action: None
+    + Response: [userId1]\n[userId2]\n...
+
+getOwnerId: get the id of the owner of a game
+    + Request: getOwnerId\t[gameId]\n
+    + Action: None
+    + Response: [userId]\n
+
+getBoards: get the board id of a game
+    + Request: getBoards\t[gameId]\n
+    + Action: None
+    + Response: [board1Id]\n[board2Id]\n
+
+startGame: start the game
+    + Request: startGame\t[gameId]\n
+    + Action:
+        - Check if there're 4 players in the game
+        - Create two new chess boards
+        - Set the gameId of the 2 newly created boards to the requested gameId (or add the 2 newly created boards to the requested game)
+        - Assign colors to players (1 black and 1 white for each team)
+        - Assign players to boards
+        - Set game's active to false
+    + Response:
+        - "OK\n" if everything went well
+        - "Not ready.\n" if there're fewer than 4 players
+
+addNewPlayer: add a new player
+    + Request: addNewPlayer\t[name]\n
+    + Action: Insert a new player with specific name to the database/hashtable
+    + Response: [playerId]\n
+        the id of the newly created player
+
+getName: get the name of a player
+    + Request: getName\t[playerId]\n
+    + Action: None
+    + Response: [name]\n
+
+isWhite: check the color of of a player
+    + Request: isWhite\t[playerId]\n
+    + Action: None
+    + Response: "false\n" if the player is not playing or the player's color is black. "true\n" otherwise
+
+getCurrentTeam: get the current team of a player
+    + Request: getCurrentTeam\t[playerId]
+    + Action: None
+    + Response: "1\n" or "2\n"
+
+
+        
