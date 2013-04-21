@@ -27,8 +27,8 @@ public interface Client {
 	public boolean isWhite(int playerId) throws IOException, RequestTimedOutException;
 	public int getCurrentTeam(int playerId) throws IOException, RequestTimedOutException;
 	public void joinGame(int playerId, int gameId, int team) throws TeamFullException, IOException, RequestTimedOutException;
-	public boolean getBoardId(int playerId);
-	public void quit(int playerId);
+	public int getBoardId(int playerId) throws IOException, RequestTimedOutException;
+	public void quit(int playerId) throws IOException, RequestTimedOutException;
 	
-	public void broadcastMove(int boardId, int from_x, int from_y, int to_x, int to_y);
+	public void move(int boardId, int from_x, int from_y, int to_x, int to_y) throws IOException, RequestTimedOutException;
 }

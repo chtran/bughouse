@@ -120,21 +120,21 @@ public class BughouseClient implements Client {
 	}
 
 	@Override
-	public boolean getBoardId(int playerId) {
-		// TODO Auto-generated method stub
-		return false;
+	public int getBoardId(int playerId) throws IOException, RequestTimedOutException {
+		String response = socket.getResponse(String.format("getBoardId\t%d\n",playerId));
+		int boardId = Integer.parseInt(response);
+		return boardId;
 	}
 
 	@Override
-	public void broadcastMove(int boardId, int from_x, int from_y, int to_x,
-			int to_y) {
-		// TODO Auto-generated method stub
+	public void move(int boardId, int from_x, int from_y, int to_x,
+			int to_y) throws IOException, RequestTimedOutException {
+		socket.getResponse(String.format("move\t%d\t%d\t%d\t%d\t%d\n", boardId,from_x,from_y,to_x,to_y));
 		
 	}
 	@Override
-	public void quit(int playerId) {
-		// TODO Auto-generated method stub
-		
+	public void quit(int playerId) throws IOException, RequestTimedOutException {
+		socket.getResponse(String.format("quit\t%d\\n", playerId));
 	}
 
 }

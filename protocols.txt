@@ -77,3 +77,26 @@ joinGame: when a player joins a game
     + Response:
         - "OK\n" if everything went well
         - "Full\n" if the room is full
+
+getBoardId: get the current board id of a player
+    + Request: getBoardId\t[playerId]\n
+    + Action: None
+    + Response: [boardId]\n
+
+
+move: move a chesspiece
+    + Request: move\t[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+    + Action:
+        - Move the chess piece in the database/hashmap
+        - broadcast the move to all players in the game
+    + Response:
+        - "OK\n" if everything went well
+
+quit: when a player exit a game
+    + Request: quit\t[playerId]
+    + Action:
+        - Set current gameId of the player to 0 (or null)
+        - Remove the player from the game's player list
+    + Response:
+        - "OK\n" if everything went well
+
