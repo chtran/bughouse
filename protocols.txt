@@ -40,7 +40,7 @@ startGame: start the game
     + Action:
         - Check if there're 4 players in the game
         - Create two new chess boards
-        - Set the gameId of the 2 newly created boards to the requested gameId (or add the 2 newly created boards to the requested game)
+        - Set the gameId of the 2 newly created boards to the requested gameId (or add the 2 newly created boards to the requested game, depending on your implementation)
         - Assign colors to players (1 black and 1 white for each team)
         - Assign players to boards
         - Set game's active to false
@@ -65,9 +65,15 @@ isWhite: check the color of of a player
     + Response: "false\n" if the player is not playing or the player's color is black. "true\n" otherwise
 
 getCurrentTeam: get the current team of a player
-    + Request: getCurrentTeam\t[playerId]
+    + Request: getCurrentTeam\t[playerId]\n
     + Action: None
     + Response: "1\n" or "2\n"
 
 
-        
+joinGame: when a player joins a game
+    + Request: joinGame\t[playerId]\t[gameId]\t[team]\n
+    + Action: 
+        - Set the current game of the requested player to the requested game (or add the player to game's player list, depending on your implementation)
+    + Response:
+        - "OK\n" if everything went well
+        - "Full\n" if the room is full

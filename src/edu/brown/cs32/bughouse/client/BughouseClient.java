@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.interfaces.Client;
 
 public class BughouseClient implements Client {
@@ -111,9 +112,11 @@ public class BughouseClient implements Client {
 	}
 
 	@Override
-	public boolean joinGame(int playerId, int gameId) {
-		// TODO Auto-generated method stub
-		return false;
+	public void joinGame(int playerId, int gameId, int team) throws TeamFullException, IOException, RequestTimedOutException {
+		String response = socket.getResponse(String.format("joinGame\t%d\t%d\t%d\n",playerId,gameId,team));
+		if (response.trim().equals("Full")) {
+			throw new TeamFullException();
+		}
 	}
 
 	@Override

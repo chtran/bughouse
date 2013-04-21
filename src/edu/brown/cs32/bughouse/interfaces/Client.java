@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 
 /**
  * Communicating with the server
@@ -25,7 +26,7 @@ public interface Client {
 	public String getName(int playerId) throws IOException, RequestTimedOutException;
 	public boolean isWhite(int playerId) throws IOException, RequestTimedOutException;
 	public int getCurrentTeam(int playerId) throws IOException, RequestTimedOutException;
-	public boolean joinGame(int playerId, int gameId);
+	public void joinGame(int playerId, int gameId, int team) throws TeamFullException, IOException, RequestTimedOutException;
 	public boolean getBoardId(int playerId);
 	public void quit(int playerId);
 	

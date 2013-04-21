@@ -10,6 +10,7 @@ import java.util.Map;
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
@@ -73,8 +74,8 @@ public class BughouseBackEnd implements BackEnd {
 	
 
 	@Override
-	public void joinGame(Game g) throws IOException, RequestTimedOutException {
-		client.joinGame(me.getId(), g.getId());
+	public void joinGame(Game g, int team) throws IOException, RequestTimedOutException, TeamFullException {
+		client.joinGame(me.getId(), g.getId(), team);
 		me.setCurrentGame(g);
 		g.addPlayerToTeam(client.getCurrentTeam(me.getId()), me);
 
