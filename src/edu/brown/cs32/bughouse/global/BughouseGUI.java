@@ -26,6 +26,7 @@ import javax.swing.TransferHandler;
 
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
+import edu.brown.cs32.bughouse.ui.BughouseBoard;
 
 /**
  * 
@@ -39,7 +40,7 @@ import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 public class BughouseGUI extends JFrame implements FrontEnd{
 
 	private static final long serialVersionUID = 1L;
-	private Board userBoard_, otherBoard_;
+	private BughouseBoard userBoard_, otherBoard_;
 	private JTextArea messageBox_,clock_;
 	private BackEnd backend_;
 
@@ -86,7 +87,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private JPanel setupGameView(){
 		JPanel game = new JPanel(new BorderLayout());
 		game.add(createBoard(),BorderLayout.CENTER); 
-		//game.add(createBoard(backend)),BorderLayout.CENTER);
 		game.add(createOptionMenu(), BorderLayout.EAST);
 		game.add(createPieceHolder(), BorderLayout.SOUTH);
 		return game;
@@ -100,9 +100,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	private JComponent createBoard(){
 		JTabbedPane boardContainer = new JTabbedPane();
-		userBoard_ = new Board();
+		userBoard_ = new BughouseBoard(true);
 		boardContainer.addTab("Your Game", userBoard_);
-		otherBoard_ = new Board();
+		otherBoard_ = new BughouseBoard(false);
 		boardContainer.addTab("Other Game", otherBoard_);
 		return boardContainer;
 	}
@@ -151,161 +151,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	}
 
 	
-	
-	
-	/**
-	 * 
-	 * @author mp42
-	 *	Board class which graphically represents the a current 
-	 *	game with pieces and players. A private class since no 
-	 *	other class except BughouseGUI needs to know about it - might be implemented
-	 *	as its own class which is package private in 
-	 *	the future for separation between BughouseGUI and its content
-	 */
-	
-	private class Board extends JPanel {
-		
-		private static final long serialVersionUID = 1L;
-		private final java.net.URL W_PAWN = getClass().getResource("img/48/wp.png");
-		private final java.net.URL W_KNIGHT = getClass().getResource("img/48/wn.png");
-		private final java.net.URL W_BISHOP = getClass().getResource("img/48/wb.png");
-		private final java.net.URL W_ROOK = getClass().getResource("img/48/wr.png");
-		private final java.net.URL W_KING = getClass().getResource("img/48/wk.png");
-		private final java.net.URL W_QUEEN = getClass().getResource("img/48/wq.png");
-		private final java.net.URL B_PAWN = getClass().getResource("img/48/bp.png");
-		private final java.net.URL B_KNIGHT = getClass().getResource("img/48/bn.png");
-		private final java.net.URL B_BISHOP = getClass().getResource("img/48/bb.png");
-		private final java.net.URL B_ROOK = getClass().getResource("img/48/br.png");
-		private final java.net.URL B_KING = getClass().getResource("img/48/bk.png");
-		private final java.net.URL B_QUEEN = getClass().getResource("img/48/bq.png");
-
-		public Board() {
-			//To DO: get a reference to the backend
-			super(new GridLayout(8,8,1,0));
-			this.setPreferredSize(new Dimension(400,400));
-			Color current = Color.GRAY;
-			for (int i = 0; i<8;i++){
-				for (int j = 0; j<8;j++){
-					JPanel box = new JPanel();
-					if (current == Color.GRAY){
-						box.setBackground(Color.WHITE);
-						current = Color.WHITE;
-					}
-					else {
-						box.setBackground(Color.GRAY);
-						current = Color.GRAY;
-					}
-					box.setBorder(null);
-					box.add(createPiece(i, j));
-					this.add(box);
-				}
-				if (current == Color.GRAY){
-					current = Color.WHITE;
-				}
-				else {
-					current = Color.GRAY;
-				}
-				
-			}
-		}
-		
-	/*
-	 * Helper method which sets up the pieces at the start of the game;
-	 */
-		private JComponent createPiece(int row, int col){
-			JLabel piece = new JLabel();	
-			piece.setTransferHandler(new TransferHandler("icon"));
-			piece.addMouseListener(new MouseListener(){
-
-				@Override
-				public void mouseClicked(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void mousePressed(MouseEvent e) {
-					// TODO Auto-generated method stub
-					System.out.println("PRessed");
-					JComponent source = (JComponent) e.getSource();
-					TransferHandler dd = source.getTransferHandler();
-					dd.exportAsDrag(source, e,TransferHandler.COPY);
-				}
-
-				@Override
-				public void mouseReleased(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void mouseEntered(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void mouseExited(MouseEvent e) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-			});
-			if (row == 6){
-					piece.setIcon(new ImageIcon(W_PAWN,"pawn"));	
-					return piece;
-			}
-			if (row == 1){
-				piece.setIcon(new ImageIcon(B_PAWN,"pawn"));	
-				return piece;
-			}
-			if (row == 0 || row == 7) {
-				switch(col){
-				case 0: case 7:
-					if (row ==7){
-						piece.setIcon(new ImageIcon(W_ROOK,"rook"));
-						return piece;
-					}
-					piece.setIcon(new ImageIcon(B_ROOK,"rook")); // add rook sprite
-					break;
-				
-				case 1: case 6:
-					if (row ==7){
-						piece.setIcon(new ImageIcon(W_KNIGHT,"knight"));
-						return piece;
-					}
-					piece.setIcon(new ImageIcon(B_KNIGHT,"knight")); // add knight sprite
-					break;
-					
-				case 2: case 5:
-					if (row ==7){
-						piece.setIcon(new ImageIcon(W_BISHOP,"bishop")); 
-						return piece;
-					}
-					piece.setIcon(new ImageIcon(B_BISHOP,"bishop")); // add bishop sprite
-					break;
-					
-				case 3:
-					if (row ==7){
-						piece.setIcon(new ImageIcon(W_QUEEN,"queen"));
-						return piece;
-					}
-					piece.setIcon(new ImageIcon(B_QUEEN,"queen")); // add queen sprite
-					break;
-				case 4: 
-					if (row ==7){
-						piece.setIcon(new ImageIcon(W_KING,"king")); 
-						return piece;
-					}
-					piece.setIcon(new ImageIcon(B_KING,"king")); // add king sprite
-					break;
-				}
-			}
-					
-			return piece;
-		
-		}
-	}
 
 
 
