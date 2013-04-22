@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.interfaces.Client;
 
 
 /**
@@ -23,11 +24,12 @@ public class ClientSocket{
 	private Thread receiving;
 	private ResponseReader foreground; //The stream that reads the response from server when the client sends a request
 	private ResponseReader background; //The stream that reads traffic data from server
-
-	public ClientSocket(String hostname, int port) throws UnknownHostException, IOException, 
+	private Client client;
+	public ClientSocket(String hostname, int port, Client client) throws UnknownHostException, IOException, 
 	IllegalArgumentException {
 
 		this.socket  = new Socket(hostname, port);
+		this.client = client;
 		System.out.println("Connected to "+hostname+" at "+port);
 		this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.output = new PrintWriter(socket.getOutputStream());
@@ -49,7 +51,7 @@ public class ClientSocket{
 					String line;
 					try {
 						line = background.readLine();
-						//TODO
+						client.receive(line);
 					} catch (IOException e) {
 						System.out.println("ERROR: IO Error in traffic handling thread");
 						e.printStackTrace();

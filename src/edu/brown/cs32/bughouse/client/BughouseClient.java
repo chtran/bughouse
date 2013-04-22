@@ -8,13 +8,14 @@ import java.util.List;
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
+import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 
 public class BughouseClient implements Client {
-	private BughouseBackEnd backend;
+	private BackEnd backend;
 	private ClientSocket socket;
-	public BughouseClient(String host, int port, BughouseBackEnd backend) throws UnknownHostException, IllegalArgumentException, IOException {
-		this.socket = new ClientSocket(host,port);
+	public BughouseClient(String host, int port, BackEnd backend) throws UnknownHostException, IllegalArgumentException, IOException {
+		this.socket = new ClientSocket(host,port,this);
 		this.backend = backend;
 	}
 	@Override
@@ -136,5 +137,25 @@ public class BughouseClient implements Client {
 	public void quit(int playerId) throws IOException, RequestTimedOutException {
 		socket.getResponse(String.format("quit\t%d\\n", playerId));
 	}
+	@Override
+	public void receive(String message) {
+		String[] splitted = message.split("\t");
+		switch (splitted[1]) {
+			case "move":
+				broadcastMove(message);
+			default:
+				return;
+		}
+	}
 
+	private void broadcastMove(String message) {
+		String[] splitted = message.split("\t");
+		int boardId = Integer.parseInt(splitted[2]);
+		int from_x = Integer.parseInt(splitted[3]);
+		int from_y = Integer.parseInt(splitted[4]);
+		int to_x = Integer.parseInt(splitted[5]);
+		int to_y = Integer.parseInt(splitted[6]);
+		
+		backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
+	}
 }

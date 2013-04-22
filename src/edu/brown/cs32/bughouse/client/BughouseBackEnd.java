@@ -29,9 +29,6 @@ public class BughouseBackEnd implements BackEnd {
 	
 	@Override
 	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException {
-		//to_y = (me.isWhite()) ? to_y :7-to_y;
-		//from_y = (me.isWhite()) ? from_y :7-from_y;
-
 		ChessPiece captured = me.getCurrentBoard().move(from_x, from_y, to_x, to_y);
 		client.move(me.getCurrentBoard().getId(), from_x, from_y, to_x, to_y);
 		if (captured!=null) {
@@ -141,6 +138,6 @@ public class BughouseBackEnd implements BackEnd {
 	@Override
 	public void updatePlayer() {
 		// TODO Auto-generated method stub
-		
 	}
+	
 }
