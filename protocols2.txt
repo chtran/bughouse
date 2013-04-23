@@ -11,6 +11,7 @@ createGame: create new game
         - Create a new game in the server
         - Set the owner of the game to user_id
         - Set the current team of user_id to 1
+        - Broadcast "GAME_CHANGED" to all other clients so they request updated info
     + Response: NEW_GAME:[id]\n
         the id of the newly created game
 
