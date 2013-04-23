@@ -105,6 +105,7 @@ quit: when a player exit a game
         - Set current gameId of the player to 0 (or null)
         - Remove the player from the game's player list
         - Broadcast a quit message to all the players in the room
+        "QUIT:[playerId]\t[gameId]\n"
     + Response:
         - "QUIT_OK:[playerId]\n" if everything went well
 
