@@ -105,7 +105,7 @@ quit: when a player exit a game
         - Set current gameId of the player to 0 (or null)
         - Remove the player from the game's player list
         - Broadcast a quit message to all the players in the room
-        "QUIT:[playerId]\t[gameId]\n"
+        "BROADCAST\tQUIT:[playerId]\t[gameId]\n"
     + Response:
         - "QUIT_OK:[playerId]\n" if everything went well
 
@@ -113,5 +113,9 @@ II. Broadcast: When the server broadcasts a message to the clients
 NOTE: All broadcast messages are prefixed with "broadcast\t"
 
 move: broadcast a move to the players in a game
-    + Message: BROADCAST:move\t[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+    + Message: BROADCAST\t:MOVE\t[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
     + When: after a player made a move
+
+quit:
+    + Message: BROADCAST\tQUIT:[playerId]\t[gameId]\n
+
