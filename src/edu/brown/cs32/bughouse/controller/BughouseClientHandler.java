@@ -1,0 +1,428 @@
+package edu.brown.cs32.bughouse.controller;
+
+import java.io.*;
+import java.net.*;
+import java.util.List;
+
+/**
+ * Encapsulate IO for the given client {@link Socket}, with a group of
+ * other clients in the given {@link ClientPool}.
+ */
+public class BughouseClientHandler extends Thread {
+	private ClientPool m_pool;
+	private Socket m_client;
+	private BufferedReader m_input;
+	private PrintWriter m_output;
+	
+	private ServerData m_data;
+	private PlayerInfo m_playerInfo;
+	
+	/**
+	 * Constructs a {@link BughouseClientHandler} on the given client with the given pool.
+	 * 
+	 * @param pool All clients currently connected to server
+	 * @param client the client to handle
+	 * @throws IOException if the client socket is invalid
+	 * @throws IllegalArgumentException if pool or client is null
+	 */
+	public BughouseClientHandler(ClientPool pool, Socket client, ServerData data) throws IOException {
+		if (pool == null || client == null) {
+			throw new IllegalArgumentException("Cannot accept null arguments.");
+		}
+		
+		m_pool = pool;
+		m_client = client;
+		m_data = data;
+		m_playerInfo = null;
+		
+		//TODO: Set up the buffered reader for the sockets to communicate with
+		m_input = new BufferedReader(new InputStreamReader(client.getInputStream()));
+		m_output = new PrintWriter(client.getOutputStream(), true);
+	}
+	
+	/**
+	 * Send and receive data from the client. The first line received will be
+	 * interpreted as the cleint's user-name.
+	 */
+	public void run() {
+		String msg;
+		String[] headerSplit;
+		String[] msgSplit;
+		int id;
+		try {
+			while (true) {
+				if ((msg = m_input.readLine()) != null) {
+					headerSplit = msg.split(":");
+					if (headerSplit.length == 2) {
+						// ADD_PLAYER:[name]\n
+						if (headerSplit[0].compareTo("ADD_PLAYER") == 0) {
+							addPlayer(headerSplit[1]);
+						// CREATE_GAME:[userId]\n
+						} else if (headerSplit[0].compareTo("CREATE_GAME") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							addGame(id);
+						// GET_GAMES: \n TODO: see if a space works here
+						} else if (headerSplit[0].compareTo("GET_GAMES") == 0) {
+							sendGameList();
+						// GAME_IS_ACTIVE:[gameId]\n
+						} else if (headerSplit[0].compareTo("GAME_IS_ACTIVE") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendIsActive(id);
+						//	GET_PLAYERS:[gameId]\n
+						} else if (headerSplit[0].compareTo("GET_PLAYERS") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendPlayerIdList(id);
+						// GET_OWNER:[gameId]\n
+						} else if (headerSplit[0].compareTo("GET_OWNER") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendGameOwner(id);
+						// GET_BOARDS:[gameId]\n
+						} else if (headerSplit[0].compareTo("GET_BOARDS") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendBoards(id);
+						// START_GAME:[gameId]\n
+						} else if (headerSplit[0].compareTo("START_GAME") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							startGame(id);
+						// GET_NAME:[playerId]\n
+						} else if (headerSplit[0].compareTo("GET_NAME") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendPlayerName(id);
+						// IS_WHITE:[playerId]\n
+						} else if (headerSplit[0].compareTo("IS_WHITE") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendIsWhite(id);
+						// GET_TEAM:[playerId]\n
+						} else if (headerSplit[0].compareTo("GET_TEAM") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendPlayerTeam(id);
+						// JOIN_GAME:[playerId]\t[gameId]\t[team]\n
+						} else if (headerSplit[0].compareTo("JOIN_GAME") == 0) {
+							msgSplit = headerSplit[1].split("\t");
+							if (msgSplit.length == 3) {
+								id = Integer.parseInt(msgSplit[0]);
+								int gameID = Integer.parseInt(msgSplit[1]);
+								int team = Integer.parseInt(msgSplit[2]);
+								addPlayerToGame(id, gameID, team);
+							} else {
+								send("ERROR: JOIN_GAME in wrong format");
+							}
+						// GET_CURRENT_BOARD:[playerId]\n
+						} else if (headerSplit[0].compareTo("GET_CURRENT_BOARD") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendCurrentBoard(id);
+						// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+						} else if (headerSplit[0].compareTo("MOVE") == 0) {
+							msgSplit = headerSplit[1].split("\t");
+							if (msgSplit.length == 5) {
+								id = Integer.parseInt(msgSplit[0]);
+								int toY = Integer.parseInt(msgSplit[4]);
+								move(id, msg);
+							}
+						// QUIT:[playerId]
+						} else if (headerSplit[0].compareTo("QUIT") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							quit(id);
+						} 
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Gets game ID for player associated with this client
+	 * @return ID
+	 */
+	public int getGameId() {
+		return m_playerInfo.getGameId();
+	}
+	
+	/**
+	 * Sends message about chess move to all players in game
+	 * Sends response to player making move:
+	 * "MOVE_OK:[boardId]\n" if everything went well
+       "MOVE_FAILED:[boardId]\n" if move failed
+	 * @param id
+	 * @param msg Message to broadcast to other players in game
+	 */
+	private void move(int id, String msg) {
+		if (m_playerInfo.getBoardId() == id) {
+			int gameID = m_playerInfo.getGameId();
+			if (gameID > 0) {
+				m_pool.broadcastToGame(gameID, msg, this);
+				send("MOVE_OK:" + id + "\n");
+			} else {
+				send("MOVE_FAILED:" + id + "\n");
+			}
+		}
+		send("MOVE_FAILED:" + id + "\n");
+	}
+
+	/**
+	 * Sends id of player's current board
+	 * CURRENT_BOARD:[playerId]\t[boardId]\n
+	 * @param id
+	 */
+	private void sendCurrentBoard(int id) {
+		int board = m_data.getPlayerBoard(id);
+		if (board > 0)
+			send("CURRENT_BOARD:" + id + "\t" + board + "\n");
+		else
+			send("ERROR: board not initialized for player " + id);
+	}
+
+	/**
+	 * Sends "TEAM:[playerId]\t1\n" or "TEAM:[playerId]\t2\n"
+	 * @param id
+	 */
+	private void sendPlayerTeam(int id) {
+		int team = m_data.getPlayerTeam(id);
+		if (team == 1)
+			send("TEAM:" + id + "\t1\n");
+		else if (team == 2)
+			send("TEAM:" + id + "\t2\n");
+		else
+			send("ERROR: player not in game");
+	}
+
+	/**
+	 * Sends true if player is white, false if not
+	 * "IS_WHITE:[playerId]\tfalse\n" if the player is not playing or the player's color is black. 
+       "IS_WHITE:[playerId]\ttrue\n" otherwise
+	 * @param id
+	 */
+	private void sendIsWhite(int id) {
+		if (m_data.isWhite(id))
+			send("IS_WHITE:" + id + "\ttrue\n");
+		else
+			send("IS_WHITE:" + id + "\tfalse\n");
+	}
+
+	/**
+	 * Sends name of player with given ID
+	 * NAME:[playerId]\t[name]\n
+	 * @param id
+	 */
+	private void sendPlayerName(int id) {
+		String name = m_data.getPlayerName(id);
+		if (name == null)
+			send("ERROR: player with id " + id + " does not exist\n");
+		else
+			send("NAME:" + id + "\t" + name + "\n");
+	}
+
+	/**
+	 * Adds player to server data and this handler and sends response to client with id
+	 * @param name Name of new player
+	 */
+	public void addPlayer(String name) {
+		PlayerInfo p = m_data.addPlayer(name);
+		m_playerInfo = p;
+		send("ADDED_PLAYER:" + p.getId() + "\n");
+	}
+
+	/**
+	 * Adds player to game on specified team and establishes player color in game
+	 * Sends "GAME_JOINED:[playerId]\n" if everything went well
+        - "GAME_FULL:[gameId]\n" if the room is full
+	 * @param playerId
+	 * @param gameId
+	 * @param teamNum
+	 */
+	public void addPlayerToGame(int playerId, int gameId, int teamNum) {
+		if (m_data.addPlayerToGame(playerId, gameId, teamNum))
+			send("GAME_JOINED:" + playerId + "\n");
+		else
+			send("GAME_FULL:" + gameId + "\n");
+	}
+	
+	/**
+	 * Creates new game in server data and sends game id to client
+	 * @param ownerId ID of game owner/client
+	 */
+	public void addGame(int ownerId) {
+		int id = m_data.addGame(ownerId);
+		send("NEW_GAME:" + id + "\n");
+		
+//		// send new game option to all other clients
+//		String msg = getGameList();
+//		m_pool.broadcast(msg, this);
+		
+		m_pool.broadcast("GAME_CHANGED", this);
+	}
+
+	/**
+	 * - Check if there are 4 players in the game
+        - Create two new chess boards
+        - Set the gameId of the 2 newly created boards to the requested gameId (or add the 2 newly created boards to the requested game, depending on your implementation)
+        - Assign colors to players (1 black and 1 white for each team)
+        - Assign players to boards
+        - Set game's active to false
+    	+ Response:
+        - "GAME_STARTED:[gameId]\n" if everything went well
+        - "NOT_READY:[gameId]\n" if there're fewer than 4 players
+	 * @param gameId
+	 */
+	public void startGame(int gameId) {
+		// TODO Auto-generated method stub
+		if (m_data.startGame(gameId))
+			send("GAME_STARTED:" + gameId + "\n");
+		else
+			send("NOT_READY:" + gameId + "\n");
+	}
+
+	public void notifyTurn(Socket s) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Sends all available games to client
+	 */
+	public void sendGameList() {
+		String msg = getGameList();
+		send(msg);
+	}
+	
+	/**
+	 * TODO: maybe use this
+	 * GAMES:[gameId] [name1,...,nameN] [name1,...,nameN]\t...\n
+	 * Sends info about all available games to client
+	 */
+	public void sendGamesInfo() {
+		List<GameInfo> games = m_data.getGames();
+		List<String> names = null;
+		String msg = "GAMES:";
+		for (GameInfo e : games) {
+			msg += e.getId() + " ";
+			names = e.getTeamOne();
+			if (names != null) {
+				for (String p : names) {
+					msg += p + ",";
+				}
+				msg = msg.substring(0, msg.length()-1) + " ";
+			} else {
+				msg += "none ";
+			}
+			
+			names = e.getTeamTwo();
+			if (names != null) {
+				for (String p : names){
+					msg += p + ",";
+				}
+				msg = msg.substring(0, msg.length()-1) + "\t";
+			} else {
+				msg += "none\t";
+			}
+		}
+		msg = msg.substring(0, msg.length()-1) + "\n";
+		send(msg);
+	}
+	
+	/**
+	 * Forms string of list of available games
+	 * @return String listing available games
+	 */
+	// TODO: figure out if we need to add teams and players
+	private String getGameList() {
+		List<GameInfo> games = m_data.getGames();
+		String msg = "GAMES:";
+		for (GameInfo e : games) {
+			msg += e.getId() + "\t";
+		}
+		msg = msg.substring(0, msg.length()-1) + "\n";
+		return msg;
+	}
+
+	/**
+	 * Sends PLAYERS:[gameId]\t[userId1]\t[userId2]\n...
+	 * @param gameId
+	 */
+	public void sendPlayerIdList(int gameId) {
+		List<Integer> ids = m_data.getPlayerIds(gameId);
+		String msg = "PLAYERS:" + gameId;
+		
+		for (Integer id : ids) {
+			msg += "\t" + id;
+		}
+		send(msg + "\n");
+	}
+
+	/**
+	 * Sends BOARDS:[gameId]\t[board1Id]\t[board2Id]\n
+	 * @param gameId
+	 */
+	public void sendBoards(int gameId) {
+		String msg = "BOARDS:" + gameId + "\t";
+		int[] boards = m_data.getBoards(gameId);
+		send(msg + boards[0] + "\t" + boards[1] + "\n");
+	}
+	
+	/**
+	 * Sends GAME_ACTIVE:[gameId]\ttrue\n if active, GAME_ACTIVE:[gameId]\tfalse\n otherwise
+	 * @param gameId
+	 */
+	private void sendIsActive(int gameId) {
+		boolean isActive = m_data.gameIsActive(gameId);
+		String msg = "GAME_ACTIVE:" + gameId + "\t";
+		if (isActive)
+			send(msg + "true\n");
+		else
+			send(msg + "false\n");
+	}
+	
+	/**
+	 * Sends GAME_OWNER:[gameId]\t[userId]\n
+	 * @param gameId
+	 */
+	private void sendGameOwner(int gameId) {
+		int owner = m_data.getGameOwner(gameId);
+		send("GAME_OWNER:" + gameId + "\t" + owner + "\n");
+	}
+	
+	/**
+	    - Set current gameId of the player to -1
+        - Remove the player from the game's player list
+        - Broadcast a quit message to all the players in the room
+    + Response:
+        - "QUIT_OK:[playerId]\n" if everything went well
+	 * @param id
+	 */
+	public void quit(int id) {
+		m_data.playerQuit(id);
+		int gameId = m_playerInfo.getGameId();
+		if (gameId > 0) {
+			String msg = "QUIT:" + id + "\t" + gameId + "\n";
+			m_pool.broadcastToGame(gameId, msg, this);
+			send("QUIT_OK:" + id + "\n");
+		}
+	}
+	
+	/**
+	 * Send a string to the client via the socket
+	 * 
+	 * @param message text to send
+	 */
+	public void send(String message) {
+		//TODO: Set up the methods, so it will send the message to the client
+		m_output.println(message);
+		m_output.flush();
+	}
+
+	/**
+	 * Close this socket and its related streams.
+	 * 
+	 * @throws IOException Passed up from socket
+	 */
+	public void kill() throws IOException {
+		//TODO: Close all the streams after the client disconnects.
+		m_input.close();
+		m_output.close();
+		m_client.close();
+	}
+}
+
+

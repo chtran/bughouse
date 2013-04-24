@@ -2,7 +2,7 @@ package edu.brown.cs32.bughouse.interfaces;
 
 import java.net.Socket;
 
-public interface Server {
+public interface ClientHandler {
 	boolean sendMessage(Socket s, long messgae);
 	
 	void addPlayerToGame(int playerId, int gameId, int teamNum);
