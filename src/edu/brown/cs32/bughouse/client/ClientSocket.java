@@ -73,7 +73,7 @@ public class ClientSocket{
 	public synchronized String getResponse(String message) throws IOException, RequestTimedOutException {
 		//System.out.println("Request: [" + message + "]");
 
-		output.println(message);
+		output.print(message);
 		output.flush();
 		String line = foreground.readLine();
 		StringBuilder builder = new StringBuilder();
@@ -112,7 +112,7 @@ public class ClientSocket{
 					String line = input.readLine();
 	        		if (line!=null) {
 	        			//If the first word in the line is traffic then forward it to the background stream
-	        			if(line.split("\t")[0].equals("traffic")) {
+	        			if(line.split("\t")[0].equals("BROADCAST")) {
 	        				//System.out.println("Forwarding to background: "+line);
 	        				background.send(line);
 	        				//System.out.println("received TRAFFIC BOT data: [" + line + "]");

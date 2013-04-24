@@ -18,6 +18,7 @@ createGame: create new game
 getGames: get the list of all the games
     + Request: GET_GAMES:m\n 
     (note: the above one is a little sketchy but I'm not sure if just a space after the colon will work)
+    (chtran note: I think this is still unsafe. Try GET_GAMES:mac20\n)
     + Action: None
     + Response: GAMES:[gameId1]\t[gameId2]\n....
 

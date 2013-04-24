@@ -20,15 +20,18 @@ public class BughouseClient implements Client {
 	}
 	@Override
 	public int createGame(int userId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("createGame\t%s\n",userId));
-		int gameId = Integer.parseInt(response);
+		String response = socket.getResponse(String.format("CREATE_GAME:%s\n",userId));
+		String[] splitted = response.split(":");
+		int gameId = Integer.parseInt(splitted[1].trim());
 		return gameId;
+		
 	}
 
 	@Override
 	public List<Integer> getGames() throws IOException, RequestTimedOutException {
-		String response = socket.getResponse("getGames\n");
-		String[] lines = response.split("\n");
+		String response = socket.getResponse("GET_GAMES:m\n");
+		
+		String[] lines = response.split(":")[1].split("\t");
 		List<Integer> toReturn = new ArrayList<Integer>();
 		for (String line: lines) {
 			int gameId = Integer.parseInt(line);
@@ -39,8 +42,8 @@ public class BughouseClient implements Client {
 
 	@Override
 	public boolean gameIsActive(int gameId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("gameIsActive\t%d\n",gameId));
-		return (response.trim().equals("true"));
+		String response = socket.getResponse(String.format("GAME_IS_ACTIVE:%d\n",gameId));
+		return (response.split("\t")[1].trim().equals("true"));
 	}
 
 	@Override
