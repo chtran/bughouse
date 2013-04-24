@@ -52,6 +52,7 @@ public class BughouseClientHandler extends Thread {
 		try {
 			while (true) {
 				if ((msg = m_input.readLine()) != null) {
+					System.out.println("RECEIVED: " + msg);
 					headerSplit = msg.split(":");
 					if (headerSplit.length == 2) {
 						// ADD_PLAYER:[name]\n
@@ -408,6 +409,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void send(String message) {
 		//TODO: Set up the methods, so it will send the message to the client
+		System.out.println("SENDING: " + message);
 		m_output.println(message);
 		m_output.flush();
 	}

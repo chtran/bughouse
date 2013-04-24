@@ -25,6 +25,7 @@ public class BughouseServer {
 	
 	public void run() throws IOException {
 		m_running = true; 
+		System.out.println("Running server");
 		while(m_running) {
 			try {
 				Socket clientConnection = m_socket.accept();
