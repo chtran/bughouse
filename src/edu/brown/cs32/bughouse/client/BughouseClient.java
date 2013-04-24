@@ -29,7 +29,7 @@ public class BughouseClient implements Client {
 
 	@Override
 	public List<Integer> getGames() throws IOException, RequestTimedOutException {
-		String response = socket.getResponse("GET_GAMES:m\n");
+		String response = socket.getResponse("GET_GAMES:\n");
 		
 		String[] lines = response.split(":")[1].split("\t");
 		List<Integer> toReturn = new ArrayList<Integer>();
@@ -48,7 +48,7 @@ public class BughouseClient implements Client {
 
 	@Override
 	public List<Integer> getPlayers(int gameId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getPlayers\t%d\n",gameId));
+		String response = socket.getResponse(String.format("GET_PLAYERS:%d\n",gameId));
 		String[] lines = response.split("\n");
 		List<Integer> toReturn = new ArrayList<Integer>();
 		for (String line: lines) {
@@ -81,8 +81,8 @@ public class BughouseClient implements Client {
 
 	@Override
 	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException {
-		String response = socket.getResponse(String.format("startGame\t%d\n",gameId));
-		if (response.trim().equals("Not ready.")) {
+		String response = socket.getResponse(String.format("START_GAME:%d\n",gameId));
+		if (response.split(":")[0].trim().equals("NOT_READY")) {
 			throw new GameNotReadyException();
 		}
 		
@@ -90,15 +90,15 @@ public class BughouseClient implements Client {
 
 	@Override
 	public int addNewPlayer(String name) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("addNewPlayer\t%s\n",name));
-		int playerId = Integer.parseInt(response.trim());
+		String response = socket.getResponse(String.format("ADD_PLAYER:%s\n",name));
+		int playerId = Integer.parseInt(response.split(":")[1].trim());
 		return playerId;
 	}
 
 	@Override
 	public String getName(int playerId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getName\t%d\n",playerId));
-		String name = response.trim();
+		String response = socket.getResponse(String.format("GET_NAME:%d\n",playerId));
+		String name = response.split(":")[1].split("\t")[1].trim();
 		return name;
 	}
 
@@ -160,5 +160,12 @@ public class BughouseClient implements Client {
 		int to_y = Integer.parseInt(splitted[6]);
 		
 		backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
+	}
+	
+	public static void main(String[] args) throws UnknownHostException, IllegalArgumentException, IOException, RequestTimedOutException {
+		BughouseClient client = new BughouseClient("localhost",3333,null);
+		client.addNewPlayer("Chau");
+		System.out.println(client.getName(0));
+		
 	}
 }

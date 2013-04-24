@@ -110,13 +110,27 @@ quit: when a player exit a game
     + Response:
         - "QUIT_OK:[playerId]\n" if everything went well
 
+gameOver:
+    + Request: GAME_OVER:[gameId]\t[team]
+    + Action:
+        - Broadcast gameOver message to players in the game
+        - Remove the game from the server
+
 II. Broadcast: When the server broadcasts a message to the clients
 NOTE: All broadcast messages are prefixed with "broadcast\t"
 
 move: broadcast a move to the players in a game
-    + Message: BROADCAST\t:MOVE\t[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+    + Message: BROADCAST:MOVE\t[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
     + When: after a player made a move
 
-quit:
-    + Message: BROADCAST\tQUIT:[playerId]\t[gameId]\n
+join_game:
+    + Message: BROADCAST:JOIN_GAME:[playerId]\t[gameId]\n
+quit_game:
+    + Message: BROADCAST:QUIT_GAME:[playerId]\t[gameId]\n
+
+new_game:
+    + Message: BROADCAST:NEW_GAME:[playerId]\t[gameId]\n
+
+game_start:
+    + Message: BROADCAST:GAME_STARTED:[gameId]\n
 

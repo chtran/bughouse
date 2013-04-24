@@ -19,7 +19,7 @@ public class BughouseServer {
 	public BughouseServer(int port) throws UnknownHostException, IOException {
 		m_socket = new ServerSocket(port);
 		m_data = new ServerData();
-		
+		m_clients = new ClientPool();
 		run();
 	}
 	
