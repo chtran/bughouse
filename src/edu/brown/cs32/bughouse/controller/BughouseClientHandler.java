@@ -153,7 +153,7 @@ public class BughouseClientHandler extends Thread {
 		if (m_playerInfo.getBoardId() == id) {
 			int gameID = m_playerInfo.getGameId();
 			if (gameID > 0) {
-				m_pool.broadcastToGame(gameID, msg, this);
+				m_pool.broadcastToGame(gameID, "BROADCAST:" + msg, this);
 				send("MOVE_OK:" + id + "\n");
 			} else {
 				send("MOVE_FAILED:" + id + "\n");
@@ -396,7 +396,7 @@ public class BughouseClientHandler extends Thread {
 		m_data.playerQuit(id);
 		int gameId = m_playerInfo.getGameId();
 		if (gameId > 0) {
-			String msg = "QUIT:" + id + "\t" + gameId + "\n";
+			String msg = "BROADCAST:QUIT\t" + id + "\t" + gameId + "\n";
 			m_pool.broadcastToGame(gameId, msg, this);
 			send("QUIT_OK:" + id + "\n");
 		}
