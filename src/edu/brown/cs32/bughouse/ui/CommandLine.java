@@ -60,7 +60,9 @@ public class CommandLine implements FrontEnd{
 		for (Player p: g.getPlayerByTeam(2)) System.out.print(p.getName()+" ");
 		System.out.println();
 	}
-	
+	private void joinGame(String line) {
+ 		backend.joinGame(g, team);
+ 	}
  	public void run() throws UnknownHostException, IOException, RequestTimedOutException {
 		System.out.print("Enter your name: ");
 		Scanner stdIn = new Scanner(System.in);
@@ -80,6 +82,9 @@ public class CommandLine implements FrontEnd{
 				case "show_players":
 					showPlayers();
 					break;
+				case "join":
+					joinGame(line);
+					break;
 				case "exit":
 					break;
 				default:
@@ -91,6 +96,7 @@ public class CommandLine implements FrontEnd{
 		backend.shutdown();
 		System.exit(0);
 	}
+ 
 	@Override
 	public void showEndGameMessage() {
 		System.out.println("Game ended.");
