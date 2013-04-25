@@ -354,7 +354,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void sendPlayerIdList(int gameId) {
 		List<Integer> ids = m_data.getPlayerIds(gameId);
-		String msg = "PLAYERS:" + gameId;
+		String msg = Integer.toString(gameId);
 		
 		for (Integer id : ids) {
 			msg += "\t" + id;
