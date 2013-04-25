@@ -16,7 +16,7 @@ public interface BackEnd {
 	public Player joinServer(String host, int port, String name) throws UnknownHostException, IOException, RequestTimedOutException;
 	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException;
 	public List<Game> getActiveGames() throws IOException, RequestTimedOutException;
-	public void joinGame(Game g, int team) throws IOException, RequestTimedOutException, TeamFullException;
+	public void joinGame(int gameId, int team) throws IOException, RequestTimedOutException, TeamFullException;
 	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException;
 	public void createGame() throws IOException, RequestTimedOutException;
 

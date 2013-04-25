@@ -12,7 +12,7 @@ import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
  *
  */
 public class Player extends Model {
-	private Game currentGame;
+	private int currentGame;
 	private final String name;
 	private Set<ChessPiece> prisoners;
 	private Player teammate;
@@ -29,7 +29,7 @@ public class Player extends Model {
 	public String getName() {
 		return this.name;
 	}
-	public Game getCurrentGame() {
+	public int getCurrentGame() {
 		return this.currentGame;
 	}
 	public ChessBoard getCurrentBoard() {
@@ -56,8 +56,8 @@ public class Player extends Model {
 	public void addPrisoner(ChessPiece piece) {
 		this.prisoners.add(piece);
 	}
-	public void setCurrentGame(Game g) {
-		this.currentGame = g;
+	public void setCurrentGame(int gameId) {
+		this.currentGame = gameId;
 	}
 	
 }
