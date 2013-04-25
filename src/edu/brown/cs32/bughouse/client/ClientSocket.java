@@ -54,6 +54,11 @@ public class ClientSocket{
 					} catch (IOException e) {
 						System.out.println("ERROR: IO Error in traffic handling thread");
 						e.printStackTrace();
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					} catch (RequestTimedOutException e) {
+						System.out.println("ERROR: Request timed out in traffic handling thread");
+						e.printStackTrace();
 					}
 				}
 			}

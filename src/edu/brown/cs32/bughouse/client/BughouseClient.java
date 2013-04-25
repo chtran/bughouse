@@ -143,16 +143,56 @@ public class BughouseClient implements Client {
 		socket.getResponse(String.format("QUIT:%d\\n", playerId));
 	}
 	@Override
-	public void receive(String message) {
+	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String[] splitted = message.split("\t");
 		switch (splitted[1]) {
 			case "MOVE":
 				broadcastMove(message);
+				break;
+			case "JOIN_GAME":
+				broadcastJoinGame(message);
+				break;
+			case "QUIT_GAME":
+				broadcastQuitGame(message);
+				break;
+			case "NEW_GAME":
+				broadcastNewGame(message);
+				break;
+			case "GAME_STARTED":
+				broadcastGameStarted(message);
+				break;
 			default:
+				System.out.println("Unknown broadcast message: "+message);
 				return;
 		}
 	}
 
+	private void broadcastGameStarted(String message) {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+
+		System.out.printf("Game #%d has started!\n",splitted[0]);
+	}
+	private void broadcastNewGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		String name = getName(Integer.parseInt(splitted[0]));
+		System.out.printf("%s created game #%d\n",name,splitted[1]);
+	}
+	private void broadcastQuitGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		String name = getName(Integer.parseInt(splitted[0]));
+		System.out.printf("%s quited game #%d\n",name,splitted[1]);
+		
+	}
+	private void broadcastJoinGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		String name = getName(Integer.parseInt(splitted[0]));
+		System.out.printf("%s joined game #%d\n",name,splitted[1]);
+		
+	}
 	private void broadcastMove(String message) {
 		String[] splitted = message.split("\t");
 		int boardId = Integer.parseInt(splitted[2]);
