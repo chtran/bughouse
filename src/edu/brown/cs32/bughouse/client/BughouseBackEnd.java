@@ -34,7 +34,7 @@ public class BughouseBackEnd implements BackEnd {
 		if (captured!=null) {
 			me.getTeammate().addPrisoner(captured);
 			if (captured.isKing()) {
-				frontEnd.showEndGameMessage();
+				client.gameOver(me.getCurrentGame().getId(), client.getCurrentTeam(me.getId()));
 			}
 		}
 	}
@@ -112,6 +112,7 @@ public class BughouseBackEnd implements BackEnd {
 		
 	}
 	private void updateGame(Game g) throws IOException, RequestTimedOutException {
+		
 		List<Integer> playerIds = client.getPlayers(g.getId());
 		g.clearPlayers();
 		for (int playerId: playerIds) {

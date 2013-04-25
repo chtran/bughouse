@@ -14,7 +14,7 @@ import edu.brown.cs32.bughouse.exceptions.TeamFullException;
  */
 public interface Client {
 	
-	//public int createGame(int userId) throws IOException, RequestTimedOutException;
+	public int createGame(int userId) throws IOException, RequestTimedOutException;
 	public List<Integer> getGames() throws IOException, RequestTimedOutException;
 	public boolean gameIsActive(int gameId) throws IOException, RequestTimedOutException;
 	public List<Integer> getPlayers(int gameId) throws IOException, RequestTimedOutException;
@@ -31,7 +31,7 @@ public interface Client {
 	public void quit(int playerId) throws IOException, RequestTimedOutException;
 	
 	public void move(int boardId, int from_x, int from_y, int to_x, int to_y) throws IOException, RequestTimedOutException;
-	
+	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException;
 	public void receive(String message);
 	public void shutdown() throws IOException;
 }

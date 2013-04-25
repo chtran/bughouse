@@ -172,8 +172,11 @@ public class BughouseClient implements Client {
 	}
 	@Override
 	public void shutdown() throws IOException {
-		// TODO Auto-generated method stub
 		socket.kill();
+	}
+	@Override
+	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException {
+		socket.getResponse(String.format("GAME_OVER:%d\t%d",gameId,team));
 	}
 	
 }

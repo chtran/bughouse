@@ -92,11 +92,11 @@ public class ClientSocket{
 	
 	public void kill() throws IOException {
 		running = false;
-		socket.close();
 		input.close();
 		output.close();
 		foreground.close();
 		background.close();
+		socket.close();
 	}
 	/**
 	 * The thread that reads everything from the server and forwards the response to the corresponding stream.
