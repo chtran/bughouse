@@ -234,10 +234,12 @@ public class BughouseClientHandler extends Thread {
 	 * @param teamNum
 	 */
 	public void addPlayerToGame(int playerId, int gameId, int teamNum) {
-		if (m_data.addPlayerToGame(playerId, gameId, teamNum))
+		if (m_data.addPlayerToGame(playerId, gameId, teamNum)) {
 			send("GAME_JOINED\n");
-		else
+			m_pool.broadcast("BROADCAST:JOIN_GAME:" + playerId + "\t" + gameId + "\n", this);
+		} else {
 			send("GAME_FULL\n");
+		}
 	}
 	
 	/**
@@ -252,7 +254,7 @@ public class BughouseClientHandler extends Thread {
 //		String msg = getGameList();
 //		m_pool.broadcast(msg, this);
 		
-		m_pool.broadcast("GAME_CHANGED", this);
+		m_pool.broadcast("BROADCAST:NEW_GAME:" + ownerId + "\t" + id + "\n", this);
 	}
 
 	/**
@@ -273,6 +275,8 @@ public class BughouseClientHandler extends Thread {
 			send("GAME_STARTED:" + gameId + "\n");
 		else
 			send("NOT_READY:" + gameId + "\n");
+		
+		m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
 	}
 
 	public void notifyTurn(Socket s) {
@@ -394,7 +398,7 @@ public class BughouseClientHandler extends Thread {
 		m_data.playerQuit(id);
 		int gameId = m_playerInfo.getGameId();
 		if (gameId > 0) {
-			String msg = "QUIT:" + id + "\t" + gameId + "\n";
+			String msg = "BROADCAST:QUIT_GAME:" + id + "\t" + gameId + "\n";
 			m_pool.broadcastToGame(gameId, msg, this);
 			send("QUIT_OK:" + id + "\n");
 		}
