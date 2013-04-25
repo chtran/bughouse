@@ -170,7 +170,7 @@ public class BughouseClientHandler extends Thread {
 	private void sendCurrentBoard(int id) {
 		int board = m_data.getPlayerBoard(id);
 		if (board > 0)
-			send("CURRENT_BOARD:" + id + "\t" + board + "\n");
+			send(board + "\n");
 		else
 			send("ERROR: board not initialized for player " + id);
 	}
@@ -182,9 +182,9 @@ public class BughouseClientHandler extends Thread {
 	private void sendPlayerTeam(int id) {
 		int team = m_data.getPlayerTeam(id);
 		if (team == 1)
-			send("TEAM:" + id + "\t1\n");
+			send("1\n");
 		else if (team == 2)
-			send("TEAM:" + id + "\t2\n");
+			send("2\n");
 		else
 			send("ERROR: player not in game");
 	}
@@ -197,9 +197,9 @@ public class BughouseClientHandler extends Thread {
 	 */
 	private void sendIsWhite(int id) {
 		if (m_data.isWhite(id))
-			send("IS_WHITE:" + id + "\ttrue\n");
+			send("true\n");
 		else
-			send("IS_WHITE:" + id + "\tfalse\n");
+			send("false\n");
 	}
 
 	/**
@@ -212,7 +212,7 @@ public class BughouseClientHandler extends Thread {
 		if (name == null)
 			send("ERROR: player with id " + id + " does not exist\n");
 		else
-			send("NAME:" + id + "\t" + name + "\n");
+			send(name + "\n");
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class BughouseClientHandler extends Thread {
 	public void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
 		m_playerInfo = p;
-		send("ADDED_PLAYER:" + p.getId() + "\n");
+		send(p.getId() + "\n");
 	}
 
 	/**
@@ -235,9 +235,9 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addPlayerToGame(int playerId, int gameId, int teamNum) {
 		if (m_data.addPlayerToGame(playerId, gameId, teamNum))
-			send("GAME_JOINED:" + playerId + "\n");
+			send("GAME_JOINED\n");
 		else
-			send("GAME_FULL:" + gameId + "\n");
+			send("GAME_FULL\n");
 	}
 	
 	/**
@@ -246,7 +246,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addGame(int ownerId) {
 		int id = m_data.addGame(ownerId);
-		send("NEW_GAME:" + id + "\n");
+		send(id + "\n");
 		
 //		// send new game option to all other clients
 //		String msg = getGameList();
@@ -357,9 +357,8 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	public void sendBoards(int gameId) {
-		String msg = "BOARDS:" + gameId + "\t";
 		int[] boards = m_data.getBoards(gameId);
-		send(msg + boards[0] + "\t" + boards[1] + "\n");
+		send(boards[0] + "\t" + boards[1] + "\n");
 	}
 	
 	/**
@@ -368,11 +367,10 @@ public class BughouseClientHandler extends Thread {
 	 */
 	private void sendIsActive(int gameId) {
 		boolean isActive = m_data.gameIsActive(gameId);
-		String msg = "GAME_ACTIVE:" + gameId + "\t";
 		if (isActive)
-			send(msg + "true\n");
+			send("true\n");
 		else
-			send(msg + "false\n");
+			send("false\n");
 	}
 	
 	/**
@@ -381,7 +379,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	private void sendGameOwner(int gameId) {
 		int owner = m_data.getGameOwner(gameId);
-		send("GAME_OWNER:" + gameId + "\t" + owner + "\n");
+		send(owner + "\n");
 	}
 	
 	/**

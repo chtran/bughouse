@@ -10,9 +10,9 @@ public class ServerData {
 	private Map<Integer, GameInfo> m_games;
 	private Map<Integer, PlayerInfo> m_players;
 
-	private int m_nextBoardId = 0; // increment every time after setting new boardId
-	private int m_nextPlayerId = 0;
-	private int m_nextGameId = 0;
+	private int m_nextBoardId = 1; // increment every time after setting new boardId
+	private int m_nextPlayerId = 1;
+	private int m_nextGameId = 1;
 
 	public ServerData() {
 		m_games = new HashMap<Integer, GameInfo>();

@@ -24,4 +24,6 @@ public interface BackEnd {
 	public void updateGame() throws IOException, RequestTimedOutException;
 	public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y);
 	public void updatePlayer();
+	public Player me();
+	public void shutdown() throws IOException;
 }

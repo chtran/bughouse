@@ -23,7 +23,7 @@ public class BughouseBackEnd implements BackEnd {
 	private Client client;
 	private Player me;
 	private FrontEnd frontEnd;
-	public BughouseBackEnd(FrontEnd frontEnd) {
+	public BughouseBackEnd(FrontEnd frontEnd) throws UnknownHostException, IllegalArgumentException, IOException {
 		this.frontEnd = frontEnd;
 	}
 	
@@ -58,7 +58,7 @@ public class BughouseBackEnd implements BackEnd {
 	public List<Game> getActiveGames() throws IOException, RequestTimedOutException {
 		List<Game> games = new ArrayList<Game>();
 		List<Integer> gameIds = client.getGames();
-		for (Integer gameId: gameIds) {
+		for (int gameId: gameIds) {
 			if (!client.gameIsActive(gameId)) continue;
 			
 			Game g = new Game(gameId);
@@ -134,10 +134,19 @@ public class BughouseBackEnd implements BackEnd {
 			System.out.println("ERROR: Illegal move");
 		}
 	}
-
+	@Override
+	public Player me() {
+		return me;
+	}
 	@Override
 	public void updatePlayer() {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void shutdown() throws IOException {
+		// TODO Auto-generated method stub
+		client.shutdown();
 	}
 	
 }
