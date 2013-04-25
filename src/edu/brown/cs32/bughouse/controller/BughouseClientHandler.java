@@ -54,6 +54,10 @@ public class BughouseClientHandler extends Thread {
 				if ((msg = m_input.readLine()) != null) {
 					System.out.println("RECEIVED: " + msg);
 					headerSplit = msg.split(":");
+					
+					if (msg.compareTo("GET_GAMES:") ==0)
+						sendGameList();
+					
 					if (headerSplit.length == 2) {
 						// ADD_PLAYER:[name]\n
 						if (headerSplit[0].compareTo("ADD_PLAYER") == 0) {
@@ -62,9 +66,6 @@ public class BughouseClientHandler extends Thread {
 						} else if (headerSplit[0].compareTo("CREATE_GAME") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
 							addGame(id);
-						// GET_GAMES: \n TODO: see if a space works here
-						} else if (headerSplit[0].compareTo("GET_GAMES") == 0) {
-							sendGameList();
 						// GAME_IS_ACTIVE:[gameId]\n
 						} else if (headerSplit[0].compareTo("GAME_IS_ACTIVE") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
@@ -334,12 +335,17 @@ public class BughouseClientHandler extends Thread {
 	// TODO: figure out if we need to add teams and players
 	private String getGameList() {
 		List<GameInfo> games = m_data.getGames();
-		String msg = "GAMES:";
-		for (GameInfo e : games) {
-			msg += e.getId() + "\t";
+		String msg = "";
+		
+		if (games.isEmpty()) {
+			return "\n";
+		} else {
+			for (GameInfo e : games) {
+				msg += e.getId() + "\t";
+			}
+			msg = msg.substring(0, msg.length()-1) + "\n";
+			return msg;
 		}
-		msg = msg.substring(0, msg.length()-1) + "\n";
-		return msg;
 	}
 
 	/**
