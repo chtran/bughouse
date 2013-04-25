@@ -115,6 +115,11 @@ gameOver:
         - Broadcast gameOver message to players in the game
         - Remove the game from the server
 
+put:
+    + Request: PUT:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
+    + Action:
+        - Broadcast the above message to "toPlayer"
+
 II. Broadcast: When the server broadcasts a message to the clients
 NOTE: All broadcast messages are prefixed with "broadcast\t"
 
@@ -124,6 +129,7 @@ move: broadcast a move to the players in a game
 
 join_game:
     + Message: BROADCAST:JOIN_GAME:[playerId]\t[gameId]\n
+
 quit_game:
     + Message: BROADCAST:QUIT_GAME:[playerId]\t[gameId]\n
 
@@ -132,4 +138,7 @@ new_game:
 
 game_start:
     + Message: BROADCAST:GAME_STARTED:[gameId]\n
+
+your_turn:
+    + Message: BROADCAST:YOUR_TURN\n
 
