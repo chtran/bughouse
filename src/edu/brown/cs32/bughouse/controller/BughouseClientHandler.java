@@ -78,6 +78,10 @@ public class BughouseClientHandler extends Thread {
 						} else if (headerSplit[0].compareTo("GET_OWNER") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
 							sendGameOwner(id);
+							// GET_OWNER:[gameId]\n
+						} else if (headerSplit[0].compareTo("GET_CURRENT_GAME") == 0) {
+							id = Integer.parseInt(headerSplit[1]);
+							sendCurrentGame(id);
 						// GET_BOARDS:[gameId]\n
 						} else if (headerSplit[0].compareTo("GET_BOARDS") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
@@ -391,7 +395,14 @@ public class BughouseClientHandler extends Thread {
 		int owner = m_data.getGameOwner(gameId);
 		send(owner + "\n");
 	}
-	
+	/**
+	 * Sends GAME_OWNER:[gameId]\t[userId]\n
+	 * @param gameId
+	 */
+	private void sendCurrentGame(int playerId) {
+		int owner = m_data.getCurrentGame(playerId);
+		send(owner + "\n");
+	}
 	/**
 	    - Set current gameId of the player to -1
         - Remove the player from the game's player list
@@ -418,7 +429,7 @@ public class BughouseClientHandler extends Thread {
 	public void send(String message) {
 		//TODO: Set up the methods, so it will send the message to the client
 		System.out.println("SENDING: " + message);
-		m_output.println(message);
+		m_output.print(message);
 		m_output.flush();
 	}
 

@@ -80,6 +80,8 @@ public class BughouseBackEnd implements BackEnd {
 		Game game = me.getCurrentGame();
 		if (me.getId()==game.getOwnerId()) {
 			client.startGame(game.getId());
+		} else {
+			System.out.println("Only the owner can start the game");
 		}
 	}
 	

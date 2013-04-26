@@ -49,10 +49,9 @@ public class ServerData {
 		m_nextGameId++;
 		m_nextBoardId += 2;
 		GameInfo g = new GameInfo(gameId, ownerId, board1Id, board1Id+1);
-		PlayerInfo p = m_players.get(ownerId);
-		g.addPlayer(p, 1);
-		
 		m_games.put(gameId, g);
+		addPlayerToGame(ownerId,gameId,1);
+
 		return gameId;
 	}
 
@@ -200,5 +199,9 @@ public class ServerData {
 			g.resetPlayers();
 			m_games.remove(g);
 		}
+	}
+	
+	public int getCurrentGame(int playerId) {
+		return m_players.get(playerId).getGameId();
 	}
 }

@@ -80,7 +80,7 @@ public class ClientSocket{
 		output.print(message);
 		output.flush();
 		String response="";
-		while(response.isEmpty()) response = foreground.readLine();
+		response = foreground.readLine();
 		/*StringBuilder builder = new StringBuilder();
 		while(!line.isEmpty()) {
 			//System.out.println("line:" +line);
@@ -88,7 +88,7 @@ public class ClientSocket{
 			line = foreground.readLine();
 		}
 		String response = new String(builder);*/
-		System.out.println("Response:"+response+".Size: "+response.length());
+		//System.out.println("Response:"+response+".Size: "+response.length());
 
 		if (response.equals("Request timed out\n")) {
 			System.out.println("Server response timed out");

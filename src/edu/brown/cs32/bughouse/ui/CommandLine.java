@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Scanner;
 
 import edu.brown.cs32.bughouse.client.BughouseBackEnd;
+import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
+import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
@@ -27,9 +29,7 @@ public class CommandLine implements FrontEnd{
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
-			e.printStackTrace();
-		} catch (TeamFullException e) {
-			System.out.println("Team is full");
+			System.out.println("Server timed out.");
 		}
 	}
 	private void showGames() throws IOException, RequestTimedOutException {
@@ -45,7 +45,7 @@ public class CommandLine implements FrontEnd{
 	
 	private void createGame() throws IOException, RequestTimedOutException {
 		backend.createGame();
-		System.out.println("Created new game. You are now in game #"+backend.me().getCurrentGame());
+		System.out.println("Created new game. You are now in game #"+backend.me().getCurrentGame().getId());
 	}
 	
 	private void showPlayers() throws IOException, RequestTimedOutException {
@@ -68,34 +68,67 @@ public class CommandLine implements FrontEnd{
 		backend.joinGame(gameId, team);
 		System.out.printf("Joined game %d on team %d\n",gameId,team);
  	}
- 	public void run() throws UnknownHostException, IOException, RequestTimedOutException, TeamFullException {
+	private void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
+		backend.startGame();
+	}
+	private void move(String line) throws IllegalMoveException, IOException, RequestTimedOutException {
+		String[] splitted = line.split(" ");
+		int from_x = Integer.parseInt(splitted[1]);
+		int from_y = Integer.parseInt(splitted[2]);
+		int to_x = Integer.parseInt(splitted[3]);
+		int to_y = Integer.parseInt(splitted[4]);
+		backend.move(from_x, from_y, to_x, to_y);
+	}
+ 	public void run() throws IOException, RequestTimedOutException {
 		System.out.print("Enter your name: ");
 		Scanner stdIn = new Scanner(System.in);
 		String line = stdIn.nextLine();
+		
 		backend.joinServer(line);
 		System.out.println("Hello "+line);
 		while(!line.equals("exit")) {
-			line = stdIn.nextLine();
-			String type = line.split(" ")[0];
-			switch (type) {
-				case "show_games":
-					showGames();
-					break;
-				case "create_game":
-					createGame();
-					break;
-				case "show_players":
-					showPlayers();
-					break;
-				case "join":
-					joinGame(line);
-					break;
-				case "exit":
-					break;
-				default:
-					System.out.println("Unknown command: "+line);;
+			try {
+				line = stdIn.nextLine();
+				String type = line.split(" ")[0];
+				switch (type) {
+					case "show_games":
+						showGames();
+						break;
+					case "create_game":
+						createGame();
+						break;
+					case "show_players":
+						showPlayers();
+						break;
+					case "join":
+						joinGame(line);
+						break;
+					case "exit":
+						break;
+					case "start_game":
+						startGame();
+						break;
+					case "move":
+						move(line);
+						break;
+					default:
+						System.out.println("Unknown command: "+line);;
+				}
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (RequestTimedOutException e) {
+				System.out.println("ERROR: Request timed out.");
+			} catch (TeamFullException e) {
+				System.out.println("ERROR: Team is full");
+			} catch (GameNotReadyException e) {
+				System.out.println("ERROR: Game not ready");
+			} catch (IllegalMoveException e) {
+				System.out.println("ERROR: Move not legal");
 			}
 		}
+		
 		System.out.println("Bye.");
 		stdIn.close();
 		backend.shutdown();

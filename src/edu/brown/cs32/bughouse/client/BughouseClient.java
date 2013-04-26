@@ -66,7 +66,12 @@ public class BughouseClient implements Client {
 		int ownerId = Integer.parseInt(response);
 		return ownerId;
 	}
-
+	@Override
+	public int getGame(int playerId) throws IOException, RequestTimedOutException {
+		String response = socket.getResponse(String.format("GET_CURRENT_GAME:%d\n",playerId));
+		int gameId = Integer.parseInt(response);
+		return gameId;
+	}
 
 	@Override
 	public List<Integer> getBoards(int gameId) throws IOException, RequestTimedOutException {
@@ -218,11 +223,6 @@ public class BughouseClient implements Client {
 	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException {
 		socket.getResponse(String.format("GAME_OVER:%d\t%d",gameId,team));
 	}
-	@Override
-	public int getGame(int playerId) throws IOException,
-			RequestTimedOutException {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+
 	
 }
