@@ -201,4 +201,13 @@ public class ServerData {
 			m_games.remove(g);
 		}
 	}
+
+	/**
+	 * Returns id of player whose turn is next in game
+	 * @param gameID
+	 */
+	public int getNextTurn(int gameID) {
+		GameInfo g = m_games.get(gameID);
+		return g.getNextTurn();
+	}
 }

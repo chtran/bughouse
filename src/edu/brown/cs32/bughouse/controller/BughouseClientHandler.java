@@ -143,6 +143,14 @@ public class BughouseClientHandler extends Thread {
 	}
 	
 	/**
+	 * Gets player ID for player associated wit this client
+	 * @return ID
+	 */
+	public int getPlayerId() {
+		return m_playerInfo.getId();
+	}
+	
+	/**
 	 * Sends message about chess move to all players in game
 	 * Sends response to player making move:
 	 * "MOVE_OK:[boardId]\n" if everything went well
@@ -156,11 +164,16 @@ public class BughouseClientHandler extends Thread {
 			if (gameID > 0) {
 				m_pool.broadcastToGame(gameID, msg, this);
 				send("MOVE_OK:" + id + "\n");
+				
+				// notify player with next turn
+				int next = m_data.getNextTurn(gameID);
+				m_pool.notifyTurn(next);
 			} else {
 				send("MOVE_FAILED:" + id + "\n");
 			}
+		} else {
+			send("MOVE_FAILED:" + id + "\n");
 		}
-		send("MOVE_FAILED:" + id + "\n");
 	}
 
 	/**
@@ -223,7 +236,9 @@ public class BughouseClientHandler extends Thread {
 	public void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
 		m_playerInfo = p;
-		send(p.getId() + "\n");
+		int id = p.getId();
+		m_pool.addToMap(id, this);
+		send(id + "\n");
 	}
 
 	/**

@@ -8,8 +8,11 @@ public class GameInfo {
 	private boolean m_isActive = true; // default to true because players can join game
 	private Map<Integer, Integer[]> m_boards; // boardId -> [player1ID, player2ID]
 	private int[] m_boardIds;
-	private List<PlayerInfo> m_team1;
-	private List<PlayerInfo> m_team2;
+	private List<PlayerInfo> m_team1; // Team 1: {white, black}
+	private List<PlayerInfo> m_team2; // Team 2: {white, black}
+	
+	// 0 -> Team 1 white, 1 -> Team 2 black, 2 -> Team 1 black, 3 -> Team 2 white
+	private int m_turn = 0;
 
 	public GameInfo(int id, int ownerId, int board1Id, int board2Id) {
 		m_id = id;
@@ -52,7 +55,7 @@ public class GameInfo {
 		boolean isWhite;
 		if (teamNum == 1) {
 			if (m_team1.size() > 0)
-				isWhite = m_team1.get(0).getColor() ? false : true;
+				isWhite = false;
 			else
 				isWhite = true;
 			
@@ -60,7 +63,7 @@ public class GameInfo {
 			m_team1.add(player);
 		} else {
 			if (m_team2.size() > 0)
-				isWhite = m_team2.get(0).getColor() ? false : true;
+				isWhite = false;
 			else
 				isWhite = true;
 			
@@ -189,5 +192,26 @@ public class GameInfo {
 			return 2;
 		else
 			return -1;
+	}
+
+	/**
+	 * Returns playerID of player with next turn
+	 * @return
+	 */
+	public int getNextTurn() {
+		switch (m_turn) {
+			case 0:
+				m_turn++;
+				return m_team1.get(0).getId();
+			case 1:
+				m_turn++;
+				return m_team2.get(1).getId();
+			case 2:
+				m_turn++;
+				return m_team1.get(1).getId();
+			default:
+				m_turn = 0;
+				return m_team2.get(0).getId();
+		}
 	}
 }

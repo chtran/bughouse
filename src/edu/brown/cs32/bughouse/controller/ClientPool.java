@@ -7,12 +7,14 @@ import java.util.*;
  */
 public class ClientPool {
 	private LinkedList<BughouseClientHandler> m_clients;
+	private Map<Integer, BughouseClientHandler> m_clientMap;
 	
 	/**
 	 * Initialize a new {@link ClientPool}.
 	 */
 	public ClientPool() {
 		m_clients = new LinkedList<BughouseClientHandler>();
+		m_clientMap = new HashMap<Integer, BughouseClientHandler>();
 	}
 	
 	/**
@@ -22,6 +24,10 @@ public class ClientPool {
 	 */
 	public synchronized void add(BughouseClientHandler client) {
 		m_clients.add(client);
+	}
+	
+	public synchronized void addToMap(int playerID, BughouseClientHandler client) {
+		m_clientMap.put(playerID, client);
 	}
 	
 	/**
@@ -63,6 +69,15 @@ public class ClientPool {
 			if (client.getGameId() == gameID && sender != null && sender != client)
 				client.send(msg);
 		}
+	}
+	
+	/**
+	 * Sends message notifying next player that it's their turn
+	 * @param playerID
+	 */
+	public synchronized void notifyTurn(int playerID) {
+		BughouseClientHandler client = m_clientMap.get(playerID);
+		client.send("BROADCAST:YOUR_TURN\n");
 	}
 	
 	/**
