@@ -200,8 +200,8 @@ public class BughouseClient implements Client {
 		int from_y = Integer.parseInt(splitted[4]);
 		int to_x = Integer.parseInt(splitted[5]);
 		int to_y = Integer.parseInt(splitted[6]);
-		
-		backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
+		//TODO
+		//backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
 	}
 	
 	public static void main(String[] args) throws UnknownHostException, IllegalArgumentException, IOException, RequestTimedOutException {
@@ -217,6 +217,12 @@ public class BughouseClient implements Client {
 	@Override
 	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException {
 		socket.getResponse(String.format("GAME_OVER:%d\t%d",gameId,team));
+	}
+	@Override
+	public int getGame(int playerId) throws IOException,
+			RequestTimedOutException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 	
 }

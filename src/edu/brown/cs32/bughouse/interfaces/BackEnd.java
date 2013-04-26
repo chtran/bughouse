@@ -13,7 +13,7 @@ import edu.brown.cs32.bughouse.models.Player;
 
 
 public interface BackEnd {
-	public Player joinServer(String host, int port, String name) throws UnknownHostException, IOException, RequestTimedOutException;
+	public Player joinServer(String name) throws UnknownHostException, IOException, RequestTimedOutException;
 	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException;
 	public List<Game> getActiveGames() throws IOException, RequestTimedOutException;
 	public void joinGame(int gameId, int team) throws IOException, RequestTimedOutException, TeamFullException;
@@ -21,9 +21,9 @@ public interface BackEnd {
 	public void createGame() throws IOException, RequestTimedOutException;
 
 	public void quit() throws IOException, RequestTimedOutException;
-	public void updateGame() throws IOException, RequestTimedOutException;
-	public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y);
-	public void updatePlayer();
+	//public void updateGame() throws IOException, RequestTimedOutException;
+	//public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y);
+	//public void updatePlayer();
 	public Player me();
 	public void shutdown() throws IOException;
 }

@@ -68,28 +68,8 @@ public class ChessBoard extends Model {
 		board[x][y]=piece;
 		
 	}
-/*	public ChessBoard getView(boolean isWhite) {
-		if (isWhite) return this;
-		ChessBoard flipped = new ChessBoard(this.getId());
-		for (int i=0; i<8; i++) {
-			ChessPiece temp;
-			temp = flipped.board[0][i];
-			flipped.board[0][i] = flipped.board[7][i];
-			flipped.board[7][i] = temp;
-			
-			temp = board[1][i];
-			flipped.board[1][i] = flipped.board[6][i];
-			flipped.board[6][i] = temp;
-		}
-		return flipped;
-	}*/
 	
-	public void setWhitePlayer(Player p) {
-		this.white = p;
-	}
-	public void setBlackPlayer(Player p) {
-		this.black = p;
-	}
+
 	public Player getWhitePlayer() {
 		return this.white;
 	}

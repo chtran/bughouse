@@ -1,9 +1,10 @@
 package edu.brown.cs32.bughouse.models;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
+import java.util.List;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 
 /**
  * belongsTo: ChessBoard, Room, Server
@@ -12,52 +13,45 @@ import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
  *
  */
 public class Player extends Model {
-	private int currentGame;
-	private final String name;
-	private Set<ChessPiece> prisoners;
-	private Player teammate;
-	private ChessBoard currentBoard;
-	private boolean isWhite;
-	
-	public Player(int id, String name) {
+	public Player(int id) {
 		super(id);
-		this.name = name;
-		this.prisoners = new HashSet<ChessPiece>();
+	}
+	public String getName() throws IOException, RequestTimedOutException {
+		return client.getName(id);
+	}
+	public Game getCurrentGame() throws IOException, RequestTimedOutException {
+		int gameId = client.getGame(id);
+		Game toReturn = new Game(gameId);
+		return toReturn;
 	}
 	
+	public ChessBoard getCurrentBoard() throws IOException, RequestTimedOutException {
+		int boardId = client.getBoardId(id);
+		return new ChessBoard(boardId);
+	}
+
+	public boolean isWhite() throws IOException, RequestTimedOutException {
+		return client.isWhite(id);
+	}
 	
-	public String getName() {
-		return this.name;
-	}
-	public int getCurrentGame() {
-		return this.currentGame;
-	}
-	public ChessBoard getCurrentBoard() {
-		return this.currentBoard;
-	}
-	public Player getTeammate() {
-		return teammate;
-	}
-	public boolean isWhite() {
-		return isWhite;
-	}
-	public void setWhite() {
-		this.isWhite = true;
-	}
-	public void setBlack() {
-		this.isWhite = false;
+	public Player getTeammate() throws IOException, RequestTimedOutException {
+		List<Integer> playerIds = client.getPlayers(client.getGame(id));
+		for (int playerId: playerIds) {
+			if (client.getCurrentTeam(playerId)==client.getCurrentTeam(id))
+				return new Player(playerId);
+		}
+		return null;
 	}
 	public void put(ChessPiece piece, int x, int y) throws IllegalPlacementException {
-		if (prisoners.contains(piece)) throw new IllegalPlacementException();
+		//TODO
+		/*if (prisoners.contains(piece)) throw new IllegalPlacementException();
 		if (currentBoard==null) return;
 		currentBoard.put(piece, x, y);
-		prisoners.remove(piece);
+		prisoners.remove(piece);*/
 	}
 	public void addPrisoner(ChessPiece piece) {
-		this.prisoners.add(piece);
-	}
-	public void setCurrentGame(int gameId) {
-		this.currentGame = gameId;
+		//TODO
+		//this.prisoners.add(piece);
 	}
 	
 }

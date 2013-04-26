@@ -17,14 +17,17 @@ import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 import edu.brown.cs32.bughouse.models.Game;
+import edu.brown.cs32.bughouse.models.Model;
 import edu.brown.cs32.bughouse.models.Player;
 
 public class BughouseBackEnd implements BackEnd {
 	private Client client;
 	private Player me;
 	private FrontEnd frontEnd;
-	public BughouseBackEnd(FrontEnd frontEnd) throws UnknownHostException, IllegalArgumentException, IOException {
+	public BughouseBackEnd(FrontEnd frontEnd,String host, int port) throws UnknownHostException, IllegalArgumentException, IOException {
 		this.frontEnd = frontEnd;
+		this.client = new BughouseClient(host,port,this);
+		Model.setClient(client);
 	}
 	
 	@Override
@@ -34,7 +37,7 @@ public class BughouseBackEnd implements BackEnd {
 		if (captured!=null) {
 			me.getTeammate().addPrisoner(captured);
 			if (captured.isKing()) {
-				client.gameOver(me.getCurrentGame(), client.getCurrentTeam(me.getId()));
+				client.gameOver(me.getCurrentGame().getId(), client.getCurrentTeam(me.getId()));
 			}
 		}
 	}
@@ -42,15 +45,13 @@ public class BughouseBackEnd implements BackEnd {
 
 	@Override
 	public void quit() throws IOException, RequestTimedOutException {
-		me.setCurrentGame(0);
 		client.quit(me.getId());
 	}
 
 	@Override
-	public Player joinServer(String host, int port, String name) throws UnknownHostException, IOException, RequestTimedOutException {
-		this.client = new BughouseClient(host,port,this);
+	public Player joinServer(String name) throws UnknownHostException, IOException, RequestTimedOutException {
 		int playerId = client.addNewPlayer(name);
-		this.me = new Player(playerId,name);
+		this.me = new Player(playerId);
 		return me;
 	}
 
@@ -58,12 +59,8 @@ public class BughouseBackEnd implements BackEnd {
 	public List<Game> getActiveGames() throws IOException, RequestTimedOutException {
 		List<Game> games = new ArrayList<Game>();
 		List<Integer> gameIds = client.getGames();
-		for (int gameId: gameIds) {
-			Game g = new Game(gameId);
-			updateGame(g);
-			g.setOwnerId(client.getOwnerId(gameId));
-			games.add(g);
-		}
+		for (int gameId: gameIds)
+			games.add(new Game(gameId));
 		return games;
 	}
 	
@@ -71,18 +68,11 @@ public class BughouseBackEnd implements BackEnd {
 	@Override
 	public void joinGame(int gameId, int team) throws IOException, RequestTimedOutException, TeamFullException {
 		client.joinGame(me.getId(), gameId, team);
-		//me.setCurrentGame(g);
-		//g.addPlayerToTeam(client.getCurrentTeam(me.getId()), me);
-
 	}
 
 	@Override
 	public void createGame() throws IOException, RequestTimedOutException {
-		int gameId = client.createGame(me.getId());
-		Game g = new Game(gameId);
-		g.setOwnerId(me.getId());
-		g.addPlayerToTeam(1, me);
-		me.setCurrentGame(gameId);
+		client.createGame(me.getId());
 	}
 
 	@Override
@@ -91,56 +81,14 @@ public class BughouseBackEnd implements BackEnd {
 		if (me.getId()==game.getOwnerId()) {
 			client.startGame(game.getId());
 		}
-		List<Integer> chessBoardIds = client.getBoards(game.getId());
-		Map<Integer, ChessBoard> boards = new HashMap<Integer,ChessBoard>();
-		for (int chessBoardId: chessBoardIds) {
-			ChessBoard board = new ChessBoard(chessBoardId);
-			game.addBoard(board);
-			boards.put(chessBoardId, board);
-		}
-		for (Player p: game.getPlayers()) {
-			if (client.isWhite(p.getId())) {
-				p.setWhite();
-				boards.get(client.getBoardId(p.getId())).setWhitePlayer(p);
-			} else {
-				p.setBlack();
-				boards.get(client.getBoardId(p.getId())).setBlackPlayer(p);
-			}
-		}
-		
 	}
-	private void updateGame(Game g) throws IOException, RequestTimedOutException {
-		
-		List<Integer> playerIds = client.getPlayers(g.getId());
-		g.clearPlayers();
-		for (int playerId: playerIds) {
-			String name = client.getName(playerId);
-			Player p = new Player(playerId,name);
-			g.addPlayerToTeam(client.getCurrentTeam(playerId), p);
-		}
-		g.setOwnerId(client.getOwnerId(g.getId()));
-	}
-	@Override
-	public void updateGame() throws IOException, RequestTimedOutException {
-		updateGame(me.getCurrentGame());
-	}
+	
 
-	@Override
-	public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y) {
-		try {
-			me.getCurrentGame().getBoard(boardId).move(from_x, from_y, to_x, to_y);
-		} catch (IllegalMoveException e) {
-			System.out.println("ERROR: Illegal move");
-		}
-	}
 	@Override
 	public Player me() {
 		return me;
 	}
-	@Override
-	public void updatePlayer() {
-		// TODO Auto-generated method stub
-	}
+	
 
 	@Override
 	public void shutdown() throws IOException {

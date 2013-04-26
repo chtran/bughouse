@@ -15,14 +15,10 @@ import edu.brown.cs32.bughouse.models.Player;
 
 public class CommandLine implements FrontEnd{
 	BackEnd backend;
-	String host;
-	int port;
 	List<Game> currentGames;
 	public CommandLine(String host, int port) {
 		try {
-			this.backend = new BughouseBackEnd(this);
-			this.host = host;
-			this.port = port;
+			this.backend = new BughouseBackEnd(this,host,port);
 			this.run();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -49,20 +45,20 @@ public class CommandLine implements FrontEnd{
 	
 	private void createGame() throws IOException, RequestTimedOutException {
 		backend.createGame();
-		System.out.println("Created new game. You are now in game #"+backend.me().getCurrentGame().getId());
+		System.out.println("Created new game. You are now in game #"+backend.me().getCurrentGame());
 	}
 	
-	private void showPlayers() {
+	private void showPlayers() throws IOException, RequestTimedOutException {
 		showGame(backend.me().getCurrentGame());
 	}
 	
-	private void showGame(Game g) {
+	private void showGame(Game g) throws IOException, RequestTimedOutException {
 		System.out.println("Game #"+g.getId());
 		System.out.print("Team 1: ");
-		for (Player p: g.getPlayerByTeam(1)) System.out.print(p.getName()+" ");
+		for (Player p: g.getPlayersByTeam(1)) System.out.print(p.getName()+" ");
 		System.out.println();
 		System.out.print("Team 2: ");
-		for (Player p: g.getPlayerByTeam(2)) System.out.print(p.getName()+" ");
+		for (Player p: g.getPlayersByTeam(2)) System.out.print(p.getName()+" ");
 		System.out.println();
 	}
 	private void joinGame(String line) throws IOException, RequestTimedOutException, TeamFullException {
@@ -76,7 +72,7 @@ public class CommandLine implements FrontEnd{
 		System.out.print("Enter your name: ");
 		Scanner stdIn = new Scanner(System.in);
 		String line = stdIn.nextLine();
-		backend.joinServer(host, port, line);
+		backend.joinServer(line);
 		System.out.println("Hello "+line);
 		while(!line.equals("exit")) {
 			line = stdIn.nextLine();

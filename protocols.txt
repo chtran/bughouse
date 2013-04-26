@@ -1,42 +1,49 @@
 I. Client requests: when a client sends a request to the server and the server responds
-NOTE: All requests and responses are ended by the new line character.
+NOTE: All requests and responses are ended by the new line character. 
+
+Mac10 note: changed all new line characters within one request or response to tabs.
+Also changed requests regarding specific games or players to include the game or player id in response
+in case multiple requests are sent in quick succession.
 
 createGame: create new game
-    + Request: createGame\t[userId]\n
+    + Request: CREATE_GAME:[userId]\n
     + Action: 
         - Create a new game in the server
         - Set the owner of the game to user_id
         - Set the current team of user_id to 1
+        - Broadcast "GAME_CHANGED" to all other clients so they request updated info
     + Response: [id]\n
         the id of the newly created game
 
 getGames: get the list of all the games
-    + Request: getGames\n
+    + Request: GET_GAMES:m\n 
+    (note: the above one is a little sketchy but I'm not sure if just a space after the colon will work)
+    (chtran note: I think this is still unsafe. Try GET_GAMES:mac20\n)
     + Action: None
-    + Response: [gameId1]\n[gameId2]\n....
+    + Response: [gameId1]\t[gameId2]\n....
 
 gameIsActive: check if a game is active
-    + Request: gameIsActive\t[gameId]\n
+    + Request: GAME_IS_ACTIVE:[gameId]\n
     + Action: None
     + Response: true\n if active, false\n otherwise
 
 getPlayers: get the list of players in a game
-    + Request: getPlayers\t[gameId]\n
+    + Request: GET_PLAYERS:[gameId]\n
     + Action: None
-    + Response: [userId1]\n[userId2]\n...
+    + Response: [userId1]\t[userId2]\n...
 
 getOwnerId: get the id of the owner of a game
-    + Request: getOwnerId\t[gameId]\n
+    + Request: GET_OWNER:[gameId]\n
     + Action: None
     + Response: [userId]\n
 
 getBoards: get the board id of a game
-    + Request: getBoards\t[gameId]\n
+    + Request: GET_BOARDS:[gameId]\n
     + Action: None
-    + Response: [board1Id]\n[board2Id]\n
+    + Response: [board1Id]\t[board2Id]\n
 
 startGame: start the game
-    + Request: startGame\t[gameId]\n
+    + Request: START_GAME:[gameId]\n
     + Action:
         - Check if there're 4 players in the game
         - Create two new chess boards
@@ -45,66 +52,93 @@ startGame: start the game
         - Assign players to boards
         - Set game's active to false
     + Response:
-        - "OK\n" if everything went well
-        - "Not ready.\n" if there're fewer than 4 players
+        - "GAME_STARTED:[gameId]\n" if everything went well
+        - "NOT_READY:[gameId]\n" if there're fewer than 4 players
 
 addNewPlayer: add a new player
-    + Request: addNewPlayer\t[name]\n
+    + Request: ADD_PLAYER:[name]\n
     + Action: Insert a new player with specific name to the database/hashtable
     + Response: [playerId]\n
         the id of the newly created player
 
 getName: get the name of a player
-    + Request: getName\t[playerId]\n
+    + Request: GET_NAME:[playerId]\n
     + Action: None
     + Response: [name]\n
 
 isWhite: check the color of of a player
-    + Request: isWhite\t[playerId]\n
+    + Request: IS_WHITE:[playerId]\n
     + Action: None
-    + Response: "false\n" if the player is not playing or the player's color is black. "true\n" otherwise
+    + Response: "false\n" if the player is not playing or the player's color is black. 
+                "true\n" otherwise
 
 getCurrentTeam: get the current team of a player
-    + Request: getCurrentTeam\t[playerId]\n
+    + Request: GET_TEAM:[playerId]\n
     + Action: None
     + Response: "1\n" or "2\n"
 
-
 joinGame: when a player joins a game
-    + Request: joinGame\t[playerId]\t[gameId]\t[team]\n
+    + Request: JOIN_GAME:[playerId]\t[gameId]\t[team]\n
     + Action: 
         - Set the current game of the requested player to the requested game (or add the player to game's player list, depending on your implementation)
     + Response:
-        - "OK\n" if everything went well
-        - "Full\n" if the room is full
+        - "GAME_JOINED\n" if everything went well
+        - "GAME_FULL\n" if the room is full
 
 getBoardId: get the current board id of a player
-    + Request: getBoardId\t[playerId]\n
+    + Request: GET_CURRENT_BOARD:[playerId]\n
     + Action: None
     + Response: [boardId]\n
 
-
 move: move a chesspiece
-    + Request: move\t[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+    + Request: MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
     + Action:
         - Move the chess piece in the database/hashmap
         - broadcast the move to all players in the game
     + Response:
-        - "OK\n" if everything went well
+        - "MOVE_OK:[boardId]\n" if everything went well
+        - "MOVE_FAILED:[boardId]\n" if move failed
 
 quit: when a player exit a game
-    + Request: quit\t[playerId]
+    + Request: QUIT:[playerId]
     + Action:
         - Set current gameId of the player to 0 (or null)
         - Remove the player from the game's player list
         - Broadcast a quit message to all the players in the room
+        "BROADCAST\tQUIT:[playerId]\t[gameId]\n"
     + Response:
-        - "OK\n" if everything went well
+        - "QUIT_OK:[playerId]\n" if everything went well
+
+gameOver:
+    + Request: GAME_OVER:[gameId]\t[team]
+    + Action:
+        - Broadcast gameOver message to players in the game
+        - Remove the game from the server
+
+put:
+    + Request: PUT:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
+    + Action:
+        - Broadcast the above message to "toPlayer"
 
 II. Broadcast: When the server broadcasts a message to the clients
 NOTE: All broadcast messages are prefixed with "broadcast\t"
 
 move: broadcast a move to the players in a game
-    + Message: broadcast\tmove\t[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+    + Message: BROADCAST:MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
     + When: after a player made a move
+
+join_game:
+    + Message: BROADCAST:JOIN_GAME:[playerId]\t[gameId]\n
+
+quit_game:
+    + Message: BROADCAST:QUIT_GAME:[playerId]\t[gameId]\n
+
+new_game:
+    + Message: BROADCAST:NEW_GAME:[playerId]\t[gameId]\n
+
+game_start:
+    + Message: BROADCAST:GAME_STARTED:[gameId]\n
+
+your_turn:
+    + Message: BROADCAST:YOUR_TURN\n
 

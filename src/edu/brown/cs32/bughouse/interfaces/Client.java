@@ -14,14 +14,14 @@ import edu.brown.cs32.bughouse.exceptions.TeamFullException;
  */
 public interface Client {
 	
-	public int createGame(int userId) throws IOException, RequestTimedOutException;
+	public int createGame(int playerId) throws IOException, RequestTimedOutException;
 	public List<Integer> getGames() throws IOException, RequestTimedOutException;
 	public boolean gameIsActive(int gameId) throws IOException, RequestTimedOutException;
 	public List<Integer> getPlayers(int gameId) throws IOException, RequestTimedOutException;
 	public int getOwnerId(int gameId) throws IOException, RequestTimedOutException;
 	public List<Integer> getBoards(int gameId) throws IOException, RequestTimedOutException;
 	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException;
-	
+	public int getGame(int playerId) throws IOException, RequestTimedOutException;
 	public int addNewPlayer(String name) throws IOException, RequestTimedOutException;
 	public String getName(int playerId) throws IOException, RequestTimedOutException;
 	public boolean isWhite(int playerId) throws IOException, RequestTimedOutException;

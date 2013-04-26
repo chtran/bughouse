@@ -1,10 +1,10 @@
 package edu.brown.cs32.bughouse.models;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 
 
 /**
@@ -15,48 +15,33 @@ import java.util.Map;
  */
 
 public class Game extends Model {
-	private Map<Integer, Map<Integer, Player>> players;
-	private int ownerId;
-	Map<Integer,ChessBoard> chessBoards;
-
-	
 	public Game(int id) {
 		super(id);
-		this.players = new HashMap<Integer, Map<Integer, Player>>();
-		this.players.put(1, new HashMap<Integer, Player>());
-		this.players.put(2, new HashMap<Integer, Player>());
-
-		this.chessBoards = new HashMap<Integer,ChessBoard>();
+	}
+	public int getOwnerId() throws IOException, RequestTimedOutException {
+		return client.getOwnerId(id);
 	}
 	
-	public void addBoard(ChessBoard board) {
-		this.chessBoards.put(board.getId(),board);
-	}
-	
-	public ChessBoard getBoard(int boardId) {
-		return chessBoards.get(boardId);
-	}
-	public void setOwnerId(int ownerId) {
-		this.ownerId = ownerId;
-	}
-
-	public int getOwnerId() {
-		return ownerId;
-	}
-	
-	public List<Player> getPlayers() {
+	public List<Player> getPlayers() throws IOException, RequestTimedOutException {
 		List<Player> toReturn = new ArrayList<Player>();
-		toReturn.addAll(players.get(1).values());
-		toReturn.addAll(players.get(2).values());
+		List<Integer> playerIds = client.getPlayers(id);
+		for (int playerId: playerIds)
+			toReturn.add(new Player(playerId));
 		return toReturn;
 	}
-	public Collection<Player> getPlayerByTeam(int team) {
-		return players.get(team).values();
+	
+	public List<ChessBoard> getBoards() throws IOException, RequestTimedOutException {
+		List<ChessBoard> toReturn = new ArrayList<ChessBoard>();
+		List<Integer> boardIds = client.getBoards(id);
+		for (int boardId: boardIds)
+			toReturn.add(new ChessBoard(boardId));
+		return toReturn;
 	}
-	public void addPlayerToTeam(int team, Player p) {
-		players.get(team).put(p.getId(),p);
-	}
-	public void clearPlayers() {
-		players.clear();
+	public List<Player> getPlayersByTeam(int team) throws IOException, RequestTimedOutException {
+		List<Player> toReturn = new ArrayList<Player>();
+		List<Integer> playerIds = client.getPlayers(id);
+		for (int playerId: playerIds)
+			if (client.getGame(playerId)==team) toReturn.add(new Player(playerId));
+		return toReturn;
 	}
 }
