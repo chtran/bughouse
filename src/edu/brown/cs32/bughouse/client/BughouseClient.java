@@ -212,8 +212,7 @@ public class BughouseClient implements Client {
 		int from_y = Integer.parseInt(splitted[4]);
 		int to_x = Integer.parseInt(splitted[5]);
 		int to_y = Integer.parseInt(splitted[6]);
-		//TODO
-		//backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
+		backend.broadcastedMove(boardId, from_x, from_y, to_x, to_y);
 	}
 	private void addPrisoner(String message) throws IOException, RequestTimedOutException {
 		String body = message.split(":")[2];

@@ -134,5 +134,31 @@ public class ChessPiece extends Model {
 		return (this.type==KING);
 	}
 
+	@Override
+	public String toString() {
+		String toReturn="";
+		switch(type) {
+		case 1:
+			toReturn+="P";
+			break;
+		case 2:
+			toReturn+="K";
+			break;
+		case 3:
+			toReturn+="B";
+			break;
+		case 4:
+			toReturn+="R";
+			break;
+		case 5:
+			toReturn+="Q";
+			break;
+		case 6:
+			toReturn+="X";
+			break;
+		}
+		toReturn+= isWhite() ? "[W]" : "[B]";
+		return toReturn;
+	}
 	
 }
