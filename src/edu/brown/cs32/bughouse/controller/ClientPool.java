@@ -75,9 +75,9 @@ public class ClientPool {
 	 * Sends message notifying next player that it's their turn
 	 * @param playerID
 	 */
-	public synchronized void notifyTurn(int playerID) {
+	public synchronized void sendToPlayer(int playerID, String msg) {
 		BughouseClientHandler client = m_clientMap.get(playerID);
-		client.send("BROADCAST:YOUR_TURN\n");
+		client.send(msg);
 	}
 	
 	/**

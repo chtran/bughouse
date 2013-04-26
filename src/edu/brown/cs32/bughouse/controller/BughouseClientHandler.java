@@ -125,7 +125,14 @@ public class BughouseClientHandler extends Thread {
 						} else if (headerSplit[0].compareTo("QUIT") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
 							quit(id);
-						} 
+						// PUT:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
+						} else if (headerSplit[0].compareTo("PUT") == 0) {
+							msgSplit = headerSplit[1].split("\t");
+							if (msgSplit.length == 3) {
+								id = Integer.parseInt(msgSplit[1]);
+								m_pool.sendToPlayer(id, msg);
+							}
+						}
 					}
 				}
 			}
@@ -133,7 +140,7 @@ public class BughouseClientHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Gets game ID for player associated with this client
 	 * @return ID
@@ -167,7 +174,7 @@ public class BughouseClientHandler extends Thread {
 				
 				// notify player with next turn
 				int next = m_data.getNextTurn(gameID);
-				m_pool.notifyTurn(next);
+				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			} else {
 				send("MOVE_FAILED:" + id + "\n");
 			}
