@@ -3,9 +3,11 @@ package edu.brown.cs32.bughouse.ui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -28,6 +30,8 @@ public class BughouseBoard extends JPanel {
 	private final java.net.URL B_KING = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bk.png");
 	private final java.net.URL B_QUEEN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bq.png");
 	private boolean isManipulable_;
+	private JLabel source_, current_;
+	private Icon piece_;
 
 	public BughouseBoard(boolean isManipulable){
 		super(new GridLayout(8,8,1,0));
@@ -46,7 +50,7 @@ public class BughouseBoard extends JPanel {
 					current = Color.GRAY;
 				}
 				box.setBorder(null);
-				box.add(createPiece(i, j));
+				box.add(this.createPiece(i,j));
 				this.add(box);
 			}
 			if (current == Color.GRAY){
@@ -58,54 +62,18 @@ public class BughouseBoard extends JPanel {
 			
 		}
 	}
-	
-	
-	private void setManipulable(JComponent piece){
-		piece.setTransferHandler(new TransferHandler("icon"));
-		piece.addMouseListener(new MouseListener(){
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				System.out.println("PRessed");
-				JComponent source = (JComponent) e.getSource();
-				TransferHandler dd = source.getTransferHandler();
-				dd.exportAsDrag(source, e,TransferHandler.COPY);
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
-	}
 	
 /*
  * Helper method which sets up the pieces at the start of the game;
  */
-	private JComponent createPiece(int row, int col){
+	private JLabel createPiece(int row, int col){
 		JLabel piece = new JLabel();
-		if (isManipulable_){ this.setManipulable(piece);}
+		piece.setPreferredSize(new Dimension(50,50));
+		if (isManipulable_){
+			piece.addMouseListener(new UserInputListener());
+
+		}
 		if (row == 6){
 				piece.setIcon(new ImageIcon(W_PAWN,"pawn"));	
 				return piece;
@@ -156,9 +124,50 @@ public class BughouseBoard extends JPanel {
 				break;
 			}
 		}
-				
 		return piece;
+		
+	}
 	
+	private class UserInputListener implements MouseListener {
+		
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			current_ = (JLabel) arg0.getSource();
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			source_  = (JLabel) arg0.getSource();
+			piece_ = source_.getIcon();
+			System.out.println("Original x "+arg0.getX()+" "+arg0.getY());
+			System.out.println("Original x "+arg0.getLocationOnScreen().getX()+" "+arg0.getLocationOnScreen().getY());
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			if (source_ != null && (!(source_.equals(current_)))){
+				System.out.println("Dest x "+current_.getX()+" "+current_.getY());
+				current_.setIcon(piece_);
+				source_.setIcon(null);
+			}
+		}
+		
 	}
 	
 }
