@@ -29,7 +29,8 @@ public interface Client {
 	public void joinGame(int playerId, int gameId, int team) throws TeamFullException, IOException, RequestTimedOutException;
 	public int getBoardId(int playerId) throws IOException, RequestTimedOutException;
 	public void quit(int playerId) throws IOException, RequestTimedOutException;
-	
+	public void pass(int fromId, int toId, int chessPieceType) throws IOException, RequestTimedOutException;
+	public void put(int chessPieceType, int color, int x, int y) throws IOException, RequestTimedOutException;
 	public void move(int boardId, int from_x, int from_y, int to_x, int to_y) throws IOException, RequestTimedOutException;
 	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException;
 	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException;

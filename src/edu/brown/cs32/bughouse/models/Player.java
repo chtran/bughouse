@@ -10,7 +10,6 @@ import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
  * belongsTo: ChessBoard, Room, Server
  * hasMany: ChessPieces
  * @author chtran
- *
  */
 public class Player extends Model {
 	public Player(int id) {
@@ -49,9 +48,8 @@ public class Player extends Model {
 		currentBoard.put(piece, x, y);
 		prisoners.remove(piece);*/
 	}
-	public void addPrisoner(ChessPiece piece) {
-		//TODO
-		//this.prisoners.add(piece);
+	public void pass(ChessPiece piece) throws IOException, RequestTimedOutException {
+		client.pass(id, getTeammate().getId(), piece.getType());
 	}
 	
 }

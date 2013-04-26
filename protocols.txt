@@ -115,10 +115,15 @@ gameOver:
         - Broadcast gameOver message to players in the game
         - Remove the game from the server
 
-put:
-    + Request: PUT:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
+pass:
+    + Request: PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
     + Action:
-        - Broadcast the above message to "toPlayer"
+        - Broadcast the ADD_PRISONER message to toPlayer
+
+put:
+    + Request: put:[chessPieceType]\t[chessPieceColor]\t[x_position]\t[y_position]
+    + Action:
+        - Broadcast the above message to players in the game
 
 II. Broadcast: When the server broadcasts a message to the clients
 NOTE: All broadcast messages are prefixed with "broadcast\t"
@@ -141,4 +146,7 @@ game_start:
 
 your_turn:
     + Message: BROADCAST:YOUR_TURN\n
+
+add_prisoner:
+    + Message: BROADCAST:ADD_PRISONER:[playerId]\t[chessPieceType]\n
 
