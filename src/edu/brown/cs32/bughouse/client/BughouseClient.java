@@ -166,6 +166,12 @@ public class BughouseClient implements Client {
 			case "GAME_STARTED":
 				broadcastGameStarted(message);
 				break;
+			case "YOUR_TURN":
+				backend.notifyTurn();
+				break;
+			case "ADD_PRISONER":
+				addPrisoner(message);
+				break;
 			default:
 				System.out.println("Unknown broadcast message: "+message);
 				return;
@@ -199,7 +205,8 @@ public class BughouseClient implements Client {
 		
 	}
 	private void broadcastMove(String message) {
-		String[] splitted = message.split("\t");
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
 		int boardId = Integer.parseInt(splitted[2]);
 		int from_x = Integer.parseInt(splitted[3]);
 		int from_y = Integer.parseInt(splitted[4]);
@@ -208,13 +215,14 @@ public class BughouseClient implements Client {
 		//TODO
 		//backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
 	}
-	
-	public static void main(String[] args) throws UnknownHostException, IllegalArgumentException, IOException, RequestTimedOutException {
-		BughouseClient client = new BughouseClient("localhost",3333,null);
-		client.addNewPlayer("Chau");
-		System.out.println(client.getName(0));
-		
+	private void addPrisoner(String message) throws IOException, RequestTimedOutException {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		int playerId = Integer.parseInt(splitted[0]);
+		int chessPieceType = Integer.parseInt(splitted[1]);
+		backend.notifyNewPrisoner(playerId,chessPieceType);
 	}
+	
 	@Override
 	public void shutdown() throws IOException {
 		socket.kill();
@@ -222,6 +230,14 @@ public class BughouseClient implements Client {
 	@Override
 	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException {
 		socket.getResponse(String.format("GAME_OVER:%d\t%d",gameId,team));
+	}
+	@Override
+	public void pass(int fromId, int toId, int chessPieceType) throws IOException, RequestTimedOutException {
+		socket.getResponse(String.format("PASS:%d\t%d\t%d", fromId, toId, chessPieceType));
+	}
+	@Override
+	public void put(int chessPieceType, int color, int x, int y) throws IOException, RequestTimedOutException {
+		socket.getResponse(String.format("PUT:%d\t%d\t%d\t%d", chessPieceType, color, x,y));
 	}
 
 	

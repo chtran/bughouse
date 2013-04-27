@@ -5,7 +5,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
@@ -14,7 +13,6 @@ import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
-import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 import edu.brown.cs32.bughouse.models.Game;
 import edu.brown.cs32.bughouse.models.Model;
@@ -24,10 +22,12 @@ public class BughouseBackEnd implements BackEnd {
 	private Client client;
 	private Player me;
 	private FrontEnd frontEnd;
+	private HashMap<Integer, List<ChessPiece>> prisoners;
 	public BughouseBackEnd(FrontEnd frontEnd,String host, int port) throws UnknownHostException, IllegalArgumentException, IOException {
 		this.frontEnd = frontEnd;
 		this.client = new BughouseClient(host,port,this);
 		Model.setClient(client);
+		this.prisoners = new HashMap<Integer, List<ChessPiece>>();
 	}
 	
 	@Override
@@ -35,7 +35,7 @@ public class BughouseBackEnd implements BackEnd {
 		ChessPiece captured = me.getCurrentBoard().move(from_x, from_y, to_x, to_y);
 		client.move(me.getCurrentBoard().getId(), from_x, from_y, to_x, to_y);
 		if (captured!=null) {
-			me.getTeammate().addPrisoner(captured);
+			me.pass(captured);
 			if (captured.isKing()) {
 				client.gameOver(me.getCurrentGame().getId(), client.getCurrentTeam(me.getId()));
 			}
@@ -96,6 +96,29 @@ public class BughouseBackEnd implements BackEnd {
 	public void shutdown() throws IOException {
 		// TODO Auto-generated method stub
 		client.shutdown();
+	}
+
+	@Override
+	public void notifyTurn() {
+		System.out.println("It's your turn");
+	}
+
+	@Override
+	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException {
+		boolean isWhite = (new Player(playerId)).isWhite();
+		ChessPiece toAdd = new ChessPiece.Builder().setType(chessPieceType).setWhite(isWhite).build();
+		if (prisoners.containsKey(playerId)) {
+			prisoners.get(playerId).add(toAdd);
+		} else {
+			List<ChessPiece> pieces = new ArrayList<ChessPiece>();
+			pieces.add(toAdd);
+			prisoners.put(playerId, pieces);
+		}
+	}
+
+	@Override
+	public List<ChessPiece> getPrisoners(int playerId) {
+		return prisoners.get(playerId);
 	}
 	
 }
