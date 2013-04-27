@@ -37,10 +37,8 @@ public class CommandLine implements FrontEnd{
 		}
 	}
 	private void showGames() throws IOException, RequestTimedOutException {
-		System.out.println("Showing games");
 		List<Game> gameList = backend.getActiveGames();
 		
-		System.out.println(gameList);
 		if (gameList.isEmpty()) System.out.println("No game available.");
 		for (Game g: gameList) {
 			showGame(g);

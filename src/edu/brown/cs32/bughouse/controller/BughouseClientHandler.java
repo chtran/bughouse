@@ -72,8 +72,10 @@ public class BughouseClientHandler extends Thread {
 							sendIsActive(id);
 						//	GET_PLAYERS:[gameId]\n
 						} else if (headerSplit[0].compareTo("GET_PLAYERS") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendPlayerIdList(id);
+							msgSplit = headerSplit[1].split("\t");
+							id = Integer.parseInt(msgSplit[0]);
+							int team = Integer.parseInt(msgSplit[1]);
+							sendPlayerIdList(id,team);
 						// GET_OWNER:[gameId]\n
 						} else if (headerSplit[0].compareTo("GET_OWNER") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
@@ -356,14 +358,14 @@ public class BughouseClientHandler extends Thread {
 	 * Sends PLAYERS:[gameId]\t[userId1]\t[userId2]\n...
 	 * @param gameId
 	 */
-	public void sendPlayerIdList(int gameId) {
-		List<Integer> ids = m_data.getPlayerIds(gameId);
-		String msg = Integer.toString(gameId);
-		
+	public void sendPlayerIdList(int gameId,int team) {
+		List<Integer> ids = m_data.getPlayerIdsByTeam(gameId, team);
+		String msg="";
 		for (Integer id : ids) {
-			msg += "\t" + id;
+			msg += id+"\t";
 		}
-		send(msg + "\n");
+		if (!ids.isEmpty()) msg = msg.substring(0, msg.length()-1);
+		send(msg+"\n");
 	}
 
 	/**
