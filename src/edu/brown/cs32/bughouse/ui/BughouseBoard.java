@@ -153,16 +153,22 @@ public class BughouseBoard extends JPanel {
 		public void mousePressed(MouseEvent arg0) {
 			// TODO Auto-generated method stub
 			source_  = (JLabel) arg0.getSource();
+			JPanel square = (JPanel) source_.getParent();
+			int originX = (int) Math.round((square.getLocation().getX()-2)/69);
+			int originY = (int) Math.round((-square.getLocation().getY()-2)/68)+7;
 			piece_ = source_.getIcon();
-			System.out.println("Original x "+arg0.getX()+" "+arg0.getY());
-			System.out.println("Original x "+arg0.getLocationOnScreen().getX()+" "+arg0.getLocationOnScreen().getY());
+			System.out.println("Panel x "+square.getLocation().getX()+" "+square.getLocation().getY());
+			System.out.println("Coordinates to send x "+ originX + " "+originY);
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
 			// TODO Auto-generated method stub
 			if (source_ != null && (!(source_.equals(current_)))){
-				System.out.println("Dest x "+current_.getX()+" "+current_.getY());
+				JPanel curSquare = (JPanel) current_.getParent();
+				int destX = (int) Math.round((curSquare.getLocation().getX()-2)/69);
+				int destY = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
+				System.out.println("Dest x "+destX+ " "+destY);
 				current_.setIcon(piece_);
 				source_.setIcon(null);
 			}
