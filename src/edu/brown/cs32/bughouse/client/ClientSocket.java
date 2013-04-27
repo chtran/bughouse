@@ -119,7 +119,7 @@ public class ClientSocket{
 					String line = input.readLine();
 	        		if (line!=null) {
 	        			//If the first word in the line is traffic then forward it to the background stream
-	        			if(line.split("\t")[0].equals("BROADCAST")) {
+	        			if(line.split(":")[0].equals("BROADCAST")) {
 	        				//System.out.println("Forwarding to background: "+line);
 	        				background.send(line);
 	        				//System.out.println("received TRAFFIC BOT data: [" + line + "]");

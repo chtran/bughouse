@@ -149,7 +149,7 @@ public class BughouseClient implements Client {
 	}
 	@Override
 	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
-		String[] splitted = message.split("\t");
+		String[] splitted = message.split(":");
 		switch (splitted[1]) {
 			case "MOVE":
 				broadcastMove(message);

@@ -26,6 +26,7 @@ import javax.swing.TransferHandler;
 
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
+import edu.brown.cs32.bughouse.models.ChessPiece;
 
 /**
  * 
@@ -147,6 +148,21 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	
 	public static void main (String[] argv){
 		new BughouseGUI();
+	}
+
+
+	@Override
+	public void addPrisoner(int playerId, ChessPiece piece) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void movePiece(int boardId, int from_x, int from_y, int to_x,
+			int to_y) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	
