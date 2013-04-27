@@ -49,7 +49,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		Container content = this.getContentPane();
 		this.setLayout(new CardLayout());
 		this.setPreferredSize(new Dimension(800,700));
-		this.setResizable(true);
+		this.setResizable(false);
 		content.add(setupGameView());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
