@@ -211,4 +211,8 @@ public class CommandLine implements FrontEnd{
 			System.out.println("Illegal move!");
 		}
 	}
+	@Override
+	public void gameListUpdated() {
+		System.out.println("Game list updated");
+	}
 }

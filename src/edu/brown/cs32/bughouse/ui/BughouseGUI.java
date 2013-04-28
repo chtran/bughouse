@@ -157,6 +157,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		
 	}
 
+	@Override
+	public void gameListUpdated() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 
 
