@@ -83,6 +83,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	
 	public static void main(String[] argv){
 		BughouseGUI ui = new BughouseGUI(argv);
+		BughouseGUI ui2 = new BughouseGUI(argv);
+		BughouseGUI ui3 = new BughouseGUI(argv);
+		BughouseGUI ui4 = new BughouseGUI(argv);
 	}
 	
 	@Override
@@ -100,7 +103,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void notifyUserTurn() {
 		// TODO create JoptionPane to tell user it is her/his turn
-		
+		game_.notifyUser();
 	}
 	
 	/*
@@ -111,49 +114,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void showEndGameMessage() {
 		// TODO Auto-generated method stub
+		game_.notifyEndGame();
 		
 	}
-	
-	private JPanel setupMainMenu(){
-		JPanel main = new JPanel(new BorderLayout());
-		JPanel buttonGroup = new JPanel(new GridLayout(2,1));
-		JButton multiplayer = new JButton("Multiplayer");
-		multiplayer.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				JButton button = (JButton)e.getSource();
-				JFrame frame = (JFrame)SwingUtilities.getRoot(button);
-				CardLayout card = (CardLayout) frame.getLayout();
-				card.next(frame);
-			}
-		});
-		JButton quit = new JButton("Quit");
-		quit.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				System.exit(0);
-			}
-			
-		});
-		JPanel buttonWrapper1 = new JPanel();
-		JPanel buttonWrapper2 = new JPanel();
-		buttonWrapper1.add(multiplayer);
-		buttonWrapper2.add(quit);
-		buttonGroup.add(buttonWrapper1);
-		buttonGroup.add(buttonWrapper2);
-		JLabel title = new JLabel("Welcome to Bughouse!");
-		title.setFont(new Font("Serif", Font.BOLD, 48));
-		main.add(title, BorderLayout.NORTH);
-		main.add(buttonGroup,BorderLayout.CENTER);
-		return main;
-	}
-	
-	
-	
 	
 	/*
 	 * sets up the game view for the user.
@@ -167,7 +130,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
 			int to_y) {
-		// TODO Auto-generated method stub
+		game_.pieceMoved(boardId,from_x, from_y,to_x,to_y);
+		
 		
 	}
 
@@ -175,6 +139,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public void gameStarted() {
 		CardLayout cards = (CardLayout) content_.getLayout();
 		cards.show(content_, "Game");
+		game_.getBoardID();
 	}
 	
 	public void joinServer(){
