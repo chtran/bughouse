@@ -6,6 +6,7 @@ import java.util.List;
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
+import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 
 /**
  * Communicating with the server
@@ -20,7 +21,7 @@ public interface Client {
 	public List<Integer> getPlayers(int gameId, int team) throws IOException, RequestTimedOutException;
 	public int getOwnerId(int gameId) throws IOException, RequestTimedOutException;
 	public List<Integer> getBoards(int gameId) throws IOException, RequestTimedOutException;
-	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException;
+	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException, UnauthorizedException;
 	public int getGame(int playerId) throws IOException, RequestTimedOutException;
 	public int addNewPlayer(String name) throws IOException, RequestTimedOutException;
 	public String getName(int playerId) throws IOException, RequestTimedOutException;

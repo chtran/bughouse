@@ -9,6 +9,7 @@ import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
+import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 import edu.brown.cs32.bughouse.models.Game;
@@ -21,7 +22,7 @@ public interface BackEnd {
 	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException;
 	public List<Game> getActiveGames() throws IOException, RequestTimedOutException;
 	public void joinGame(int gameId, int team) throws IOException, RequestTimedOutException, TeamFullException;
-	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException;
+	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException, UnauthorizedException;
 	public Map<Integer,ChessBoard> getBoards() throws IOException, RequestTimedOutException, GameNotReadyException;
 	public void createGame() throws IOException, RequestTimedOutException;
 	public void quit() throws IOException, RequestTimedOutException;

@@ -8,6 +8,7 @@ import java.util.List;
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
+import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 
@@ -88,10 +89,13 @@ public class BughouseClient implements Client {
 
 
 	@Override
-	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException {
+	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException, UnauthorizedException {
 		String response = socket.getResponse(String.format("START_GAME:%d\n",gameId));
-		if (response.split(":")[0].trim().equals("NOT_READY")) {
+		String header = response.split(":")[0].trim();
+		if (header.equals("NOT_READY")) {
 			throw new GameNotReadyException();
+		} else if (header.equals("UNAUTHORIZED")) {
+			throw new UnauthorizedException();
 		}
 		
 	}
