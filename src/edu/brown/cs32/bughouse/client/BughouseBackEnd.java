@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
@@ -13,6 +14,7 @@ import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
+import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 import edu.brown.cs32.bughouse.models.Game;
 import edu.brown.cs32.bughouse.models.Model;
@@ -120,5 +122,22 @@ public class BughouseBackEnd implements BackEnd {
 	public List<ChessPiece> getPrisoners(int playerId) {
 		return prisoners.get(playerId);
 	}
+
+	@Override
+	public Map<Integer,ChessBoard> getBoards() throws IOException,	RequestTimedOutException, GameNotReadyException {
+		List<Integer> boardIds = client.getBoards(me.getCurrentGame().getId());
+		Map<Integer,ChessBoard> toReturn = new HashMap<Integer,ChessBoard>();
+		for (int boardId: boardIds) {
+			toReturn.put(boardId,new ChessBoard(boardId));
+		}
+		return toReturn;
+	}
+
+	@Override
+	public void broadcastedMove(int boardId, int from_x, int from_y, int to_x,
+			int to_y) {
+		frontEnd.movePiece(boardId, from_x, from_y, to_x, to_y);
+	}
+
 	
 }

@@ -45,6 +45,7 @@ public class GameInfo {
 	 * @param teamNum
 	 */
 	public boolean addPlayer(PlayerInfo player, int teamNum) {
+		System.out.printf("Adding %s to game %d in team %d\n",player.getName(),this.m_id,teamNum);
 		// return false if unable to add player to game
 		if (!canJoin())
 			return false;
@@ -86,7 +87,15 @@ public class GameInfo {
 		}
 		return players;
 	}
-	
+	public List<Integer> getPlayerIdsByTeam(int team) {
+		List<Integer> players = new ArrayList<>();
+		List<PlayerInfo> list = (team==1) ? m_team1 : m_team2;
+		// get team 1
+		for (PlayerInfo p : list) {
+			players.add(p.getId());
+		}
+		return players;
+	}
 	/**
 	 * Sets gameID, boardID, team, and color to initialized
 	 * values for all players in game (called when someone quits

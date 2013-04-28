@@ -49,8 +49,8 @@ public class BughouseClient implements Client {
 	}
 
 	@Override
-	public List<Integer> getPlayers(int gameId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("GET_PLAYERS:%d\n",gameId));
+	public List<Integer> getPlayers(int gameId, int team) throws IOException, RequestTimedOutException {
+		String response = socket.getResponse(String.format("GET_PLAYERS:%d\t%d\n",gameId,team));
 		String[] lines = response.split("\t");
 		List<Integer> toReturn = new ArrayList<Integer>();
 		for (String line: lines) {
@@ -149,7 +149,7 @@ public class BughouseClient implements Client {
 	}
 	@Override
 	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
-		String[] splitted = message.split("\t");
+		String[] splitted = message.split(":");
 		switch (splitted[1]) {
 			case "MOVE":
 				broadcastMove(message);
@@ -187,21 +187,30 @@ public class BughouseClient implements Client {
 	private void broadcastNewGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
 		String[] splitted = body.split("\t");
-		String name = getName(Integer.parseInt(splitted[0]));
-		System.out.printf("%s created game #%d\n",name,splitted[1]);
+		int playerId=Integer.parseInt(splitted[0]);
+		int gameId = Integer.parseInt(splitted[1]);
+		
+		String name = getName(playerId);
+		System.out.printf("%s created game #%d\n",name,gameId);
 	}
 	private void broadcastQuitGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
 		String[] splitted = body.split("\t");
-		String name = getName(Integer.parseInt(splitted[0]));
-		System.out.printf("%s quited game #%d\n",name,splitted[1]);
+		int playerId=Integer.parseInt(splitted[0]);
+		int gameId = Integer.parseInt(splitted[1]);
+		
+		String name = getName(playerId);
+		System.out.printf("%s quited game #%d\n",name,gameId);
 		
 	}
 	private void broadcastJoinGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
 		String[] splitted = body.split("\t");
-		String name = getName(Integer.parseInt(splitted[0]));
-		System.out.printf("%s joined game #%d\n",name,splitted[1]);
+		int playerId=Integer.parseInt(splitted[0]);
+		int gameId = Integer.parseInt(splitted[1]);
+		
+		String name = getName(playerId);
+		System.out.printf("%s joined game #%d\n",name,gameId);
 		
 	}
 	private void broadcastMove(String message) {
@@ -212,8 +221,7 @@ public class BughouseClient implements Client {
 		int from_y = Integer.parseInt(splitted[4]);
 		int to_x = Integer.parseInt(splitted[5]);
 		int to_y = Integer.parseInt(splitted[6]);
-		//TODO
-		//backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
+		backend.broadcastedMove(boardId, from_x, from_y, to_x, to_y);
 	}
 	private void addPrisoner(String message) throws IOException, RequestTimedOutException {
 		String body = message.split(":")[2];

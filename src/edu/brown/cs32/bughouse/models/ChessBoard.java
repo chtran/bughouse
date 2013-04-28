@@ -68,7 +68,9 @@ public class ChessBoard extends Model {
 		board[x][y]=piece;
 		
 	}
-	
+	public ChessPiece getPiece(int x, int y) {
+		return board[x][y];
+	}
 
 	public Player getWhitePlayer() {
 		return this.white;

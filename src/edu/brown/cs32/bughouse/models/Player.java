@@ -34,9 +34,9 @@ public class Player extends Model {
 	}
 	
 	public Player getTeammate() throws IOException, RequestTimedOutException {
-		List<Integer> playerIds = client.getPlayers(client.getGame(id));
+		List<Integer> playerIds = client.getPlayers(client.getGame(id),client.getCurrentTeam(id));
 		for (int playerId: playerIds) {
-			if (client.getCurrentTeam(playerId)==client.getCurrentTeam(id))
+			if (playerId!=id)
 				return new Player(playerId);
 		}
 		return null;

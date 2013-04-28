@@ -22,13 +22,7 @@ public class Game extends Model {
 		return client.getOwnerId(id);
 	}
 	
-	public List<Player> getPlayers() throws IOException, RequestTimedOutException {
-		List<Player> toReturn = new ArrayList<Player>();
-		List<Integer> playerIds = client.getPlayers(id);
-		for (int playerId: playerIds)
-			toReturn.add(new Player(playerId));
-		return toReturn;
-	}
+
 	
 	public List<ChessBoard> getBoards() throws IOException, RequestTimedOutException {
 		List<ChessBoard> toReturn = new ArrayList<ChessBoard>();
@@ -39,9 +33,9 @@ public class Game extends Model {
 	}
 	public List<Player> getPlayersByTeam(int team) throws IOException, RequestTimedOutException {
 		List<Player> toReturn = new ArrayList<Player>();
-		List<Integer> playerIds = client.getPlayers(id);
+		List<Integer> playerIds = client.getPlayers(id,team);
 		for (int playerId: playerIds)
-			if (client.getGame(playerId)==team) toReturn.add(new Player(playerId));
+			toReturn.add(new Player(playerId));
 		return toReturn;
 	}
 }

@@ -140,10 +140,16 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	
 	public static void main (String[] argv){
 		new BughouseGUI();
+	
 	}
 
+	@Override
+	public void movePiece(int boardId, int from_x, int from_y, int to_x,
+			int to_y) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	
 	
 
 

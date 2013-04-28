@@ -17,7 +17,7 @@ public interface Client {
 	public int createGame(int playerId) throws IOException, RequestTimedOutException;
 	public List<Integer> getGames() throws IOException, RequestTimedOutException;
 	public boolean gameIsActive(int gameId) throws IOException, RequestTimedOutException;
-	public List<Integer> getPlayers(int gameId) throws IOException, RequestTimedOutException;
+	public List<Integer> getPlayers(int gameId, int team) throws IOException, RequestTimedOutException;
 	public int getOwnerId(int gameId) throws IOException, RequestTimedOutException;
 	public List<Integer> getBoards(int gameId) throws IOException, RequestTimedOutException;
 	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException;

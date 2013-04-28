@@ -3,6 +3,7 @@ package edu.brown.cs32.bughouse.ui;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import edu.brown.cs32.bughouse.client.BughouseBackEnd;
@@ -12,6 +13,7 @@ import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
+import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 import edu.brown.cs32.bughouse.models.Game;
 import edu.brown.cs32.bughouse.models.Player;
@@ -19,6 +21,7 @@ import edu.brown.cs32.bughouse.models.Player;
 public class CommandLine implements FrontEnd{
 	BackEnd backend;
 	List<Game> currentGames;
+	Map<Integer, ChessBoard> currentBoards;
 	public CommandLine(String host, int port) {
 		try {
 			this.backend = new BughouseBackEnd(this,host,port);
@@ -34,10 +37,8 @@ public class CommandLine implements FrontEnd{
 		}
 	}
 	private void showGames() throws IOException, RequestTimedOutException {
-		System.out.println("Showing games");
 		List<Game> gameList = backend.getActiveGames();
 		
-		System.out.println(gameList);
 		if (gameList.isEmpty()) System.out.println("No game available.");
 		for (Game g: gameList) {
 			showGame(g);
@@ -71,6 +72,7 @@ public class CommandLine implements FrontEnd{
  	}
 	private void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
 		backend.startGame();
+		currentBoards = backend.getBoards();
 	}
 	private void move(String line) throws IllegalMoveException, IOException, RequestTimedOutException {
 		String[] splitted = line.split(" ");
@@ -150,7 +152,18 @@ public class CommandLine implements FrontEnd{
 	public void repaint() {
 		return;
 	}
-	
+	public void printBoards() {
+		for (ChessBoard board: currentBoards.values()) {
+			System.out.println("Board #"+board.getId());
+			for (int y=7; y>=0; y--) {
+				for (int x=0; x<=7; x++) {
+					System.out.print(board.getPiece(x, y)+"\t00");
+				}
+				System.out.println();
+			}
+			System.out.println();
+		}
+	}
 	public static void main(String[] args) {
 		String host = args[0];
 		int port = Integer.parseInt(args[1]);
@@ -168,6 +181,15 @@ public class CommandLine implements FrontEnd{
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
 			System.out.println("Request timed out.");
+		}
+	}
+	@Override
+	public void movePiece(int boardId, int from_x, int from_y, int to_x,
+			int to_y) {
+		try {
+			currentBoards.get(boardId).move(from_x, from_y, to_x, to_y);
+		} catch (IllegalMoveException e) {
+			System.out.println("Illegal move!");
 		}
 	}
 }
