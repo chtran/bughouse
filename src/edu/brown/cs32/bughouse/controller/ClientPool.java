@@ -66,8 +66,10 @@ public class ClientPool {
 	public synchronized void broadcastToGame(int gameID, String msg, BughouseClientHandler sender) {
 		for (BughouseClientHandler client : m_clients) {
 			// only broadcast message to clients in given game
-			if (client.getGameId() == gameID && sender != null)
+			if (client.getGameId() == gameID && sender != null) {
+				System.out.println("Sending " + msg + " to " + client.getName());
 				client.send(msg);
+			}
 		}
 	}
 	
@@ -77,7 +79,7 @@ public class ClientPool {
 	 */
 	public synchronized void sendToPlayer(int playerID, String msg) {
 		BughouseClientHandler client = m_clientMap.get(playerID);
-		System.out.println("Sending player " + playerID + ": " + msg);
+		System.out.println("Sending " + msg + " to " + client.getName());
 		client.send(msg);
 	}
 	
