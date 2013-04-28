@@ -45,6 +45,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private static final long serialVersionUID = 1L;
 	private GameView game_;
 	private BackEnd backend_;
+	private RoomMenu rooms_;
 	
 
 	public BughouseGUI(BackEnd backend){
@@ -129,6 +130,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		return main;
 	}
 	
+	public static void main(String[] argv){
+		new BughouseGUI(null);
+	}
+	
 	
 	/*
 	 * sets up the game view for the user.
@@ -149,17 +154,17 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void gameStarted() {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	private JPanel setupRoomMenu(BackEnd backend){
-		return new RoomMenu(backend);
+		rooms_ = new RoomMenu(backend);
+		return rooms_;
 	}
 
 	@Override
 	public void gameListUpdated() {
 		// TODO Auto-generated method stub
-		
+		rooms_.updateGames();
 	}
 
 	
