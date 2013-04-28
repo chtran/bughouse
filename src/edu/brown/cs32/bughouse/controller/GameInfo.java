@@ -12,7 +12,7 @@ public class GameInfo {
 	private List<PlayerInfo> m_team2; // Team 2: {white, black}
 	
 	// 0 -> Team 1 white, 1 -> Team 2 black, 2 -> Team 1 black, 3 -> Team 2 white
-	private int m_turn = 0;
+	private int m_turn = 1;
 
 	public GameInfo(int id, int ownerId, int board1Id, int board2Id) {
 		m_id = id;

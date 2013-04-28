@@ -124,7 +124,6 @@ public class BughouseClientHandler extends Thread {
 							msgSplit = headerSplit[1].split("\t");
 							if (msgSplit.length == 5) {
 								id = Integer.parseInt(msgSplit[0]);
-								int toY = Integer.parseInt(msgSplit[4]);
 								move(id, msg);
 							}
 						// QUIT:[playerId]
@@ -306,6 +305,7 @@ public class BughouseClientHandler extends Thread {
 		} else if (m_data.startGame(gameId)) {
 			send("GAME_STARTED:" + gameId + "\n");
 			m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
+			send("BROADCAST:YOUR_TURN\n");
 		} else {
 			send("NOT_READY:" + gameId + "\n");
 		}

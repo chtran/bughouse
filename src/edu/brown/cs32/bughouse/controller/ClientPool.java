@@ -77,6 +77,7 @@ public class ClientPool {
 	 */
 	public synchronized void sendToPlayer(int playerID, String msg) {
 		BughouseClientHandler client = m_clientMap.get(playerID);
+		System.out.println("Sending player " + playerID + ": " + msg);
 		client.send(msg);
 	}
 	
