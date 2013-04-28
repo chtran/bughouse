@@ -153,7 +153,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	}
 	
 	private JPanel setupRoomMenu(){
-		rooms_ = new RoomMenu(backend_);
+		rooms_ = new RoomMenu(this,backend_); // not clean way - get server to broadcast to all 
 		return rooms_;
 	}
 

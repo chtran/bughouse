@@ -183,7 +183,7 @@ public class BughouseBoard extends JPanel {
 				destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
 				System.out.println("Dest x "+destX_+ " "+destY_);
 					 try {
-						turn_ = false;
+						//turn_ = false;
 						backend_.move(originX_, originY_, destX_, destY_);
 					} catch (IllegalMoveException e) {
 						// TODO Auto-generated catch block

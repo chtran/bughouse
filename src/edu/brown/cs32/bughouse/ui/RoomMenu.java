@@ -36,10 +36,12 @@ public class RoomMenu extends JPanel {
 	private List<Game> activeGames_;
 	private JPanel roomList_;
 	private int selectedGameID_, selectedTeamID_;
+	private BughouseGUI front_;
 	
-	public RoomMenu(BackEnd backend){
+	public RoomMenu(BughouseGUI frame,BackEnd backend){
 		super();
 		this.setLayout(new BorderLayout());
+		this.front_ = frame;
 		this.backend_ = backend;
 		this.add(getRooms(), BorderLayout.CENTER);
 		this.add(userControl(), BorderLayout.SOUTH);
@@ -151,6 +153,7 @@ public class RoomMenu extends JPanel {
 				// TODO Auto-generated method stub
 						try {
 							backend_.startGame();
+							front_.gameStarted();
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
