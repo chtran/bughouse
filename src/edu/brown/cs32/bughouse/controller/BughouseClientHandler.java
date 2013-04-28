@@ -160,13 +160,14 @@ public class BughouseClientHandler extends Thread {
 		if (m_playerInfo.getBoardId() == id) {
 			int gameID = m_playerInfo.getGameId();
 			if (gameID > 0) {
-				m_pool.broadcastToGame(gameID, msg, this);
-				send("MOVE_OK:" + id + "\n");
+				send("MOVE_OK\n");
+				m_pool.broadcastToGame(gameID, "BROADCAST:"+msg+"\n", this);
 			} else {
-				send("MOVE_FAILED:" + id + "\n");
+				send("MOVE_FAILED\n");
 			}
+		} else {
+			send("MOVE_FAILED:\n");
 		}
-		send("MOVE_FAILED:" + id + "\n");
 	}
 
 	/**

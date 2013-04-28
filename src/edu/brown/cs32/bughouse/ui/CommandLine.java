@@ -94,6 +94,7 @@ public class CommandLine implements FrontEnd{
 		int to_x = Integer.parseInt(splitted[3]);
 		int to_y = Integer.parseInt(splitted[4]);
 		backend.move(from_x, from_y, to_x, to_y);
+		System.out.println("Moved successfully");
 	}
  	public void run() throws IOException, RequestTimedOutException {
 		System.out.print("Enter your name: ");
@@ -174,7 +175,7 @@ public class CommandLine implements FrontEnd{
 			System.out.println("Board #"+board.getId());
 			for (int y=7; y>=0; y--) {
 				for (int x=0; x<=7; x++) {
-					System.out.print(board.getPiece(x, y)+"\t00");
+					System.out.print(board.getPiece(x, y)+"\t");
 				}
 				System.out.println();
 			}
@@ -204,6 +205,7 @@ public class CommandLine implements FrontEnd{
 	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
 			int to_y) {
 		try {
+			System.out.printf("Board #%d: (%d,%d) moved to (%d,%d)\n",boardId,from_x,from_y,to_x,to_y);
 			currentBoards.get(boardId).move(from_x, from_y, to_x, to_y);
 		} catch (IllegalMoveException e) {
 			System.out.println("Illegal move!");
