@@ -5,3 +5,5 @@ tmp/**
 tmp/**/*
 *.swp
 .settings/**
+derived/**/*
+*.class

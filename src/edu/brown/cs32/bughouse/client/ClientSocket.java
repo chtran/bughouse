@@ -80,7 +80,7 @@ public class ClientSocket{
 		output.print(message);
 		output.flush();
 		String response="";
-		while(response.isEmpty()) response = foreground.readLine();
+		response = foreground.readLine();
 		/*StringBuilder builder = new StringBuilder();
 		while(!line.isEmpty()) {
 			//System.out.println("line:" +line);
@@ -88,7 +88,7 @@ public class ClientSocket{
 			line = foreground.readLine();
 		}
 		String response = new String(builder);*/
-		System.out.println("Response:"+response+".Size: "+response.length());
+		//System.out.println("Response:"+response+".Size: "+response.length());
 
 		if (response.equals("Request timed out\n")) {
 			System.out.println("Server response timed out");
@@ -119,7 +119,7 @@ public class ClientSocket{
 					String line = input.readLine();
 	        		if (line!=null) {
 	        			//If the first word in the line is traffic then forward it to the background stream
-	        			if(line.split("\t")[0].equals("BROADCAST")) {
+	        			if(line.split(":")[0].equals("BROADCAST")) {
 	        				//System.out.println("Forwarding to background: "+line);
 	        				background.send(line);
 	        				//System.out.println("received TRAFFIC BOT data: [" + line + "]");

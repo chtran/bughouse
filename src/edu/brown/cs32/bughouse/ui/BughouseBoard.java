@@ -5,32 +5,31 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.TransferHandler;
+
+import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.interfaces.BackEnd;
 
 public class BughouseBoard extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-	private final java.net.URL W_PAWN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wp.png");
-	private final java.net.URL W_KNIGHT = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wn.png");
-	private final java.net.URL W_BISHOP = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wb.png");
-	private final java.net.URL W_ROOK = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wr.png");
-	private final java.net.URL W_KING = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wk.png");
-	private final java.net.URL W_QUEEN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wq.png");
-	private final java.net.URL B_PAWN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bp.png");
-	private final java.net.URL B_KNIGHT = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bn.png");
-	private final java.net.URL B_BISHOP = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bb.png");
-	private final java.net.URL B_ROOK = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/br.png");
-	private final java.net.URL B_KING = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bk.png");
-	private final java.net.URL B_QUEEN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bq.png");
 	private boolean isManipulable_;
+	private JLabel source_, current_;
+	private Icon piece_;
+	private int originX_, originY_, destX_, destY_;
+	private ChessPieceImageFactory imgFactory_;
+	private BackEnd backend_;
 
-	public BughouseBoard(boolean isManipulable){
+	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable){
 		super(new GridLayout(8,8,1,0));
+		this.imgFactory_ = imgFactory;
+		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.setPreferredSize(new Dimension(400,400));
 		Color current = Color.GRAY;
@@ -46,7 +45,7 @@ public class BughouseBoard extends JPanel {
 					current = Color.GRAY;
 				}
 				box.setBorder(null);
-				box.add(createPiece(i, j));
+				box.add(this.createPiece(i,j));
 				this.add(box);
 			}
 			if (current == Color.GRAY){
@@ -58,107 +57,126 @@ public class BughouseBoard extends JPanel {
 			
 		}
 	}
-	
-	
-	private void setManipulable(JComponent piece){
-		piece.setTransferHandler(new TransferHandler("icon"));
-		piece.addMouseListener(new MouseListener(){
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				System.out.println("PRessed");
-				JComponent source = (JComponent) e.getSource();
-				TransferHandler dd = source.getTransferHandler();
-				dd.exportAsDrag(source, e,TransferHandler.COPY);
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-		});
-	}
 	
 /*
  * Helper method which sets up the pieces at the start of the game;
  */
-	private JComponent createPiece(int row, int col){
+	private JLabel createPiece(int row, int col){
 		JLabel piece = new JLabel();
-		if (isManipulable_){ this.setManipulable(piece);}
+		piece.setPreferredSize(new Dimension(50,50));
+		if (isManipulable_){
+			piece.addMouseListener(new UserInputListener());
+
+		}
 		if (row == 6){
-				piece.setIcon(new ImageIcon(W_PAWN,"pawn"));	
+				piece.setIcon(imgFactory_.getPawn(Color.WHITE));	
 				return piece;
 		}
 		if (row == 1){
-			piece.setIcon(new ImageIcon(B_PAWN,"pawn"));	
+			piece.setIcon(imgFactory_.getPawn(Color.BLACK));	
 			return piece;
 		}
 		if (row == 0 || row == 7) {
 			switch(col){
 			case 0: case 7:
 				if (row ==7){
-					piece.setIcon(new ImageIcon(W_ROOK,"rook"));
+					piece.setIcon(imgFactory_.getRook(Color.WHITE));
 					return piece;
 				}
-				piece.setIcon(new ImageIcon(B_ROOK,"rook")); // add rook sprite
+				piece.setIcon(imgFactory_.getRook(Color.BLACK)); // add rook sprite
 				break;
 			
 			case 1: case 6:
 				if (row ==7){
-					piece.setIcon(new ImageIcon(W_KNIGHT,"knight"));
+					piece.setIcon(imgFactory_.getKnight(Color.WHITE));
 					return piece;
 				}
-				piece.setIcon(new ImageIcon(B_KNIGHT,"knight")); // add knight sprite
+				piece.setIcon(imgFactory_.getKnight(Color.BLACK)); // add knight sprite
 				break;
 				
 			case 2: case 5:
 				if (row ==7){
-					piece.setIcon(new ImageIcon(W_BISHOP,"bishop")); 
+					piece.setIcon(imgFactory_.getBishop(Color.WHITE)); 
 					return piece;
 				}
-				piece.setIcon(new ImageIcon(B_BISHOP,"bishop")); // add bishop sprite
+				piece.setIcon(imgFactory_.getBishop(Color.BLACK)); // add bishop sprite
 				break;
 				
 			case 3:
 				if (row ==7){
-					piece.setIcon(new ImageIcon(W_QUEEN,"queen"));
+					piece.setIcon(imgFactory_.getQueen(Color.WHITE));
 					return piece;
 				}
-				piece.setIcon(new ImageIcon(B_QUEEN,"queen")); // add queen sprite
+				piece.setIcon(imgFactory_.getQueen(Color.BLACK)); // add queen sprite
 				break;
 			case 4: 
 				if (row ==7){
-					piece.setIcon(new ImageIcon(W_KING,"king")); 
+					piece.setIcon(imgFactory_.getKing(Color.WHITE)); 
 					return piece;
 				}
-				piece.setIcon(new ImageIcon(B_KING,"king")); // add king sprite
+				piece.setIcon(imgFactory_.getKing(Color.BLACK)); // add king sprite
 				break;
 			}
 		}
-				
 		return piece;
+		
+	}
 	
+	private class UserInputListener implements MouseListener {
+		
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			current_ = (JLabel) arg0.getSource();
+		}
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent arg0) {
+			// TODO Auto-generated method stub
+			source_  = (JLabel) arg0.getSource();
+			JPanel square = (JPanel) source_.getParent();
+			originX_ = (int) Math.round((square.getLocation().getX()-2)/69);
+			originY_ = (int) Math.round((-square.getLocation().getY()-2)/68)+7;
+			piece_ = source_.getIcon();
+			System.out.println("Coordinates to send x "+ originX_ + " "+originY_);
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent arg0) {
+			// TODO call backend move and catch errors
+			if (source_ != null && (!(source_.equals(current_)))){
+				JPanel curSquare = (JPanel) current_.getParent();
+				destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
+				destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
+				System.out.println("Dest x "+destX_+ " "+destY_);
+				try {
+					 backend_.move(originX_, originY_, destX_, destY_);
+				}catch (IllegalMoveException | IOException | RequestTimedOutException e){
+					source_ = null; 
+					piece_ = null; 
+					//JDialog illegalMove = new JOptionPane("That move is illegal", ERROR_MESSAGE);
+					return;
+				}
+				current_.setIcon(piece_);
+				source_.setIcon(null);
+				// notify backend/server/user that the current turn has ended
+			}
+		}
+		
 	}
 	
 }

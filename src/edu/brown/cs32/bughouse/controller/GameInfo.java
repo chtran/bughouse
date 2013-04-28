@@ -39,6 +39,18 @@ public class GameInfo {
 			return false;
 	}
 	
+	/*
+	 * Returns true if players can join team, false if not
+	 */
+	public boolean canJoinTeam(int teamNum) {
+		if (teamNum == 1 && m_isActive && m_team1.size() < 2)
+			return true;
+		else if (teamNum == 2 && m_isActive && m_team2.size() < 2)
+			return true;
+		
+		return false;
+	}
+	
 	// Setters
 	public void setIsActive(boolean isActive) { m_isActive = isActive; }
 
@@ -48,8 +60,9 @@ public class GameInfo {
 	 * @param teamNum
 	 */
 	public boolean addPlayer(PlayerInfo player, int teamNum) {
-		// return false if unable to add player to game
-		if (!canJoin())
+		System.out.printf("Adding %s to game %d in team %d\n",player.getName(),this.m_id,teamNum);
+		// return false if unable to add player to team
+		if (!canJoinTeam(teamNum))
 			return false;
 		
 		boolean isWhite;
@@ -89,7 +102,15 @@ public class GameInfo {
 		}
 		return players;
 	}
-	
+	public List<Integer> getPlayerIdsByTeam(int team) {
+		List<Integer> players = new ArrayList<>();
+		List<PlayerInfo> list = (team==1) ? m_team1 : m_team2;
+		// get team 1
+		for (PlayerInfo p : list) {
+			players.add(p.getId());
+		}
+		return players;
+	}
 	/**
 	 * Sets gameID, boardID, team, and color to initialized
 	 * values for all players in game (called when someone quits

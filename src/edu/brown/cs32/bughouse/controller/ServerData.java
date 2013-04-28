@@ -102,7 +102,10 @@ public class ServerData {
 			return g.getPlayerIds();
 		}
 	}
-	
+	public List<Integer> getPlayerIdsByTeam(int gameId,int team) {
+		GameInfo g = m_games.get(gameId);
+		return g.getPlayerIdsByTeam(team);
+	}
 	/**
 	 * Returns true if game is active, false if not
 	 * @param id ID of game
@@ -241,5 +244,9 @@ public class ServerData {
 			GameInfo g = m_games.get(gameID);
 			return g.getNextTurn();
 		}
+	}
+	
+	public int getCurrentGame(int playerId) {
+		return m_players.get(playerId).getGameId();
 	}
 }

@@ -44,6 +44,10 @@ public class ChessPiece extends Model {
 			this.isWhite = true;
 			return this;
 		}
+		public Builder setWhite(boolean isWhite) {
+			this.isWhite = isWhite;
+			return this;
+		}
 		public Builder king() {
 			this.type = KING;
 			return this;
@@ -66,6 +70,10 @@ public class ChessPiece extends Model {
 		}
 		public Builder pawn() {
 			this.type = PAWN;
+			return this;
+		}
+		public Builder setType(int type) {
+			this.type = type;
 			return this;
 		}
 		public ChessPiece build() {
@@ -98,9 +106,59 @@ public class ChessPiece extends Model {
 			
 		}
 	}
+	
+	public int getType() {
+		return this.type;
+	}
+	public static String getName(int type) {
+		switch(type) {
+			case 1:
+				return "PAWN";
+			case 2:
+				return "KNIGHT";
+			case 3:
+				return "BISHOP";
+			case 4:
+				return "ROOK";
+			case 5:
+				return "QUEEN";
+			case 6:
+				return "KING";
+		}
+		return null;
+	}
+	public String getName() {
+		return ChessPiece.getName(type);
+	}
 	public boolean isKing() {
 		return (this.type==KING);
 	}
 
+	@Override
+	public String toString() {
+		String toReturn="";
+		switch(type) {
+		case 1:
+			toReturn+="P";
+			break;
+		case 2:
+			toReturn+="K";
+			break;
+		case 3:
+			toReturn+="B";
+			break;
+		case 4:
+			toReturn+="R";
+			break;
+		case 5:
+			toReturn+="Q";
+			break;
+		case 6:
+			toReturn+="X";
+			break;
+		}
+		toReturn+= isWhite() ? "[W]" : "[B]";
+		return toReturn;
+	}
 	
 }
