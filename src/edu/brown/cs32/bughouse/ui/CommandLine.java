@@ -11,6 +11,7 @@ import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
+import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 import edu.brown.cs32.bughouse.models.ChessBoard;
@@ -72,8 +73,12 @@ public class CommandLine implements FrontEnd{
  	}
 	//When client starts the game (client is owner of the room)
 	private void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
-		backend.startGame();
-		currentBoards = backend.getBoards();
+		try {
+			backend.startGame();
+			currentBoards = backend.getBoards();
+		} catch (UnauthorizedException e) {
+			System.out.println("You are not authorized to start game");
+		}
 	}
 	//When server starts the game (client not owner)
 	public void gameStarted() {

@@ -11,6 +11,7 @@ import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
+import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
@@ -78,12 +79,12 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
+	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException, UnauthorizedException {
 		Game game = me.getCurrentGame();
 		if (me.getId()==game.getOwnerId()) {
 			client.startGame(game.getId());
 		} else {
-			System.out.println("Only the owner can start the game");
+			throw new UnauthorizedException();
 		}
 	}
 	

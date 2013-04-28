@@ -16,9 +16,8 @@ createGame: create new game
         the id of the newly created game
 
 getGames: get the list of all the games
-    + Request: GET_GAMES:m\n 
+    + Request: GET_GAMES:\n 
     (note: the above one is a little sketchy but I'm not sure if just a space after the colon will work)
-    (chtran note: I think this is still unsafe. Try GET_GAMES:mac20\n)
     + Action: None
     + Response: [gameId1]\t[gameId2]\n....
 
@@ -43,7 +42,7 @@ getBoards: get the board id of a game
     + Response: [board1Id]\t[board2Id]\n
 
 startGame: start the game
-    + Request: START_GAME:[gameId]\n
+    + Request: START_GAME:[gameId]\t[playerId]\n
     + Action:
         - Check if there're 4 players in the game
         - Create two new chess boards
@@ -54,6 +53,7 @@ startGame: start the game
     + Response:
         - "GAME_STARTED:[gameId]\n" if everything went well
         - "NOT_READY:[gameId]\n" if there're fewer than 4 players
+        - "UNAUTHORIZED:[gameId]\n" if not owner
 
 addNewPlayer: add a new player
     + Request: ADD_PLAYER:[name]\n
