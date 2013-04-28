@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -12,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.interfaces.BackEnd;
 
 public class BughouseBoard extends JPanel {
 	
@@ -21,10 +24,12 @@ public class BughouseBoard extends JPanel {
 	private Icon piece_;
 	private int originX_, originY_, destX_, destY_;
 	private ChessPieceImageFactory imgFactory_;
+	private BackEnd backend_;
 
-	public BughouseBoard(ChessPieceImageFactory imgFactory, boolean isManipulable){
+	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable){
 		super(new GridLayout(8,8,1,0));
 		this.imgFactory_ = imgFactory;
+		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.setPreferredSize(new Dimension(400,400));
 		Color current = Color.GRAY;
@@ -158,14 +163,14 @@ public class BughouseBoard extends JPanel {
 				destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
 				destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
 				System.out.println("Dest x "+destX_+ " "+destY_);
-				/*try {
-					 backend.move(originX_, originY_, destX_, destY_)
-				}catch (IllegalMoveException e){
+				try {
+					 backend_.move(originX_, originY_, destX_, destY_);
+				}catch (IllegalMoveException | IOException | RequestTimedOutException e){
 					source_ = null; 
 					piece_ = null; 
-					JDialog illegalMove = new JOptionPane("That move is illegal", ERROR_MESSAGE);
+					//JDialog illegalMove = new JOptionPane("That move is illegal", ERROR_MESSAGE);
 					return;
-				}*/
+				}
 				current_.setIcon(piece_);
 				source_.setIcon(null);
 				// notify backend/server/user that the current turn has ended

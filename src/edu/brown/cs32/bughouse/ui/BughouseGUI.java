@@ -23,6 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -49,11 +50,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private GameView game_;
 	private BackEnd backend_;
 	private RoomMenu rooms_;
+	private JFrame home_;
 	
 
 	public BughouseGUI(String[] argv){
 		super("Bughouse Chess");
-		
+		home_ = this;
 		try {
 			this.backend_ = new BughouseBackEnd(this,argv[0],new Integer(argv[1]));
 		} catch (UnknownHostException e) {
@@ -156,7 +158,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 * sets up the game view for the user.
 	 */
 	private JPanel setupGameView(){
-		game_ =  new GameView();
+		game_ =  new GameView(backend_);
 		return game_;
 	}
 
@@ -171,6 +173,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void gameStarted() {
 		// TODO Auto-generated method stub
+		home_.getContentPane().removeAll();
+		home_.getContentPane().add(setupGameView());
+		home_.revalidate();
+		home_.repaint();
 	}
 	
 	private JPanel setupRoomMenu(BackEnd backend){

@@ -18,6 +18,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
+import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 
 public class GameView extends JPanel {
@@ -31,9 +32,11 @@ public class GameView extends JPanel {
 	private JTextArea messageBox_,clock_;
 	private JScrollPane prison_;
 	private List<ChessPiece> myPrisoners_;
+	private BackEnd backend_;
 
-	public GameView(){
+	public GameView(BackEnd backend){
 		super(new BorderLayout());
+		backend_ = backend;
 		myPrisoners_ = new ArrayList<>();
 		imgFactory_ = new ChessPieceImageFactory();
 		this.add(this.createBoard(), BorderLayout.CENTER);
@@ -54,9 +57,9 @@ public class GameView extends JPanel {
 	 */
 	private JComponent createBoard(){
 		JTabbedPane boardContainer = new JTabbedPane();
-		userBoard_ = new BughouseBoard(imgFactory_,true);
+		userBoard_ = new BughouseBoard(backend_,imgFactory_,true);
 		boardContainer.addTab("Your Game", userBoard_);
-		otherBoard_ = new BughouseBoard(imgFactory_,false);
+		otherBoard_ = new BughouseBoard(backend_,imgFactory_,false);
 		boardContainer.addTab("Other Game", otherBoard_);
 		return boardContainer;
 	}
