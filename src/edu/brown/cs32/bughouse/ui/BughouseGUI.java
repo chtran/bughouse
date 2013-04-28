@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -27,6 +29,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import edu.brown.cs32.bughouse.client.BughouseBackEnd;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 import edu.brown.cs32.bughouse.models.ChessPiece;
@@ -48,9 +51,21 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private RoomMenu rooms_;
 	
 
-	public BughouseGUI(BackEnd backend){
+	public BughouseGUI(String[] argv){
 		super("Bughouse Chess");
-		this.backend_ = backend;
+		
+		try {
+			this.backend_ = new BughouseBackEnd(this,argv[0],new Integer(argv[1]));
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Container content = this.getContentPane();
 		content.setLayout(new CardLayout());
 		this.setPreferredSize(new Dimension(800,700));
@@ -61,6 +76,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
 		this.setVisible(true);
+	}
+	
+	public static void main(String[] argv){
+		BughouseGUI ui = new BughouseGUI(argv);
 	}
 	
 	@Override
@@ -130,9 +149,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		return main;
 	}
 	
-	public static void main(String[] argv){
-		new BughouseGUI(null);
-	}
+	
 	
 	
 	/*
