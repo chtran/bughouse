@@ -70,9 +70,22 @@ public class CommandLine implements FrontEnd{
 		backend.joinGame(gameId, team);
 		System.out.printf("Joined game %d on team %d\n",gameId,team);
  	}
+	//When client starts the game (client is owner of the room)
 	private void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
 		backend.startGame();
 		currentBoards = backend.getBoards();
+	}
+	//When server starts the game (client not owner)
+	public void gameStarted() {
+		try {
+			currentBoards = backend.getBoards();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			System.out.println("Request timed out");
+		} catch (GameNotReadyException e) {
+			System.out.println("Game not ready");
+		}
 	}
 	private void move(String line) throws IllegalMoveException, IOException, RequestTimedOutException {
 		String[] splitted = line.split(" ");
@@ -114,6 +127,9 @@ public class CommandLine implements FrontEnd{
 					case "move":
 						move(line);
 						break;
+					case "print_board":
+						printBoards();
+						break;
 					default:
 						System.out.println("Unknown command: "+line);;
 				}
@@ -152,7 +168,8 @@ public class CommandLine implements FrontEnd{
 	public void repaint() {
 		return;
 	}
-	public void printBoards() {
+	public void printBoards() throws IOException, RequestTimedOutException {
+		System.out.printf("You are %s in board %d\n",backend.me().isWhite() ? "white" : "black", backend.me().getCurrentBoard().getId());
 		for (ChessBoard board: currentBoards.values()) {
 			System.out.println("Board #"+board.getId());
 			for (int y=7; y>=0; y--) {
@@ -184,7 +201,7 @@ public class CommandLine implements FrontEnd{
 		}
 	}
 	@Override
-	public void movePiece(int boardId, int from_x, int from_y, int to_x,
+	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
 			int to_y) {
 		try {
 			currentBoards.get(boardId).move(from_x, from_y, to_x, to_y);

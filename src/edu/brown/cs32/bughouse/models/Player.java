@@ -32,7 +32,6 @@ public class Player extends Model {
 	public boolean isWhite() throws IOException, RequestTimedOutException {
 		return client.isWhite(id);
 	}
-	
 	public Player getTeammate() throws IOException, RequestTimedOutException {
 		List<Integer> playerIds = client.getPlayers(client.getGame(id),client.getCurrentTeam(id));
 		for (int playerId: playerIds) {

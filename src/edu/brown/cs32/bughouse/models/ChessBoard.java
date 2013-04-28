@@ -23,25 +23,25 @@ public class ChessBoard extends Model {
 	
 	private void populateBoard() {
 		board[0][0] = new ChessPiece.Builder().rook().white().build();
-		board[0][1] = new ChessPiece.Builder().knight().white().build();
-		board[0][2] = new ChessPiece.Builder().bishop().white().build();
-		board[0][3] = new ChessPiece.Builder().queen().white().build();
-		board[0][4] = new ChessPiece.Builder().king().white().build();
-		board[0][5] = new ChessPiece.Builder().bishop().white().build();
-		board[0][6] = new ChessPiece.Builder().knight().white().build();
-		board[0][7] = new ChessPiece.Builder().rook().white().build();
+		board[1][0] = new ChessPiece.Builder().knight().white().build();
+		board[2][0] = new ChessPiece.Builder().bishop().white().build();
+		board[3][0] = new ChessPiece.Builder().queen().white().build();
+		board[4][0] = new ChessPiece.Builder().king().white().build();
+		board[5][0] = new ChessPiece.Builder().bishop().white().build();
+		board[6][0] = new ChessPiece.Builder().knight().white().build();
+		board[7][0] = new ChessPiece.Builder().rook().white().build();
 		
-		board[7][0] = new ChessPiece.Builder().rook().black().build();
-		board[7][1] = new ChessPiece.Builder().knight().black().build();
-		board[7][2] = new ChessPiece.Builder().bishop().black().build();
-		board[7][3] = new ChessPiece.Builder().queen().black().build();
-		board[7][4] = new ChessPiece.Builder().king().black().build();
-		board[7][5] = new ChessPiece.Builder().bishop().black().build();
-		board[7][6] = new ChessPiece.Builder().knight().black().build();
+		board[0][7] = new ChessPiece.Builder().rook().black().build();
+		board[1][7] = new ChessPiece.Builder().knight().black().build();
+		board[2][7] = new ChessPiece.Builder().bishop().black().build();
+		board[3][7] = new ChessPiece.Builder().queen().black().build();
+		board[4][7] = new ChessPiece.Builder().king().black().build();
+		board[5][7] = new ChessPiece.Builder().bishop().black().build();
+		board[6][7] = new ChessPiece.Builder().knight().black().build();
 		board[7][7] = new ChessPiece.Builder().rook().black().build();
 		for (int i =0; i<8; i++) {
-			board[1][i] = new ChessPiece.Builder().pawn().white().build();
-			board[6][i] = new ChessPiece.Builder().pawn().black().build();
+			board[i][1] = new ChessPiece.Builder().pawn().white().build();
+			board[i][6] = new ChessPiece.Builder().pawn().black().build();
 		}
 
 	}

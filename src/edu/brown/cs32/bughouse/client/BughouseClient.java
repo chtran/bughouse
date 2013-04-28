@@ -53,6 +53,7 @@ public class BughouseClient implements Client {
 		String response = socket.getResponse(String.format("GET_PLAYERS:%d\t%d\n",gameId,team));
 		String[] lines = response.split("\t");
 		List<Integer> toReturn = new ArrayList<Integer>();
+		if (response.length()==0) return toReturn;
 		for (String line: lines) {
 			int userId = Integer.parseInt(line);
 			toReturn.add(userId);
@@ -167,7 +168,7 @@ public class BughouseClient implements Client {
 				broadcastGameStarted(message);
 				break;
 			case "YOUR_TURN":
-				backend.notifyTurn();
+				backend.frontEnd().notifyUserTurn();
 				break;
 			case "ADD_PRISONER":
 				addPrisoner(message);
@@ -181,8 +182,9 @@ public class BughouseClient implements Client {
 	private void broadcastGameStarted(String message) {
 		String body = message.split(":")[2];
 		String[] splitted = body.split("\t");
-
-		System.out.printf("Game #%d has started!\n",splitted[0]);
+		int gameId = Integer.parseInt(splitted[0]);
+		backend.frontEnd().gameStarted();
+		System.out.printf("Game #%d has started!\n",gameId);
 	}
 	private void broadcastNewGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
@@ -221,7 +223,7 @@ public class BughouseClient implements Client {
 		int from_y = Integer.parseInt(splitted[4]);
 		int to_x = Integer.parseInt(splitted[5]);
 		int to_y = Integer.parseInt(splitted[6]);
-		backend.broadcastedMove(boardId, from_x, from_y, to_x, to_y);
+		backend.frontEnd().pieceMoved(boardId, from_x, from_y, to_x, to_y);
 	}
 	private void addPrisoner(String message) throws IOException, RequestTimedOutException {
 		String body = message.split(":")[2];

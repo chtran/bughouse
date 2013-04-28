@@ -10,5 +10,6 @@ public interface FrontEnd {
 	//Add the piece on front end
 	public void addPrisoner(int playerId, ChessPiece piece);
 	//Move the piece on the board on front end
-	public void movePiece(int boardId, int from_x, int from_y, int to_x, int to_y);
+	public void pieceMoved(int boardId, int from_x, int from_y, int to_x, int to_y);
+	public void gameStarted();
 }

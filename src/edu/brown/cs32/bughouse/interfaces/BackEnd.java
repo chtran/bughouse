@@ -25,10 +25,9 @@ public interface BackEnd {
 	public Map<Integer,ChessBoard> getBoards() throws IOException, RequestTimedOutException, GameNotReadyException;
 	public void createGame() throws IOException, RequestTimedOutException;
 	public void quit() throws IOException, RequestTimedOutException;
-	public void notifyTurn();
 	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException;
 	public Player me();
 	public void shutdown() throws IOException;
 	public List<ChessPiece> getPrisoners(int playerId);
-	public void broadcastedMove(int boardId, int from_x, int from_y, int to_x, int to_y);
+	public FrontEnd frontEnd();
 }

@@ -277,13 +277,13 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	public void startGame(int gameId) {
-		// TODO Auto-generated method stub
-		if (m_data.startGame(gameId))
+		if (m_data.startGame(gameId)) {
 			send("GAME_STARTED:" + gameId + "\n");
-		else
+			m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
+		} else {
 			send("NOT_READY:" + gameId + "\n");
+		}
 		
-		m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
 	}
 
 	public void notifyTurn(Socket s) {

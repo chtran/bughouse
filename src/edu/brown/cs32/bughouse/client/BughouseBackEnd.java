@@ -100,10 +100,7 @@ public class BughouseBackEnd implements BackEnd {
 		client.shutdown();
 	}
 
-	@Override
-	public void notifyTurn() {
-		System.out.println("It's your turn");
-	}
+
 
 	@Override
 	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException {
@@ -133,11 +130,10 @@ public class BughouseBackEnd implements BackEnd {
 		return toReturn;
 	}
 
-	@Override
-	public void broadcastedMove(int boardId, int from_x, int from_y, int to_x,
-			int to_y) {
-		frontEnd.movePiece(boardId, from_x, from_y, to_x, to_y);
-	}
 
+	@Override
+	public FrontEnd frontEnd() {
+		return this.frontEnd;
+	}
 	
 }
