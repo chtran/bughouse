@@ -185,6 +185,7 @@ public class BughouseClient implements Client {
 		int gameId = Integer.parseInt(splitted[0]);
 		backend.frontEnd().gameStarted();
 		System.out.printf("Game #%d has started!\n",gameId);
+		backend.frontEnd().gameListUpdated();
 	}
 	private void broadcastNewGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
@@ -194,6 +195,7 @@ public class BughouseClient implements Client {
 		
 		String name = getName(playerId);
 		System.out.printf("%s created game #%d\n",name,gameId);
+		backend.frontEnd().gameListUpdated();
 	}
 	private void broadcastQuitGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
@@ -203,6 +205,7 @@ public class BughouseClient implements Client {
 		
 		String name = getName(playerId);
 		System.out.printf("%s quited game #%d\n",name,gameId);
+		backend.frontEnd().gameListUpdated();
 		
 	}
 	private void broadcastJoinGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
@@ -213,16 +216,16 @@ public class BughouseClient implements Client {
 		
 		String name = getName(playerId);
 		System.out.printf("%s joined game #%d\n",name,gameId);
-		
+		backend.frontEnd().gameListUpdated();
 	}
 	private void broadcastMove(String message) {
 		String body = message.split(":")[2];
 		String[] splitted = body.split("\t");
-		int boardId = Integer.parseInt(splitted[2]);
-		int from_x = Integer.parseInt(splitted[3]);
-		int from_y = Integer.parseInt(splitted[4]);
-		int to_x = Integer.parseInt(splitted[5]);
-		int to_y = Integer.parseInt(splitted[6]);
+		int boardId = Integer.parseInt(splitted[0]);
+		int from_x = Integer.parseInt(splitted[1]);
+		int from_y = Integer.parseInt(splitted[2]);
+		int to_x = Integer.parseInt(splitted[3]);
+		int to_y = Integer.parseInt(splitted[4]);
 		backend.frontEnd().pieceMoved(boardId, from_x, from_y, to_x, to_y);
 	}
 	private void addPrisoner(String message) throws IOException, RequestTimedOutException {

@@ -60,7 +60,7 @@ public class ClientPool {
 	public synchronized void broadcastToGame(int gameID, String msg, BughouseClientHandler sender) {
 		for (BughouseClientHandler client : m_clients) {
 			// only broadcast message to clients in given game
-			if (client.getGameId() == gameID && sender != null && sender != client)
+			if (client.getGameId() == gameID && sender != null)
 				client.send(msg);
 		}
 	}

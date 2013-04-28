@@ -27,8 +27,8 @@ gameIsActive: check if a game is active
     + Action: None
     + Response: true\n if active, false\n otherwise
 
-getPlayers: get the list of players in a game
-    + Request: GET_PLAYERS:[gameId]\n
+getPlayers: get the list of players in a game by team
+    + Request: GET_PLAYERS:[gameId]\t[team]\n
     + Action: None
     + Response: [userId1]\t[userId2]\n...
 
