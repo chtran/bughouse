@@ -55,6 +55,7 @@ public class ServerData {
 			m_nextBoardId += 2;
 			GameInfo g = new GameInfo(gameId, ownerId, board1Id, board1Id+1);
 			PlayerInfo p = m_players.get(ownerId);
+			p.setGameId(gameId);
 			g.addPlayer(p, 1);
 			
 			m_games.put(gameId, g);
@@ -246,7 +247,16 @@ public class ServerData {
 		}
 	}
 	
+	/**
+	 * Gets gameID of current player 
+	 * @param playerId
+	 * @return gameID or -1 if player not in game or player does not exist
+	 */
 	public int getCurrentGame(int playerId) {
-		return m_players.get(playerId).getGameId();
+		PlayerInfo p = m_players.get(playerId);
+		if (p != null)
+			return p.getGameId();
+		else
+			return -1;
 	}
 }

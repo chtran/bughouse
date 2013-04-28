@@ -80,7 +80,7 @@ public class BughouseClientHandler extends Thread {
 						} else if (headerSplit[0].compareTo("GET_OWNER") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
 							sendGameOwner(id);
-							// GET_OWNER:[gameId]\n
+						// GET_CURRENT_GAME:[playerId]\n
 						} else if (headerSplit[0].compareTo("GET_CURRENT_GAME") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
 							sendCurrentGame(id);
@@ -423,12 +423,17 @@ public class BughouseClientHandler extends Thread {
 		send(owner + "\n");
 	}
 	/**
-	 * Sends GAME_OWNER:[gameId]\t[userId]\n
+	 * Sends GET_CURRENT_GAME:[userId]\n
 	 * @param gameId
 	 */
 	private void sendCurrentGame(int playerId) {
-		int owner = m_data.getCurrentGame(playerId);
-		send(owner + "\n");
+		int gameId;
+		if (playerId == m_playerInfo.getId()) {
+			gameId = m_playerInfo.getGameId();
+		} else {
+			gameId = m_data.getCurrentGame(playerId);
+		}
+		send(gameId + "\n");
 	}
 	/**
 	    - Set current gameId of the player to -1
