@@ -47,14 +47,15 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private BackEnd backend_;
 	
 
-	public BughouseGUI(){
+	public BughouseGUI(BackEnd backend){
 		super("Bughouse Chess");
-	//	this.backend_ = backend;
+		this.backend_ = backend;
 		Container content = this.getContentPane();
 		content.setLayout(new CardLayout());
 		this.setPreferredSize(new Dimension(800,700));
 		this.setResizable(false);
 	//	content.add(setupMainMenu());
+		content.add(setupRoomMenu(backend_));
 		content.add(setupGameView());
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
@@ -137,12 +138,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		return game_;
 	}
 
-	
-	public static void main (String[] argv){
-		new BughouseGUI();
-	
-	}
-
 
 	@Override
 	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
@@ -155,6 +150,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public void gameStarted() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	private JPanel setupRoomMenu(BackEnd backend){
+		return new RoomMenu(backend);
 	}
 
 	
