@@ -51,11 +51,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private BackEnd backend_;
 	private RoomMenu rooms_;
 	private JFrame home_;
+	private Container content_;
+	private ConnectToServerMenu joinServerMenu_;
 	
 
 	public BughouseGUI(String[] argv){
 		super("Bughouse Chess");
-		home_ = this;
 		try {
 			this.backend_ = new BughouseBackEnd(this,argv[0],new Integer(argv[1]));
 		} catch (UnknownHostException e) {
@@ -68,13 +69,13 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Container content = this.getContentPane();
-		content.setLayout(new CardLayout());
+		content_ = this.getContentPane();
+		content_.setLayout(new CardLayout());
 		this.setPreferredSize(new Dimension(800,700));
 		this.setResizable(false);
-	//	content.add(setupMainMenu());
-		content.add(setupRoomMenu(backend_));
-		content.add(setupGameView());
+		content_.add(setupJoinServerMenu(),"Join");
+		content_.add(setupRoomMenu(), "Rooms");
+		content_.add(setupGameView(), "Game");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
 		this.setVisible(true);
@@ -172,23 +173,30 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void gameStarted() {
-		// TODO Auto-generated method stub
-		home_.getContentPane().removeAll();
-		home_.getContentPane().add(setupGameView());
-		home_.revalidate();
-		home_.repaint();
+		CardLayout cards = (CardLayout) content_.getLayout();
+		cards.show(content_, "Game");
 	}
 	
-	private JPanel setupRoomMenu(BackEnd backend){
-		rooms_ = new RoomMenu(backend);
+	public void joinServer(){
+		CardLayout cards = (CardLayout)content_.getLayout();
+		cards.show(content_, "Rooms");
+	}
+	
+	private JPanel setupJoinServerMenu(){
+		joinServerMenu_ = new ConnectToServerMenu(this,backend_);
+		return joinServerMenu_;
+	}
+	
+	private JPanel setupRoomMenu(){
+		rooms_ = new RoomMenu(backend_);
 		return rooms_;
 	}
 
 	@Override
 	public void gameListUpdated() {
-		// TODO Auto-generated method stub
 		rooms_.updateGames();
 	}
+	
 
 	
 
