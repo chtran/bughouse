@@ -64,6 +64,7 @@ public class CommandLine implements FrontEnd{
 		for (Player p: g.getPlayersByTeam(2)) System.out.print(p.getName()+" ");
 		System.out.println();
 	}
+	
 	private void joinGame(String line) throws IOException, RequestTimedOutException, TeamFullException {
 		String[] splitted = line.split(" ");
 		int gameId = Integer.parseInt(splitted[1]);
