@@ -91,6 +91,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public void showEndGameMessage() {
 		game_.notifyEndGame();
 		
+		
 	}
 	
 	/*
