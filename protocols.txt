@@ -13,13 +13,13 @@ createGame: create new game
         - Set the current team of user_id to 1
         - Broadcast "GAME_CHANGED" to all other clients so they request updated info
     + Response: [id]\n
-        the id of the newly created game
+        the id of the newly created game (-1 if failed)
 
 getGames: get the list of all the games
     + Request: GET_GAMES:\n 
     (note: the above one is a little sketchy but I'm not sure if just a space after the colon will work)
     + Action: None
-    + Response: [gameId1]\t[gameId2]\n....
+    + Response: [gameId1]\t[gameId2]\n.... or \n if failed
 
 gameIsActive: check if a game is active
     + Request: GAME_IS_ACTIVE:[gameId]\n
@@ -29,17 +29,17 @@ gameIsActive: check if a game is active
 getPlayers: get the list of players in a game by team
     + Request: GET_PLAYERS:[gameId]\t[team]\n
     + Action: None
-    + Response: [userId1]\t[userId2]\n...
+    + Response: [userId1]\t[userId2]\n... or "\n" if failed
 
 getOwnerId: get the id of the owner of a game
     + Request: GET_OWNER:[gameId]\n
     + Action: None
-    + Response: [userId]\n
+    + Response: [userId]\n (-1 if failed)
 
 getBoards: get the board id of a game
     + Request: GET_BOARDS:[gameId]\n
     + Action: None
-    + Response: [board1Id]\t[board2Id]\n
+    + Response: [board1Id]\t[board2Id]\n or \n if failed
 
 startGame: start the game
     + Request: START_GAME:[gameId]\t[playerId]\n
@@ -64,7 +64,7 @@ addNewPlayer: add a new player
 getName: get the name of a player
     + Request: GET_NAME:[playerId]\n
     + Action: None
-    + Response: [name]\n
+    + Response: [name]\n or "ERROR: player with id [playerId] does not exist\n"
 
 isWhite: check the color of of a player
     + Request: IS_WHITE:[playerId]\n
@@ -75,7 +75,7 @@ isWhite: check the color of of a player
 getCurrentTeam: get the current team of a player
     + Request: GET_TEAM:[playerId]\n
     + Action: None
-    + Response: "1\n" or "2\n"
+    + Response: "1\n" or "2\n" or "-1\n" if not on team or player does not exist
 
 joinGame: when a player joins a game
     + Request: JOIN_GAME:[playerId]\t[gameId]\t[team]\n
@@ -88,7 +88,7 @@ joinGame: when a player joins a game
 getBoardId: get the current board id of a player
     + Request: GET_CURRENT_BOARD:[playerId]\n
     + Action: None
-    + Response: [boardId]\n
+    + Response: [boardId]\n (-1 if failed)
 
 move: move a chesspiece
     + Request: MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
@@ -107,7 +107,7 @@ quit: when a player exit a game
         - Broadcast a quit message to all the players in the room
         "BROADCAST\tQUIT:[playerId]\t[gameId]\n"
     + Response:
-        - "QUIT_OK:[playerId]\n" if everything went well
+        - "QUIT_OK" if everything went well, "QUIT_FAILED" if failed
 
 gameOver:
     + Request: GAME_OVER:[gameId]\t[team]
