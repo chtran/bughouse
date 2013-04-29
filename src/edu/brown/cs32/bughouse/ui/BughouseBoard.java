@@ -184,7 +184,7 @@ public class BughouseBoard extends JPanel {
 						return;
 					}catch (WrongColorException e) {
 						// TODO Auto-generated catch block
-						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please" +
+						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please " +
 								"move another chess piece of yours", 
 								"Piece Error", JOptionPane.ERROR_MESSAGE);
 						return;

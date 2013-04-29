@@ -51,7 +51,7 @@ public class GameView extends JPanel {
 		this.add(this.createBoard(), BorderLayout.CENTER);
 		this.add(this.createOptionMenu(),BorderLayout.EAST);
 		this.add(this.createPieceHolder(),BorderLayout.SOUTH);
-		this.notifyUser();
+
 	}
 	
 	

@@ -77,10 +77,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 * @see edu.brown.cs32.bughouse.interfaces.FrontEnd#notifyUserTurn()
 	 *  Notifies this user that it is his/her turn
 	 */
-	/*@Override
+	@Override
 	public void notifyUserTurn() {
 		game_.notifyUser();
-	}*/
+	}
 	
 	/*
 	 * (non-Javadoc)

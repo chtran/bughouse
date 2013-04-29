@@ -155,24 +155,24 @@ public class RoomMenu extends JPanel {
 		start.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-						try {
-							backend_.startGame();
-							front_.gameStarted();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						} catch (RequestTimedOutException e1) {
-							JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-									"Connection time out", JOptionPane.ERROR_MESSAGE);
-							return;
-						} catch (GameNotReadyException e1) {
-							JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
-									"Cannot start game", JOptionPane.ERROR_MESSAGE);
-							return;
-						} catch (UnauthorizedException e1) {
-							JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
-									"Authorization error", JOptionPane.ERROR_MESSAGE);
-							return;
-						}
+					try {
+						backend_.startGame();
+						front_.gameStarted();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (RequestTimedOutException e1) {
+						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						return;
+					} catch (GameNotReadyException e1) {
+						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+								"Cannot start game", JOptionPane.ERROR_MESSAGE);
+						return;
+					} catch (UnauthorizedException e1) {
+						JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
+								"Authorization error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					
 			}
 		});
@@ -183,7 +183,6 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public void updateGames() throws IOException, RequestTimedOutException{
-
 		 list_.setEnabled(true);
 		 roomList_.remove(list_);
 	     DefaultListModel<String> options = new DefaultListModel<>();
