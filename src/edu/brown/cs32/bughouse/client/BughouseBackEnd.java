@@ -3,6 +3,7 @@ package edu.brown.cs32.bughouse.client;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class BughouseBackEnd implements BackEnd {
 	private Player me;
 	private FrontEnd frontEnd;
 	private HashMap<Integer, List<ChessPiece>> prisoners;
+	private Map<Integer, ChessBoard> currentBoards;
 	public BughouseBackEnd(FrontEnd frontEnd,String host, int port) throws UnknownHostException, IllegalArgumentException, IOException {
 		this.frontEnd = frontEnd;
 		this.client = new BughouseClient(host,port,this);
@@ -88,7 +90,6 @@ public class BughouseBackEnd implements BackEnd {
 
 	@Override
 	public void shutdown() throws IOException {
-		// TODO Auto-generated method stub
 		client.shutdown();
 	}
 
@@ -113,7 +114,7 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public Map<Integer,ChessBoard> getBoards() throws IOException,	RequestTimedOutException, GameNotReadyException {
+	public void setBoards() throws IOException,	RequestTimedOutException {
 		List<Integer> boardIds = client.getBoards(me.getCurrentGame().getId());
 		Map<Integer,ChessBoard> toReturn = new HashMap<Integer,ChessBoard>();
 		for (int boardId: boardIds) {
@@ -123,13 +124,32 @@ public class BughouseBackEnd implements BackEnd {
 			}
 			toReturn.put(boardId,board);
 		}
-		return toReturn;
+		System.out.println("Setting currentBoards to: "+toReturn);
+		currentBoards= toReturn;
 	}
 
 
 	@Override
 	public FrontEnd frontEnd() {
 		return this.frontEnd;
+	}
+
+
+
+
+	@Override
+	public void updateBoard(int boardId, int from_x, int from_y, int to_x,
+			int to_y) {
+		currentBoards.get(boardId).pieceMoved(from_x, from_y, to_x, to_y);
+	}
+
+
+
+
+	@Override
+	public Collection<ChessBoard> getCurrentBoards() {
+		
+		return currentBoards.values();
 	}
 	
 }

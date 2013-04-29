@@ -55,9 +55,9 @@ public class ServerData {
 			m_nextBoardId += 2;
 			GameInfo g = new GameInfo(gameId, ownerId, board1Id, board1Id+1);
 			PlayerInfo p = m_players.get(ownerId);
-			p.setGameId(gameId);
 			g.addPlayer(p, 1);
-			
+			p.setTeamId(1);
+			p.setGameId(gameId);
 			m_games.put(gameId, g);
 			return gameId;
 		}

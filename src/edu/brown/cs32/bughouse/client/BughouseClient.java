@@ -183,13 +183,15 @@ public class BughouseClient implements Client {
 		}
 	}
 
-	private void broadcastGameStarted(String message) {
+	private void broadcastGameStarted(String message) throws IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
-		String[] splitted = body.split("\t");
-		int gameId = Integer.parseInt(splitted[0]);
-		backend.frontEnd().gameStarted();
-		System.out.printf("Game #%d has started!\n",gameId);
-		backend.frontEnd().gameListUpdated();
+		int gameId = Integer.parseInt(body.trim());
+		if (backend.me().getCurrentGame().getId()==gameId) {
+			backend.setBoards();
+			backend.frontEnd().gameStarted();
+		} else {
+			backend.frontEnd().gameListUpdated();
+		}
 	}
 	private void broadcastNewGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
@@ -231,6 +233,7 @@ public class BughouseClient implements Client {
 		int to_x = Integer.parseInt(splitted[3]);
 		int to_y = Integer.parseInt(splitted[4]);
 		backend.frontEnd().pieceMoved(boardId, from_x, from_y, to_x, to_y);
+		backend.updateBoard(boardId, from_x, from_y, to_x, to_y);
 	}
 	private void addPrisoner(String message) throws IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
@@ -246,15 +249,15 @@ public class BughouseClient implements Client {
 	}
 	@Override
 	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("GAME_OVER:%d\t%d",gameId,team));
+		socket.getResponse(String.format("GAME_OVER:%d\t%d\n",gameId,team));
 	}
 	@Override
 	public void pass(int fromId, int toId, int chessPieceType) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("PASS:%d\t%d\t%d", fromId, toId, chessPieceType));
+		socket.getResponse(String.format("PASS:%d\t%d\t%d\n", fromId, toId, chessPieceType));
 	}
 	@Override
 	public void put(int chessPieceType, int color, int x, int y) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("PUT:%d\t%d\t%d\t%d", chessPieceType, color, x,y));
+		socket.getResponse(String.format("PUT:%d\t%d\t%d\t%d\n", chessPieceType, color, x,y));
 	}
 
 	
