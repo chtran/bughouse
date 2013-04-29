@@ -12,6 +12,7 @@ import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
+import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 import edu.brown.cs32.bughouse.models.ChessBoard;
@@ -22,7 +23,7 @@ import edu.brown.cs32.bughouse.models.Player;
 public class CommandLine implements FrontEnd{
 	BackEnd backend;
 	List<Game> currentGames;
-	Map<Integer, ChessBoard> currentBoards;
+	
 	public CommandLine(String host, int port) {
 		try {
 			this.backend = new BughouseBackEnd(this,host,port);
@@ -76,30 +77,21 @@ public class CommandLine implements FrontEnd{
 	private void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
 		try {
 			backend.startGame();
-			currentBoards = backend.getBoards();
 		} catch (UnauthorizedException e) {
 			System.out.println("You are not authorized to start game");
 		}
 	}
 	//When server starts the game (client not owner)
 	public void gameStarted() {
-		try {
-			currentBoards = backend.getBoards();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RequestTimedOutException e) {
-			System.out.println("Request timed out");
-		} catch (GameNotReadyException e) {
-			System.out.println("Game not ready");
-		}
+		System.out.println("Your game started!");
 	}
-	private void move(String line) throws IllegalMoveException, IOException, RequestTimedOutException {
+	private void movePiece(String line) throws IllegalMoveException, IOException, RequestTimedOutException, WrongColorException {
 		String[] splitted = line.split(" ");
 		int from_x = Integer.parseInt(splitted[1]);
 		int from_y = Integer.parseInt(splitted[2]);
 		int to_x = Integer.parseInt(splitted[3]);
 		int to_y = Integer.parseInt(splitted[4]);
-		backend.move(from_x, from_y, to_x, to_y);
+		backend.me().move(from_x, from_y, to_x, to_y);
 		System.out.println("Moved successfully");
 	}
  	public void run() throws IOException, RequestTimedOutException {
@@ -132,7 +124,10 @@ public class CommandLine implements FrontEnd{
 						startGame();
 						break;
 					case "move":
-						move(line);
+						movePiece(line);
+						break;
+					case "quit":
+						backend.quit();
 						break;
 					case "print_board":
 						printBoards();
@@ -152,6 +147,9 @@ public class CommandLine implements FrontEnd{
 				System.out.println("ERROR: Game not ready");
 			} catch (IllegalMoveException e) {
 				System.out.println("ERROR: Move not legal");
+				e.printStackTrace();
+			} catch (WrongColorException e) {
+				System.out.println("ERROR: Wrong color");
 			}
 		}
 		
@@ -176,17 +174,9 @@ public class CommandLine implements FrontEnd{
 		return;
 	}
 	public void printBoards() throws IOException, RequestTimedOutException {
-		System.out.printf("You are %s in board %d\n",backend.me().isWhite() ? "white" : "black", backend.me().getCurrentBoard().getId());
-		for (ChessBoard board: currentBoards.values()) {
-			System.out.println("Board #"+board.getId());
-			for (int y=7; y>=0; y--) {
-				for (int x=0; x<=7; x++) {
-					System.out.print(board.getPiece(x, y)+"\t");
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}
+		System.out.printf("You are %s in board %d\n",backend.me().isWhite() ? "white" : "black", backend.me().getCurrentBoardId());
+		for (ChessBoard board: backend.getCurrentBoards())
+			System.out.println(board);
 	}
 	public static void main(String[] args) {
 		String host = args[0];
@@ -210,15 +200,14 @@ public class CommandLine implements FrontEnd{
 	@Override
 	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
 			int to_y) {
-		try {
-			System.out.printf("Board #%d: (%d,%d) moved to (%d,%d)\n",boardId,from_x,from_y,to_x,to_y);
-			currentBoards.get(boardId).move(from_x, from_y, to_x, to_y);
-		} catch (IllegalMoveException e) {
-			System.out.println("Illegal move!");
-		}
+		System.out.printf("Board #%d: (%d,%d) moved to (%d,%d)\n",boardId,from_x,from_y,to_x,to_y);
 	}
 	@Override
 	public void gameListUpdated() {
 		System.out.println("Game list updated");
+	}
+	@Override
+	public void prisonersUpdated() {
+		
 	}
 }

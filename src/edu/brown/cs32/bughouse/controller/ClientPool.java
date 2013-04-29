@@ -50,10 +50,6 @@ public class ClientPool {
 	 */
 	public synchronized void broadcast(String message, BughouseClientHandler sender) {
 		for (BughouseClientHandler client : m_clients) {
-			if (sender != null && sender == client) {
-				continue;
-			}
-
 			client.send(message);
 		}
 	}

@@ -1,7 +1,11 @@
 package edu.brown.cs32.bughouse.models;
 
+import java.io.IOException;
+
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 
 
 /**
@@ -50,19 +54,28 @@ public class ChessBoard extends Model {
 		return (this.board[x][y]!=null);
 	}
 	
-	public ChessPiece move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException {
+	public ChessPiece movePiece(boolean isWhite, int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, WrongColorException, IOException, RequestTimedOutException {
+		System.out.println(toString());
 		if (!isOccupied(from_x, from_y)) throw new IllegalMoveException();
 		if (isOccupied(to_x,to_y)) {
 			if (board[from_x][from_y].isWhite()==board[to_x][to_y].isWhite()) {
 				throw new IllegalMoveException();
 			}
 		}
+		if (board[from_x][from_y].isWhite()!=isWhite) throw new WrongColorException();
 		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y)) throw new IllegalMoveException();
 		ChessPiece captured = board[to_x][to_y];
-		board[to_x][to_y] = board[from_x][from_y];
-		board[from_x][from_y]=null;
+
+		client.move(getId(), from_x, from_y, to_x, to_y);
+
 		return captured;
 	}
+	
+	public void pieceMoved(int from_x, int from_y, int to_x, int to_y) {
+		board[to_x][to_y] = board[from_x][from_y];
+		board[from_x][from_y]=null;
+	}
+	
 	public void put(ChessPiece piece, int x, int y) throws IllegalPlacementException {
 		if (board[x][y]!=null) throw new IllegalPlacementException();
 		board[x][y]=piece;
@@ -78,4 +91,17 @@ public class ChessBoard extends Model {
 	public Player getBlackPlayer() {
 		return this.black;
 	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Board #"+getId()+"\n");
+		for (int y=7; y>=0; y--) {
+			for (int x=0; x<=7; x++) {
+				builder.append(getPiece(x, y)+"\t");
+			}
+			builder.append("\n");
+		}
+		return new String(builder);
+	}
+	
 }

@@ -130,9 +130,10 @@ public class BughouseClientHandler extends Thread {
 						} else if (headerSplit[0].compareTo("QUIT") == 0) {
 							id = Integer.parseInt(headerSplit[1]);
 							quit(id);
-						// PUT:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
-						} else if (headerSplit[0].compareTo("PUT") == 0) {
+						// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
+						} else if (headerSplit[0].compareTo("PASS") == 0) {
 							msgSplit = headerSplit[1].split("\t");
+							send("\n");
 							if (msgSplit.length == 3) {
 								id = Integer.parseInt(msgSplit[1]);
 								m_pool.sendToPlayer(id, msg);
@@ -151,6 +152,7 @@ public class BughouseClientHandler extends Thread {
 	 * @return ID
 	 */
 	public int getGameId() {
+		System.out.println("m_playerInfo: "+m_playerInfo);
 		return m_playerInfo.getGameId();
 	}
 	
@@ -182,9 +184,11 @@ public class BughouseClientHandler extends Thread {
 				System.out.println("Next turn: " + next);
 				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			} else {
+				System.out.println("GameId incorrect: "+gameID);
 				send("MOVE_FAILED" + id + "\n");
 			}
 		} else {
+			System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
 			send("MOVE_FAILED:" + id + "\n");
 		}
 	}
@@ -199,7 +203,7 @@ public class BughouseClientHandler extends Thread {
 		if (board > 0)
 			send(board + "\n");
 		else
-			send("ERROR: board not initialized for player " + id);
+			send("ERROR: board not initialized for player\n " + id);
 	}
 
 	/**
@@ -212,8 +216,9 @@ public class BughouseClientHandler extends Thread {
 			send("1\n");
 		else if (team == 2)
 			send("2\n");
-		else
-			send("ERROR: player not in game");
+		else {
+			send("ERROR: player not in game\n");
+		}
 	}
 
 	/**
@@ -248,6 +253,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
+		System.out.println("Setting m_playerInfo to "+p);
 		m_playerInfo = p;
 		int id = p.getId();
 		m_pool.addToMap(id, this);

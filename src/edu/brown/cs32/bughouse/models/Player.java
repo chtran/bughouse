@@ -3,8 +3,10 @@ package edu.brown.cs32.bughouse.models;
 import java.io.IOException;
 import java.util.List;
 
+import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 
 /**
  * belongsTo: ChessBoard, Room, Server
@@ -12,6 +14,7 @@ import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
  * @author chtran
  */
 public class Player extends Model {
+	private ChessBoard currentBoard;
 	public Player(int id) {
 		super(id);
 	}
@@ -23,12 +26,22 @@ public class Player extends Model {
 		Game toReturn = new Game(gameId);
 		return toReturn;
 	}
-	
-	public ChessBoard getCurrentBoard() throws IOException, RequestTimedOutException {
-		int boardId = client.getBoardId(id);
-		return new ChessBoard(boardId);
+	public void setBoard(ChessBoard board) {
+		this.currentBoard = board;
 	}
 
+	public int getCurrentBoardId() throws IOException, RequestTimedOutException {
+		return client.getBoardId(id);
+	}
+	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException, WrongColorException {
+		ChessPiece captured = currentBoard.movePiece(isWhite(),from_x, from_y, to_x, to_y);
+		if (captured!=null) {
+			pass(captured);
+			if (captured.isKing()) {
+				client.gameOver(getCurrentGame().getId(), client.getCurrentTeam(getId()));
+			}
+		}
+	}
 	public boolean isWhite() throws IOException, RequestTimedOutException {
 		return client.isWhite(id);
 	}

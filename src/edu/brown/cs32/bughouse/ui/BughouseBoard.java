@@ -8,12 +8,13 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 
 public class BughouseBoard extends JPanel {
@@ -36,6 +37,7 @@ public class BughouseBoard extends JPanel {
 		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.setPreferredSize(new Dimension(400,400));
+		this.turn_ = false;
 		Color current = Color.GRAY;
 		for (int i = 0; i<8;i++){
 			for (int j = 0; j<8;j++){
@@ -50,8 +52,7 @@ public class BughouseBoard extends JPanel {
 				}
 				box.setBorder(null);
 				box.add(this.createPiece(i,j));
-				this.add(box);
-				
+				this.add(box);		
 			}
 			if (current == Color.GRAY){
 				current = Color.WHITE;
@@ -65,6 +66,7 @@ public class BughouseBoard extends JPanel {
 	
 	public void startTurn(){
 		turn_ = true;
+		JOptionPane.showMessageDialog(this, "Your turn");
 	}
 	
 	
@@ -141,25 +143,10 @@ public class BughouseBoard extends JPanel {
 		
 	}
 	
-	private class UserInputListener implements MouseListener {
-		
-
-		@Override
-		public void mouseClicked(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
+	private class UserInputListener implements MouseListener {	
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
-			// TODO Auto-generated method stub
 			current_ = (JLabel) arg0.getSource();
-		}
-
-		@Override
-		public void mouseExited(MouseEvent arg0) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -173,39 +160,43 @@ public class BughouseBoard extends JPanel {
 				System.out.println("Coordinates to send x "+ originX_ + " "+originY_);
 			}
 		}
-
+		
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
-			// TODO call backend move and catch errors
 			if (source_ != null && (!(source_.equals(current_))) && turn_){
 				JPanel curSquare = (JPanel) current_.getParent();
 				destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
 				destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
 				System.out.println("Dest x "+destX_+ " "+destY_);
 					 try {
-						//turn_ = false;
-						backend_.move(originX_, originY_, destX_, destY_);
+						turn_ = false;
+						backend_.me().move(originX_, originY_, destX_, destY_);
 					} catch (IllegalMoveException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						System.out.println("Illegal Move");
+						JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
+								"Illegal Move Error", JOptionPane.ERROR_MESSAGE);
 						turn_ = true;
+						return;
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
-						System.out.println("IO Exception");
 					} catch (RequestTimedOutException e) {
+						JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+								"Timeout Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}catch (WrongColorException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
-						System.out.println("RequestTimedOut");
+						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please " +
+								"move another chess piece of yours", 
+								"Piece Error", JOptionPane.ERROR_MESSAGE);
+						return;
 					}
-					//JDialog illegalMove = new JOptionPane("That move is illegal", ERROR_MESSAGE);
-				
-				
-				// notify backend/server/user that the current turn has ended
 			}
 		}
-		
+
+		@Override
+		public void mouseExited(MouseEvent arg0) {}
+
+		@Override
+		public void mouseClicked(MouseEvent arg0) {}
 	}
 	
 }

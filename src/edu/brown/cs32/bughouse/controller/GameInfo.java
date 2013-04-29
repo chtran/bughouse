@@ -206,15 +206,20 @@ public class GameInfo {
 	 * Returns team number for player with given id
 	 * @param id
 	 */
-	public int getPlayerTeam(int id) {
+	/*public int getPlayerTeam(int id) {
 		if (m_team1.contains(id))
 			return 1;
 		else if (m_team2.contains(id))
 			return 2;
 		else
 			return -1;
+	}*/
+	
+	public int getPlayerTeam(int id) {
+		for (PlayerInfo p: m_team1) if (p.getId()==id) return 1;
+		for (PlayerInfo p: m_team2) if (p.getId()==id) return 2;
+		return -1;
 	}
-
 	/**
 	 * Returns playerID of player with next turn
 	 * @return

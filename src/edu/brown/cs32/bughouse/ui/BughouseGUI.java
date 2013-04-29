@@ -1,36 +1,17 @@
 package edu.brown.cs32.bughouse.ui;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.LayoutManager;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-
 import edu.brown.cs32.bughouse.client.BughouseBackEnd;
+import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 import edu.brown.cs32.bughouse.models.ChessPiece;
@@ -50,7 +31,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	private GameView game_;
 	private BackEnd backend_;
 	private RoomMenu rooms_;
-	private JFrame home_;
 	private Container content_;
 	private ConnectToServerMenu joinServerMenu_;
 	
@@ -60,13 +40,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		try {
 			this.backend_ = new BughouseBackEnd(this,argv[0],new Integer(argv[1]));
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		content_ = this.getContentPane();
@@ -102,7 +79,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	@Override
 	public void notifyUserTurn() {
-		// TODO create JoptionPane to tell user it is her/his turn
 		game_.notifyUser();
 	}
 	
@@ -113,8 +89,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	@Override
 	public void showEndGameMessage() {
-		// TODO Auto-generated method stub
 		game_.notifyEndGame();
+		
 		
 	}
 	
@@ -139,7 +115,19 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public void gameStarted() {
 		CardLayout cards = (CardLayout) content_.getLayout();
 		cards.show(content_, "Game");
-		game_.getBoardID();
+		try {
+			game_.getBoardID();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+					"Connection timed out", JOptionPane.ERROR_MESSAGE);
+			return;
+		} catch (GameNotReadyException e) {
+			JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+					"Cannot start game", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 	}
 	
 	public void joinServer(){
@@ -159,7 +147,21 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void gameListUpdated() {
-		rooms_.updateGames();
+		try {
+			rooms_.updateGames();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+					"Time out error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+	}
+
+	@Override
+	public void prisonersUpdated() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 
