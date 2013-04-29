@@ -8,8 +8,11 @@ public class GameInfo {
 	private boolean m_isActive = true; // default to true because players can join game
 	private Map<Integer, Integer[]> m_boards; // boardId -> [player1ID, player2ID]
 	private int[] m_boardIds;
-	private List<PlayerInfo> m_team1;
-	private List<PlayerInfo> m_team2;
+	private List<PlayerInfo> m_team1; // Team 1: {white, black}
+	private List<PlayerInfo> m_team2; // Team 2: {white, black}
+	
+	// 0 -> Team 1 white, 1 -> Team 2 black, 2 -> Team 1 black, 3 -> Team 2 white
+	private int m_turn = 1;
 
 	public GameInfo(int id, int ownerId, int board1Id, int board2Id) {
 		m_id = id;
@@ -36,6 +39,18 @@ public class GameInfo {
 			return false;
 	}
 	
+	/*
+	 * Returns true if players can join team, false if not
+	 */
+	public boolean canJoinTeam(int teamNum) {
+		if (teamNum == 1 && m_isActive && m_team1.size() < 2)
+			return true;
+		else if (teamNum == 2 && m_isActive && m_team2.size() < 2)
+			return true;
+		
+		return false;
+	}
+	
 	// Setters
 	public void setIsActive(boolean isActive) { m_isActive = isActive; }
 
@@ -45,14 +60,15 @@ public class GameInfo {
 	 * @param teamNum
 	 */
 	public boolean addPlayer(PlayerInfo player, int teamNum) {
-		// return false if unable to add player to game
-		if (!canJoin())
+		System.out.printf("Adding %s to game %d in team %d\n",player.getName(),this.m_id,teamNum);
+		// return false if unable to add player to team
+		if (!canJoinTeam(teamNum))
 			return false;
 		
 		boolean isWhite;
 		if (teamNum == 1) {
 			if (m_team1.size() > 0)
-				isWhite = m_team1.get(0).getColor() ? false : true;
+				isWhite = false;
 			else
 				isWhite = true;
 			
@@ -60,7 +76,7 @@ public class GameInfo {
 			m_team1.add(player);
 		} else {
 			if (m_team2.size() > 0)
-				isWhite = m_team2.get(0).getColor() ? false : true;
+				isWhite = false;
 			else
 				isWhite = true;
 			
@@ -86,7 +102,15 @@ public class GameInfo {
 		}
 		return players;
 	}
-	
+	public List<Integer> getPlayerIdsByTeam(int team) {
+		List<Integer> players = new ArrayList<>();
+		List<PlayerInfo> list = (team==1) ? m_team1 : m_team2;
+		// get team 1
+		for (PlayerInfo p : list) {
+			players.add(p.getId());
+		}
+		return players;
+	}
 	/**
 	 * Sets gameID, boardID, team, and color to initialized
 	 * values for all players in game (called when someone quits
@@ -182,12 +206,38 @@ public class GameInfo {
 	 * Returns team number for player with given id
 	 * @param id
 	 */
-	public int getPlayerTeam(int id) {
+	/*public int getPlayerTeam(int id) {
 		if (m_team1.contains(id))
 			return 1;
 		else if (m_team2.contains(id))
 			return 2;
 		else
 			return -1;
+	}*/
+	
+	public int getPlayerTeam(int id) {
+		for (PlayerInfo p: m_team1) if (p.getId()==id) return 1;
+		for (PlayerInfo p: m_team2) if (p.getId()==id) return 2;
+		return -1;
+	}
+	/**
+	 * Returns playerID of player with next turn
+	 * @return
+	 */
+	public int getNextTurn() {
+		switch (m_turn) {
+			case 0:
+				m_turn++;
+				return m_team1.get(0).getId();
+			case 1:
+				m_turn++;
+				return m_team2.get(1).getId();
+			case 2:
+				m_turn++;
+				return m_team1.get(1).getId();
+			default:
+				m_turn = 0;
+				return m_team2.get(0).getId();
+		}
 	}
 }

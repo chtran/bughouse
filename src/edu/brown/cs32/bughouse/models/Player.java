@@ -1,63 +1,67 @@
 package edu.brown.cs32.bughouse.models;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
+import java.util.List;
 
+import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 
 /**
  * belongsTo: ChessBoard, Room, Server
  * hasMany: ChessPieces
  * @author chtran
- *
  */
 public class Player extends Model {
-	private Game currentGame;
-	private final String name;
-	private Set<ChessPiece> prisoners;
-	private Player teammate;
 	private ChessBoard currentBoard;
-	private boolean isWhite;
-	
-	public Player(int id, String name) {
+	public Player(int id) {
 		super(id);
-		this.name = name;
-		this.prisoners = new HashSet<ChessPiece>();
 	}
-	
-	
-	public String getName() {
-		return this.name;
+	public String getName() throws IOException, RequestTimedOutException {
+		return client.getName(id);
 	}
-	public Game getCurrentGame() {
-		return this.currentGame;
+	public Game getCurrentGame() throws IOException, RequestTimedOutException {
+		int gameId = client.getGame(id);
+		Game toReturn = new Game(gameId);
+		return toReturn;
 	}
-	public ChessBoard getCurrentBoard() {
-		return this.currentBoard;
+	public void setBoard(ChessBoard board) {
+		this.currentBoard = board;
 	}
-	public Player getTeammate() {
-		return teammate;
+
+	public int getCurrentBoardId() throws IOException, RequestTimedOutException {
+		return client.getBoardId(id);
 	}
-	public boolean isWhite() {
-		return isWhite;
+	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException, WrongColorException {
+		ChessPiece captured = currentBoard.movePiece(isWhite(),from_x, from_y, to_x, to_y);
+		if (captured!=null) {
+			pass(captured);
+			if (captured.isKing()) {
+				client.gameOver(getCurrentGame().getId(), client.getCurrentTeam(getId()));
+			}
+		}
 	}
-	public void setWhite() {
-		this.isWhite = true;
+	public boolean isWhite() throws IOException, RequestTimedOutException {
+		return client.isWhite(id);
 	}
-	public void setBlack() {
-		this.isWhite = false;
+	public Player getTeammate() throws IOException, RequestTimedOutException {
+		List<Integer> playerIds = client.getPlayers(client.getGame(id),client.getCurrentTeam(id));
+		for (int playerId: playerIds) {
+			if (playerId!=id)
+				return new Player(playerId);
+		}
+		return null;
 	}
 	public void put(ChessPiece piece, int x, int y) throws IllegalPlacementException {
-		if (prisoners.contains(piece)) throw new IllegalPlacementException();
+		//TODO
+		/*if (prisoners.contains(piece)) throw new IllegalPlacementException();
 		if (currentBoard==null) return;
 		currentBoard.put(piece, x, y);
-		prisoners.remove(piece);
+		prisoners.remove(piece);*/
 	}
-	public void addPrisoner(ChessPiece piece) {
-		this.prisoners.add(piece);
-	}
-	public void setCurrentGame(Game g) {
-		this.currentGame = g;
+	public void pass(ChessPiece piece) throws IOException, RequestTimedOutException {
+		client.pass(id, getTeammate().getId(), piece.getType());
 	}
 	
 }

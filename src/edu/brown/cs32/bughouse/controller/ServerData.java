@@ -13,6 +13,8 @@ public class ServerData {
 	private int m_nextBoardId = 1; // increment every time after setting new boardId
 	private int m_nextPlayerId = 1;
 	private int m_nextGameId = 1;
+	
+	private final Object m_lock = new Object();
 
 	public ServerData() {
 		m_games = new HashMap<Integer, GameInfo>();
@@ -26,34 +28,43 @@ public class ServerData {
 	 * @return true if successful, false if unable to add player to game
 	 */
 	public boolean addPlayerToGame(int playerId, int gameId, int teamNum) {
-		GameInfo g = m_games.get(gameId);
-		PlayerInfo p = m_players.get(playerId);
-		if (g != null && p != null) {
-			if (!g.addPlayer(p, teamNum))
-				return false;
-			
-			p.setGameId(gameId);
-			p.setTeamId(teamNum);
-			return true;
+		synchronized (m_lock) {
+			GameInfo g = m_games.get(gameId);
+			PlayerInfo p = m_players.get(playerId);
+			if (g != null && p != null) {
+				if (!g.addPlayer(p, teamNum))
+					return false;
+				
+				p.setGameId(gameId);
+				p.setTeamId(teamNum);
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 
 	/**
 	 * Adds game to server info
 	 * @param ownerId
+	 * @return ID of new game or -1 if something went wrong
 	 */
 	public int addGame(int ownerId) {
-		int board1Id = m_nextBoardId;
-		int gameId = m_nextGameId;
-		m_nextGameId++;
-		m_nextBoardId += 2;
-		GameInfo g = new GameInfo(gameId, ownerId, board1Id, board1Id+1);
-		PlayerInfo p = m_players.get(ownerId);
-		g.addPlayer(p, 1);
-		
-		m_games.put(gameId, g);
-		return gameId;
+		synchronized (m_lock) {
+			PlayerInfo p = m_players.get(ownerId);
+			if (p == null)
+				return -1;
+			
+			int board1Id = m_nextBoardId;
+			int gameId = m_nextGameId;
+			m_nextGameId++;
+			m_nextBoardId += 2;
+			GameInfo g = new GameInfo(gameId, ownerId, board1Id, board1Id+1);
+			g.addPlayer(p, 1);
+			p.setTeamId(1);
+			p.setGameId(gameId);
+			m_games.put(gameId, g);
+			return gameId;
+		}
 	}
 
 	/**
@@ -61,11 +72,13 @@ public class ServerData {
 	 * @param name Name of new player
 	 */
 	public PlayerInfo addPlayer(String name) {
-		int id = m_nextPlayerId;
-		m_nextPlayerId++;
-		PlayerInfo p = new PlayerInfo(name, id);
-		m_players.put(id, p);
-		return p;
+		synchronized (m_lock) {
+			int id = m_nextPlayerId;
+			m_nextPlayerId++;
+			PlayerInfo p = new PlayerInfo(name, id);
+			m_players.put(id, p);
+			return p;
+		}
 	}
 	
 	/**
@@ -73,31 +86,61 @@ public class ServerData {
 	 * @return list of available games
 	 */
 	public List<GameInfo> getGames() {
-		List<GameInfo> games = new ArrayList<GameInfo>();
-		
-		// iterate through games and send available ones
-		GameInfo curr;
-		for (Map.Entry<Integer, GameInfo> e : m_games.entrySet()) {
-			curr = e.getValue();
-			if (curr.canJoin())
-				games.add(curr);
+		synchronized (m_lock) {
+			List<GameInfo> games = new ArrayList<GameInfo>();
+			
+			// iterate through games and send available ones
+			GameInfo curr;
+			for (Map.Entry<Integer, GameInfo> e : m_games.entrySet()) {
+				curr = e.getValue();
+				if (curr.canJoin())
+					games.add(curr);
+			}
+			return games;
 		}
-		return games;
 	}
 	
 	// TODO: figure out which one we actually want to send
+	/**
+	 * Returns list of player IDs
+	 * @param gameId
+	 * @return list of player IDs for game or null if game does not exist
+	 */
 	public List<Integer> getPlayerIds(int gameId) {
-		GameInfo g = m_games.get(gameId);
-		return g.getPlayerIds();
+		synchronized (m_lock) {
+			GameInfo g = m_games.get(gameId);
+			if (g != null)
+				return g.getPlayerIds();
+			else
+				return null;
+		}
 	}
 	
 	/**
+	 * Returns list of player IDs on team
+	 * @param gameId
+	 * @return list of player IDs for team or null if game and/or team does not exist
+	 */
+	public List<Integer> getPlayerIdsByTeam(int gameId,int team) {
+		GameInfo g = m_games.get(gameId);
+		if (g != null)
+			return g.getPlayerIdsByTeam(team);
+		else
+			return null;
+	}
+	/**
 	 * Returns true if game is active, false if not
 	 * @param id ID of game
+	 * @return true if active, false if inactive or does not exist
 	 */
 	public boolean gameIsActive(int id) {
-		GameInfo g = m_games.get(id);
-		return g.isActive();
+		synchronized (m_lock) {
+			GameInfo g = m_games.get(id);
+			if (g != null)
+				return g.isActive();
+			else
+				return false;
+		}
 	}
 
 	/**
@@ -105,8 +148,13 @@ public class ServerData {
 	 * @param gameId
 	 */
 	public int getGameOwner(int gameId) {
-		GameInfo g = m_games.get(gameId);
-		return g.getOwner();
+		synchronized (m_lock) {
+			GameInfo g = m_games.get(gameId);
+			if (g != null)
+				return g.getOwner();
+			else
+				return -1;
+		}
 	}
 	
 	/**
@@ -114,8 +162,13 @@ public class ServerData {
 	 * @param gameId
 	 */
 	public int[] getBoards(int gameId) {
-		GameInfo g = m_games.get(gameId);
-		return g.getBoardIds();
+		synchronized (m_lock) {
+			GameInfo g = m_games.get(gameId);
+			if (g != null)
+				return g.getBoardIds();
+			else
+				return null;
+		}
 	}
 
 	/**
@@ -125,14 +178,16 @@ public class ServerData {
 	 * @return true if game started successfully, false if < 4 players in game and/or game not active
 	 */
 	public boolean startGame(int gameId) {
-		GameInfo g = m_games.get(gameId);
-		List<Integer> players = g.getPlayerIds();
-		if (players != null && players.size() == 4 && g.isActive()) {
-			g.setIsActive(false);
-			g.assignBoards();
-			return true;
+		synchronized (m_lock) {
+			GameInfo g = m_games.get(gameId);
+			List<Integer> players = g.getPlayerIds();
+			if (players != null && players.size() == 4 && g.isActive()) {
+				g.setIsActive(false);
+				g.assignBoards();
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 
 	/**
@@ -140,23 +195,28 @@ public class ServerData {
 	 * @param id
 	 */
 	public String getPlayerName(int id) {
-		PlayerInfo p = m_players.get(id);
-		if (p != null)
-			return p.getName();
-		else
-			return null;
+		synchronized (m_lock) {
+			PlayerInfo p = m_players.get(id);
+			if (p != null)
+				return p.getName();
+			else
+				return null;
+		}
 	}
 
 	/**
 	 * Returns true if player ID is white, false if not
-	 * @param id
+	 * @param id Player id
+	 * @return true if white, false if not or does not exist
 	 */
 	public boolean isWhite(int id) {
-		PlayerInfo p = m_players.get(id);
-		if (p.getColor())
-			return true;
-		else
-			return false;
+		synchronized (m_lock) {
+			PlayerInfo p = m_players.get(id);
+			if (p != null && p.getColor())
+				return true;
+			else
+				return false;
+		}
 	}
 
 	/**
@@ -164,13 +224,13 @@ public class ServerData {
 	 * @param id
 	 */
 	public int getPlayerTeam(int id) {
-		PlayerInfo p = m_players.get(id);
-		int g = p.getGameId();
-		if (g > 0) {
-			GameInfo game = m_games.get(g);
-			return game.getPlayerTeam(id);
+		synchronized (m_lock) {
+			PlayerInfo p = m_players.get(id);
+			if (p != null)
+				return p.getTeamId();
+			else
+				return -1;
 		}
-		return -1;
 	}
 
 	/**
@@ -179,11 +239,13 @@ public class ServerData {
 	 * @return board ID or -1 if not in game or assigned to board
 	 */
 	public int getPlayerBoard(int id) {
-		PlayerInfo p = m_players.get(id);
-		if (p != null)
-			return p.getBoardId();
-		else
-			return -1;
+		synchronized (m_lock) {
+			PlayerInfo p = m_players.get(id);
+			if (p != null)
+				return p.getBoardId();
+			else
+				return -1;
+		}
 	}
 
 	/**
@@ -193,12 +255,46 @@ public class ServerData {
 	 * @param id
 	 */
 	public void playerQuit(int id) {
-		PlayerInfo p = m_players.get(id);
-		int gameID;
-		if ((gameID = p.getGameId()) > 0) {
-			GameInfo g = m_games.get(gameID);
-			g.resetPlayers();
-			m_games.remove(g);
+		synchronized (m_lock) {
+			PlayerInfo p = m_players.get(id);
+			if (p != null) {
+				int gameID;
+				if ((gameID = p.getGameId()) > 0) {
+					GameInfo g = m_games.get(gameID);
+					if (g != null) {
+						g.resetPlayers();
+						m_games.remove(g);
+					}
+				}
+			}
 		}
+	}
+
+	/**
+	 * Returns id of player whose turn is next in game
+	 * @param gameID
+	 * @return id of next player or -1 if game does not exist
+	 */
+	public int getNextTurn(int gameID) {
+		synchronized (m_lock) {
+			GameInfo g = m_games.get(gameID);
+			if (g != null)
+				return g.getNextTurn();
+			else
+				return -1;
+		}
+	}
+	
+	/**
+	 * Gets gameID of current player 
+	 * @param playerId
+	 * @return gameID or -1 if player not in game or player does not exist
+	 */
+	public int getCurrentGame(int playerId) {
+		PlayerInfo p = m_players.get(playerId);
+		if (p != null)
+			return p.getGameId();
+		else
+			return -1;
 	}
 }

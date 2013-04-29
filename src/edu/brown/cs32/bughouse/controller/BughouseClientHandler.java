@@ -49,82 +49,119 @@ public class BughouseClientHandler extends Thread {
 		String[] headerSplit;
 		String[] msgSplit;
 		int id;
+		int team;
 		try {
 			while (true) {
 				if ((msg = m_input.readLine()) != null) {
 					System.out.println("RECEIVED: " + msg);
 					headerSplit = msg.split(":");
+					if (msg.compareTo("GET_GAMES:") ==0)
+						sendGameList();
+					
 					if (headerSplit.length == 2) {
-						// ADD_PLAYER:[name]\n
-						if (headerSplit[0].compareTo("ADD_PLAYER") == 0) {
-							addPlayer(headerSplit[1]);
-						// CREATE_GAME:[userId]\n
-						} else if (headerSplit[0].compareTo("CREATE_GAME") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							addGame(id);
-						// GET_GAMES: \n TODO: see if a space works here
-						} else if (headerSplit[0].compareTo("GET_GAMES") == 0) {
-							sendGameList();
-						// GAME_IS_ACTIVE:[gameId]\n
-						} else if (headerSplit[0].compareTo("GAME_IS_ACTIVE") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendIsActive(id);
-						//	GET_PLAYERS:[gameId]\n
-						} else if (headerSplit[0].compareTo("GET_PLAYERS") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendPlayerIdList(id);
-						// GET_OWNER:[gameId]\n
-						} else if (headerSplit[0].compareTo("GET_OWNER") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendGameOwner(id);
-						// GET_BOARDS:[gameId]\n
-						} else if (headerSplit[0].compareTo("GET_BOARDS") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendBoards(id);
-						// START_GAME:[gameId]\n
-						} else if (headerSplit[0].compareTo("START_GAME") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							startGame(id);
-						// GET_NAME:[playerId]\n
-						} else if (headerSplit[0].compareTo("GET_NAME") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendPlayerName(id);
-						// IS_WHITE:[playerId]\n
-						} else if (headerSplit[0].compareTo("IS_WHITE") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendIsWhite(id);
-						// GET_TEAM:[playerId]\n
-						} else if (headerSplit[0].compareTo("GET_TEAM") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendPlayerTeam(id);
-						// JOIN_GAME:[playerId]\t[gameId]\t[team]\n
-						} else if (headerSplit[0].compareTo("JOIN_GAME") == 0) {
-							msgSplit = headerSplit[1].split("\t");
-							if (msgSplit.length == 3) {
+						switch (headerSplit[0]) {
+							// ADD_PLAYER:[name]\n
+							case "ADD_PLAYER":
+								addPlayer(headerSplit[1]);
+								break;
+							// CREATE_GAME:[userId]\n
+							case "CREATE_GAME":
+								id = Integer.parseInt(headerSplit[1]);
+								addGame(id);
+								break;
+							// GAME_IS_ACTIVE:[gameId]\n
+							case "GAME_IS_ACTIVE":
+								id = Integer.parseInt(headerSplit[1]);
+								sendIsActive(id);
+								break;
+//								GET_PLAYERS:[gameId]\n
+							case "GET_PLAYERS":
+								msgSplit = headerSplit[1].split("\t");
 								id = Integer.parseInt(msgSplit[0]);
-								int gameID = Integer.parseInt(msgSplit[1]);
-								int team = Integer.parseInt(msgSplit[2]);
-								addPlayerToGame(id, gameID, team);
-							} else {
-								send("ERROR: JOIN_GAME in wrong format");
-							}
-						// GET_CURRENT_BOARD:[playerId]\n
-						} else if (headerSplit[0].compareTo("GET_CURRENT_BOARD") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							sendCurrentBoard(id);
-						// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
-						} else if (headerSplit[0].compareTo("MOVE") == 0) {
-							msgSplit = headerSplit[1].split("\t");
-							if (msgSplit.length == 5) {
-								id = Integer.parseInt(msgSplit[0]);
-								int toY = Integer.parseInt(msgSplit[4]);
-								move(id, msg);
-							}
-						// QUIT:[playerId]
-						} else if (headerSplit[0].compareTo("QUIT") == 0) {
-							id = Integer.parseInt(headerSplit[1]);
-							quit(id);
-						} 
+								team = Integer.parseInt(msgSplit[1]);
+								sendPlayerIdList(id,team);
+								break;
+							// GET_OWNER:[gameId]\n
+							case "GET_OWNER":
+								id = Integer.parseInt(headerSplit[1]);
+								sendGameOwner(id);
+								break;
+							// GET_CURRENT_GAME:[playerId]\n	
+							case "GET_CURRENT_GAME":
+								id = Integer.parseInt(headerSplit[1]);
+								sendCurrentGame(id);
+								break;
+							// GET_BOARDS:[gameId]\n
+							case "GET_BOARDS":
+								id = Integer.parseInt(headerSplit[1]);
+								sendBoards(id);
+								break;
+							// START_GAME:[gameId]\n
+							case "START_GAME":
+								id = Integer.parseInt(headerSplit[1]);
+								startGame(id);
+								break;
+							// GET_NAME:[playerId]\n
+							case "GET_NAME":
+								id = Integer.parseInt(headerSplit[1]);
+								sendPlayerName(id);
+								break;
+							// IS_WHITE:[playerId]\n
+							case "IS_WHITE":
+								id = Integer.parseInt(headerSplit[1]);
+								sendIsWhite(id);
+								break;
+							// GET_TEAM:[playerId]\n
+							case "GET_TEAM":
+								id = Integer.parseInt(headerSplit[1]);
+								sendPlayerTeam(id);
+								break;
+							// JOIN_GAME:[playerId]\t[gameId]\t[team]\n
+							case "JOIN_GAME":
+								msgSplit = headerSplit[1].split("\t");
+								if (msgSplit.length == 3) {
+									id = Integer.parseInt(msgSplit[0]);
+									int gameID = Integer.parseInt(msgSplit[1]);
+									team = Integer.parseInt(msgSplit[2]);
+									addPlayerToGame(id, gameID, team);
+								} else {
+									send("ERROR: JOIN_GAME in wrong format");
+								}
+								break;
+							// GET_CURRENT_BOARD:[playerId]\n
+							case "GET_CURRENT_BOARD":
+								id = Integer.parseInt(headerSplit[1]);
+								sendCurrentBoard(id);
+								break;
+							// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+							case "MOVE":
+								msgSplit = headerSplit[1].split("\t");
+								if (msgSplit.length == 5) {
+									id = Integer.parseInt(msgSplit[0]);
+									move(id, msg);
+								}
+								break;
+							// PUT:[boardId]\t[userId]\t[pieceType]\t[pieceIsWhite]\t[toX]\t[toY]\n
+							case "PUT":
+								sendPutMessage(msg);
+								break;
+							// QUIT:[playerId]
+							case "QUIT":
+								id = Integer.parseInt(headerSplit[1]);
+								quit(id);
+								break;
+							// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
+							case "PASS":
+								msgSplit = headerSplit[1].split("\t");
+								send("\n");
+								if (msgSplit.length == 3) {
+									id = Integer.parseInt(msgSplit[1]);
+									m_pool.sendToPlayer(id, msg);
+								}
+								break;
+							default:
+								System.out.println("Unknown message " + msg);
+						}
 					}
 				}
 			}
@@ -132,13 +169,37 @@ public class BughouseClientHandler extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Broadcasts put message to all players in the game 
+	 * @param msg
+	 */
+	private void sendPutMessage(String msg) {
+		int gameId = m_playerInfo.getGameId();
+		m_pool.broadcastToGame(gameId, "BROADCAST:" + msg + "\n", this);
+	}
+
 	/**
 	 * Gets game ID for player associated with this client
-	 * @return ID
+	 * @return ID or -1 if m_playerInfo not set
 	 */
 	public int getGameId() {
-		return m_playerInfo.getGameId();
+		System.out.println("m_playerInfo: "+m_playerInfo);
+		if (m_playerInfo != null)
+			return m_playerInfo.getGameId();
+		else
+			return -1;
+	}
+	
+	/**
+	 * Gets player ID for player associated wit this client
+	 * @return ID or -1 if m_playerInfo not set
+	 */
+	public int getPlayerId() {
+		if (m_playerInfo != null)
+			return m_playerInfo.getId();
+		else
+			return -1;
 	}
 	
 	/**
@@ -146,20 +207,28 @@ public class BughouseClientHandler extends Thread {
 	 * Sends response to player making move:
 	 * "MOVE_OK:[boardId]\n" if everything went well
        "MOVE_FAILED:[boardId]\n" if move failed
-	 * @param id
+	 * @param id Board id
 	 * @param msg Message to broadcast to other players in game
 	 */
 	private void move(int id, String msg) {
 		if (m_playerInfo.getBoardId() == id) {
 			int gameID = m_playerInfo.getGameId();
 			if (gameID > 0) {
-				m_pool.broadcastToGame(gameID, "BROADCAST:" + msg, this);
+				m_pool.broadcastToGame(gameID, "BROADCAST:" + msg + "\n", this);
 				send("MOVE_OK:" + id + "\n");
+				
+				// notify player with next turn
+				int next = m_data.getNextTurn(gameID);
+				System.out.println("Next turn: " + next);
+				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			} else {
-				send("MOVE_FAILED:" + id + "\n");
+				System.out.println("GameId incorrect: "+gameID);
+				send("MOVE_FAILED" + id + "\n");
 			}
+		} else {
+			System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
+			send("MOVE_FAILED:" + id + "\n");
 		}
-		send("MOVE_FAILED:" + id + "\n");
 	}
 
 	/**
@@ -172,7 +241,7 @@ public class BughouseClientHandler extends Thread {
 		if (board > 0)
 			send(board + "\n");
 		else
-			send("ERROR: board not initialized for player " + id);
+			send("ERROR: board not initialized for player\n " + id);
 	}
 
 	/**
@@ -185,8 +254,9 @@ public class BughouseClientHandler extends Thread {
 			send("1\n");
 		else if (team == 2)
 			send("2\n");
-		else
-			send("ERROR: player not in game");
+		else {
+			send("ERROR: player not in game\n");
+		}
 	}
 
 	/**
@@ -221,8 +291,11 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
+		System.out.println("Setting m_playerInfo to "+p);
 		m_playerInfo = p;
-		send(p.getId() + "\n");
+		int id = p.getId();
+		m_pool.addToMap(id, this);
+		send(id + "\n");
 	}
 
 	/**
@@ -267,23 +340,22 @@ public class BughouseClientHandler extends Thread {
     	+ Response:
         - "GAME_STARTED:[gameId]\n" if everything went well
         - "NOT_READY:[gameId]\n" if there're fewer than 4 players
+        - "UNAUTHORIZED:[gameId]\n" if not owner
 	 * @param gameId
 	 */
 	public void startGame(int gameId) {
-		// TODO Auto-generated method stub
-		if (m_data.startGame(gameId))
+		// send unauthorized message if client not game owner
+		if (m_data.getGameOwner(gameId) != m_playerInfo.getId()) {
+			send("UNAUTHORIZED:" + gameId + "\n");
+		} else if (m_data.startGame(gameId)) {
 			send("GAME_STARTED:" + gameId + "\n");
-		else
+			m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
+			send("BROADCAST:YOUR_TURN\n");
+		} else {
 			send("NOT_READY:" + gameId + "\n");
-		
-		m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
+		}
 	}
-
-	public void notifyTurn(Socket s) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	/**
 	 * Sends all available games to client
 	 */
@@ -334,26 +406,31 @@ public class BughouseClientHandler extends Thread {
 	// TODO: figure out if we need to add teams and players
 	private String getGameList() {
 		List<GameInfo> games = m_data.getGames();
-		String msg = "GAMES:";
-		for (GameInfo e : games) {
-			msg += e.getId() + "\t";
+		String msg = "";
+		
+		if (games.isEmpty()) {
+			return "\n";
+		} else {
+			for (GameInfo e : games) {
+				msg += e.getId() + "\t";
+			}
+			msg = msg.substring(0, msg.length()-1) + "\n";
+			return msg;
 		}
-		msg = msg.substring(0, msg.length()-1) + "\n";
-		return msg;
 	}
 
 	/**
 	 * Sends PLAYERS:[gameId]\t[userId1]\t[userId2]\n...
 	 * @param gameId
 	 */
-	public void sendPlayerIdList(int gameId) {
-		List<Integer> ids = m_data.getPlayerIds(gameId);
-		String msg = "PLAYERS:" + gameId;
-		
+	public void sendPlayerIdList(int gameId,int team) {
+		List<Integer> ids = m_data.getPlayerIdsByTeam(gameId, team);
+		String msg="";
 		for (Integer id : ids) {
-			msg += "\t" + id;
+			msg += id+"\t";
 		}
-		send(msg + "\n");
+		if (!ids.isEmpty()) msg = msg.substring(0, msg.length()-1);
+		send(msg+"\n");
 	}
 
 	/**
@@ -362,7 +439,10 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void sendBoards(int gameId) {
 		int[] boards = m_data.getBoards(gameId);
-		send(boards[0] + "\t" + boards[1] + "\n");
+		if (boards != null)
+			send(boards[0] + "\t" + boards[1] + "\n");
+		else
+			send("\n");
 	}
 	
 	/**
@@ -385,7 +465,19 @@ public class BughouseClientHandler extends Thread {
 		int owner = m_data.getGameOwner(gameId);
 		send(owner + "\n");
 	}
-	
+	/**
+	 * Sends GET_CURRENT_GAME:[userId]\n
+	 * @param gameId
+	 */
+	private void sendCurrentGame(int playerId) {
+		int gameId;
+		if (playerId == m_playerInfo.getId()) {
+			gameId = m_playerInfo.getGameId();
+		} else {
+			gameId = m_data.getCurrentGame(playerId);
+		}
+		send(gameId + "\n");
+	}
 	/**
 	    - Set current gameId of the player to -1
         - Remove the player from the game's player list
@@ -400,7 +492,9 @@ public class BughouseClientHandler extends Thread {
 		if (gameId > 0) {
 			String msg = "BROADCAST:QUIT_GAME:" + id + "\t" + gameId + "\n";			
 			m_pool.broadcastToGame(gameId, msg, this);
-			send("QUIT_OK:" + id + "\n");
+			send("QUIT_OK\n");
+		} else {
+			send("QUIT_FAILED\n");
 		}
 	}
 	
@@ -412,7 +506,7 @@ public class BughouseClientHandler extends Thread {
 	public void send(String message) {
 		//TODO: Set up the methods, so it will send the message to the client
 		System.out.println("SENDING: " + message);
-		m_output.println(message);
+		m_output.print(message);
 		m_output.flush();
 	}
 

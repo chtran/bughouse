@@ -7,12 +7,14 @@ import java.util.*;
  */
 public class ClientPool {
 	private LinkedList<BughouseClientHandler> m_clients;
+	private Map<Integer, BughouseClientHandler> m_clientMap;
 	
 	/**
 	 * Initialize a new {@link ClientPool}.
 	 */
 	public ClientPool() {
 		m_clients = new LinkedList<BughouseClientHandler>();
+		m_clientMap = new HashMap<Integer, BughouseClientHandler>();
 	}
 	
 	/**
@@ -22,6 +24,10 @@ public class ClientPool {
 	 */
 	public synchronized void add(BughouseClientHandler client) {
 		m_clients.add(client);
+	}
+	
+	public synchronized void addToMap(int playerID, BughouseClientHandler client) {
+		m_clientMap.put(playerID, client);
 	}
 	
 	/**
@@ -44,10 +50,6 @@ public class ClientPool {
 	 */
 	public synchronized void broadcast(String message, BughouseClientHandler sender) {
 		for (BughouseClientHandler client : m_clients) {
-			if (sender != null && sender == client) {
-				continue;
-			}
-
 			client.send(message);
 		}
 	}
@@ -60,9 +62,21 @@ public class ClientPool {
 	public synchronized void broadcastToGame(int gameID, String msg, BughouseClientHandler sender) {
 		for (BughouseClientHandler client : m_clients) {
 			// only broadcast message to clients in given game
-			if (client.getGameId() == gameID && sender != null && sender != client)
+			if (client.getGameId() == gameID && sender != null) {
+				System.out.println("Sending " + msg + " to " + client.getName());
 				client.send(msg);
+			}
 		}
+	}
+	
+	/**
+	 * Sends message notifying next player that it's their turn
+	 * @param playerID
+	 */
+	public synchronized void sendToPlayer(int playerID, String msg) {
+		BughouseClientHandler client = m_clientMap.get(playerID);
+		System.out.println("Sending " + msg + " to " + client.getName());
+		client.send(msg);
 	}
 	
 	/**

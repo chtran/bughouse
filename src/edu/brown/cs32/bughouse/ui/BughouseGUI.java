@@ -1,31 +1,20 @@
 package edu.brown.cs32.bughouse.ui;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.TransferHandler;
-
+import edu.brown.cs32.bughouse.client.BughouseBackEnd;
+import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
+import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
+import edu.brown.cs32.bughouse.models.ChessPiece;
 
 /**
  * 
@@ -39,23 +28,49 @@ import edu.brown.cs32.bughouse.interfaces.FrontEnd;
 public class BughouseGUI extends JFrame implements FrontEnd{
 
 	private static final long serialVersionUID = 1L;
-	private BughouseBoard userBoard_, otherBoard_;
-	private JTextArea messageBox_,clock_;
+	private GameView game_;
 	private BackEnd backend_;
+	private RoomMenu rooms_;
+	private Container content_;
+	private ConnectToServerMenu joinServerMenu_;
+	
 
-	public BughouseGUI(){
+	public BughouseGUI(String[] argv){
 		super("Bughouse Chess");
-	//	this.backend_ = backend;
-		Container content = this.getContentPane();
-		this.setLayout(new CardLayout());
+		try {
+			this.backend_ = new BughouseBackEnd(this,argv[0],new Integer(argv[1]));
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		content_ = this.getContentPane();
+		content_.setLayout(new CardLayout());
 		this.setPreferredSize(new Dimension(800,700));
-		this.setResizable(true);
-		content.add(setupGameView());
+		this.setResizable(false);
+		content_.add(setupJoinServerMenu(),"Join");
+		content_.add(setupRoomMenu(), "Rooms");
+		content_.add(setupGameView(), "Game");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
 		this.setVisible(true);
 	}
 	
+	public static void main(String[] argv){
+		BughouseGUI ui = new BughouseGUI(argv);
+		BughouseGUI ui2 = new BughouseGUI(argv);
+		BughouseGUI ui3 = new BughouseGUI(argv);
+		BughouseGUI ui4 = new BughouseGUI(argv);
+	}
+	
+	@Override
+	public void addPrisoner(int playerId, ChessPiece piece) {
+		// TODO generate image for piece and add it the display + notify user
+		game_.addPrisoner(playerId,piece);
+	}
+
 	
 	/*
 	 * (non-Javadoc)
@@ -64,8 +79,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	@Override
 	public void notifyUserTurn() {
-		// TODO Auto-generated method stub
-		
+		game_.notifyUser();
 	}
 	
 	/*
@@ -75,79 +89,81 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	@Override
 	public void showEndGameMessage() {
-		// TODO Auto-generated method stub
+		game_.notifyEndGame();
+		
 		
 	}
-	
 	
 	/*
 	 * sets up the game view for the user.
 	 */
 	private JPanel setupGameView(){
-		JPanel game = new JPanel(new BorderLayout());
-		game.add(createBoard(),BorderLayout.CENTER); 
-		game.add(createOptionMenu(), BorderLayout.EAST);
-		game.add(createPieceHolder(), BorderLayout.SOUTH);
-		return game;
+		game_ =  new GameView(backend_);
+		return game_;
 	}
-	
-	
-	/*
-	 * creates the initial board for both the user's game and the user's team
-	 * mate's game. Needs to check what color the player is playing as to get 
-	 * the correct board
-	 */
-	private JComponent createBoard(){
-		JTabbedPane boardContainer = new JTabbedPane();
-		userBoard_ = new BughouseBoard(true);
-		boardContainer.addTab("Your Game", userBoard_);
-		otherBoard_ = new BughouseBoard(false);
-		boardContainer.addTab("Other Game", otherBoard_);
-		return boardContainer;
-	}
-	
-	/*l
-	 * sets up the option menu for users where information gets 
-	 * displayed
-	 */
-	private JComponent createOptionMenu(){
-		JPanel options = new JPanel();
-		options.setPreferredSize(new Dimension(250,190));
-		clock_ = new JTextArea();
-		clock_.setPreferredSize(new Dimension(200,50));
-		clock_.setEditable(false);
-		clock_.setText("Time is ticking....");
-		messageBox_ = new JTextArea();
-		messageBox_.setPreferredSize(new Dimension(200,190));
-		messageBox_.setEditable(false);
-		messageBox_.setText("Template text");
-		JButton quit  = new JButton("Click me!");
-		quit.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// TODO call backend.quit();
-				
-			}
-			
-		});
-		quit.setPreferredSize(new Dimension(100,60));
-		options.add(clock_);
-		options.add(messageBox_);
-		options.add(quit);
-		return options;
+
+	@Override
+	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
+			int to_y) {
+		game_.pieceMoved(boardId,from_x, from_y,to_x,to_y);
+		
+		
+	}
+
+	@Override
+	public void gameStarted() {
+		CardLayout cards = (CardLayout) content_.getLayout();
+		cards.show(content_, "Game");
+		try {
+			game_.getBoardID();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+					"Connection timed out", JOptionPane.ERROR_MESSAGE);
+			return;
+		} catch (GameNotReadyException e) {
+			JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+					"Cannot start game", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 	}
 	
-	private JComponent createPieceHolder(){
-		JScrollPane pieceHolderPanel = new JScrollPane();
-		pieceHolderPanel.setPreferredSize(new Dimension(200,110));
-		pieceHolderPanel.setBackground(Color.YELLOW);
-		return pieceHolderPanel;
+	public void joinServer(){
+		CardLayout cards = (CardLayout)content_.getLayout();
+		cards.show(content_, "Rooms");
 	}
 	
-	public static void main (String[] argv){
-		new BughouseGUI();
+	private JPanel setupJoinServerMenu(){
+		joinServerMenu_ = new ConnectToServerMenu(this,backend_);
+		return joinServerMenu_;
 	}
+	
+	private JPanel setupRoomMenu(){
+		rooms_ = new RoomMenu(this,backend_); // not clean way - get server to broadcast to all 
+		return rooms_;
+	}
+
+	@Override
+	public void gameListUpdated() {
+		try {
+			rooms_.updateGames();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+					"Time out error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+	}
+
+	@Override
+	public void prisonersUpdated() {
+		// TODO Auto-generated method stub
+		
+	}
+	
 
 	
 
