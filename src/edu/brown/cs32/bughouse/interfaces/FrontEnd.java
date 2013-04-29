@@ -13,5 +13,6 @@ public interface FrontEnd {
 	public void pieceMoved(int boardId, int from_x, int from_y, int to_x, int to_y);
 	public void gameStarted();
 	public void gameListUpdated();
+	public void prisonersUpdated();
 
 }

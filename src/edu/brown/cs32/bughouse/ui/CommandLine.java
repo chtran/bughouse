@@ -206,4 +206,8 @@ public class CommandLine implements FrontEnd{
 	public void gameListUpdated() {
 		System.out.println("Game list updated");
 	}
+	@Override
+	public void prisonersUpdated() {
+		
+	}
 }

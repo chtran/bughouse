@@ -156,6 +156,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			return;
 		}
 	}
+
+	@Override
+	public void prisonersUpdated() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 	

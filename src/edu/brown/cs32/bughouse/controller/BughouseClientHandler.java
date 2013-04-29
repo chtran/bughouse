@@ -133,6 +133,7 @@ public class BughouseClientHandler extends Thread {
 						// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
 						} else if (headerSplit[0].compareTo("PASS") == 0) {
 							msgSplit = headerSplit[1].split("\t");
+							send("\n");
 							if (msgSplit.length == 3) {
 								id = Integer.parseInt(msgSplit[1]);
 								m_pool.sendToPlayer(id, msg);
@@ -187,7 +188,7 @@ public class BughouseClientHandler extends Thread {
 				send("MOVE_FAILED" + id + "\n");
 			}
 		} else {
-			System.out.println("Client sending move to the wrong board");
+			System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
 			send("MOVE_FAILED:" + id + "\n");
 		}
 	}
