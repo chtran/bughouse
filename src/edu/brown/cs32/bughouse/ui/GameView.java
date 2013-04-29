@@ -81,7 +81,7 @@ public class GameView extends JPanel {
 	
 	public void getBoardID(){
 		try {
-			myBoardID_ = backend_.me().getCurrentBoard().getId();
+			myBoardID_ = backend_.me().getCurrentBoardId();
 			Map<Integer, ChessBoard> boards;
 			boards = backend_.getBoards();
 			Iterator<Integer> ids = boards.keySet().iterator();

@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 
 public class BughouseBoard extends JPanel {
@@ -184,7 +185,7 @@ public class BughouseBoard extends JPanel {
 				System.out.println("Dest x "+destX_+ " "+destY_);
 					 try {
 						//turn_ = false;
-						backend_.move(originX_, originY_, destX_, destY_);
+						backend_.me().move(originX_, originY_, destX_, destY_);
 					} catch (IllegalMoveException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -200,6 +201,10 @@ public class BughouseBoard extends JPanel {
 						System.out.println("RequestTimedOut");
 					}
 					//JDialog illegalMove = new JOptionPane("That move is illegal", ERROR_MESSAGE);
+ catch (WrongColorException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				
 				
 				// notify backend/server/user that the current turn has ended

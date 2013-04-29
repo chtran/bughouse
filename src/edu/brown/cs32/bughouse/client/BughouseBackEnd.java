@@ -12,6 +12,7 @@ import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
+import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
@@ -33,17 +34,7 @@ public class BughouseBackEnd implements BackEnd {
 		this.prisoners = new HashMap<Integer, List<ChessPiece>>();
 	}
 	
-	@Override
-	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException {
-		ChessPiece captured = me.getCurrentBoard().move(from_x, from_y, to_x, to_y);
-		client.move(me.getCurrentBoard().getId(), from_x, from_y, to_x, to_y);
-		if (captured!=null) {
-			me.pass(captured);
-			if (captured.isKing()) {
-				client.gameOver(me.getCurrentGame().getId(), client.getCurrentTeam(me.getId()));
-			}
-		}
-	}
+
 	
 
 	@Override
@@ -126,7 +117,11 @@ public class BughouseBackEnd implements BackEnd {
 		List<Integer> boardIds = client.getBoards(me.getCurrentGame().getId());
 		Map<Integer,ChessBoard> toReturn = new HashMap<Integer,ChessBoard>();
 		for (int boardId: boardIds) {
-			toReturn.put(boardId,new ChessBoard(boardId));
+			ChessBoard board = new ChessBoard(boardId);
+			if (boardId==me.getCurrentBoardId()) {
+				me.setBoard(board);
+			}
+			toReturn.put(boardId,board);
 		}
 		return toReturn;
 	}

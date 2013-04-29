@@ -151,6 +151,7 @@ public class BughouseClientHandler extends Thread {
 	 * @return ID
 	 */
 	public int getGameId() {
+		System.out.println("m_playerInfo: "+m_playerInfo);
 		return m_playerInfo.getGameId();
 	}
 	
@@ -248,6 +249,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
+		System.out.println("Setting m_playerInfo to "+p);
 		m_playerInfo = p;
 		int id = p.getId();
 		m_pool.addToMap(id, this);

@@ -150,7 +150,7 @@ public class BughouseClient implements Client {
 	}
 	@Override
 	public void quit(int playerId) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("QUIT:%d\\n", playerId));
+		socket.getResponse(String.format("QUIT:%d\n", playerId));
 	}
 	@Override
 	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
