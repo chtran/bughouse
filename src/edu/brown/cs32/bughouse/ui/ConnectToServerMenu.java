@@ -9,12 +9,12 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
-import edu.brown.cs32.bughouse.models.Player;
 
 public class ConnectToServerMenu extends JPanel {
 
@@ -25,7 +25,6 @@ public class ConnectToServerMenu extends JPanel {
 	private BackEnd backend_;
 	private BughouseGUI parent_;
 	private JTextField input_;
-	private Player self_;
 
 	public ConnectToServerMenu(BughouseGUI parent,BackEnd backend){
 		super();
@@ -69,14 +68,19 @@ public class ConnectToServerMenu extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e){
 				String name = input_.getText();
-				if (name.equals(null)){
-					System.exit(1);
+				if (name.length()==0){
+					JOptionPane.showMessageDialog(null, "Type in a name", "Name needed", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 				try {
-					self_ = backend_.joinServer(name);
+					 backend_.joinServer(name);
 				} catch (IOException
 						| RequestTimedOutException e1) {
 					// TODO Add a pop up dialog box
+					JOptionPane.showMessageDialog(null, "The connection to the " +
+							"server timed out.Please try connecting again",
+							"Connection timed out",	JOptionPane.ERROR_MESSAGE);
+					return;
 					
 				}
 				parent_.joinServer();
