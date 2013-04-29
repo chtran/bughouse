@@ -138,7 +138,7 @@ public class CommandLine implements FrontEnd{
 						printBoards();
 						break;
 					default:
-						System.out.println("Unknown command: "+line);;
+						System.out.println("Unknown command: "+line);
 				}
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
