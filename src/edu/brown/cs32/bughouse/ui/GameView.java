@@ -17,6 +17,7 @@ import java.util.Set;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -55,21 +56,20 @@ public class GameView extends JPanel {
 	
 	
 	public void addPrisoner (int playerID, ChessPiece prisoner){
-		//TO DO : decide which player is getting the prisoner and add it 
 		myPrisoners_.add(prisoner);
 	}
 	
 	public void notifyEndGame(){
-		//To DO : Show a JDialog that the game has ended
-	}
+		// To DO: return user to lobby room
+		JOptionPane.showMessageDialog(null, "Game Over", "Finished", JOptionPane.OK_OPTION);
+		
+	} 
 	
 	public void notifyUser(){
-		// To DO: Show a JDialog that it is the user's turn
 		userBoard_.startTurn();
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){
-		//TO DO : update board identified by id's pieces
 		if (boardId == myBoardID_){
 			System.out.println("Moving piece");
 			userBoard_.updatePieceMoved(from_x, from_y, to_x, to_y);
@@ -79,22 +79,17 @@ public class GameView extends JPanel {
 		}
 	}
 	
-	public void getBoardID(){
-		try {
-			myBoardID_ = backend_.me().getCurrentBoard().getId();
-			Map<Integer, ChessBoard> boards;
-			boards = backend_.getBoards();
-			Iterator<Integer> ids = boards.keySet().iterator();
-			while (ids.hasNext()){
-				int id = ids.next();
-				if (id != myBoardID_){
-					otherBoardID_ = id;
-					break;
-				}
+	public void getBoardID() throws IOException, RequestTimedOutException, GameNotReadyException{
+		myBoardID_ = backend_.me().getCurrentBoard().getId();
+		Map<Integer, ChessBoard> boards;
+		boards = backend_.getBoards();
+		Iterator<Integer> ids = boards.keySet().iterator();
+		while (ids.hasNext()){
+			int id = ids.next();
+			if (id != myBoardID_){
+				otherBoardID_ = id;
+				break;
 			}
-		} catch (IOException | RequestTimedOutException | GameNotReadyException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 		}
 		
 	}

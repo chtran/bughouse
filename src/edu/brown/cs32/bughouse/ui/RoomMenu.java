@@ -10,6 +10,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
@@ -43,9 +44,17 @@ public class RoomMenu extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.front_ = frame;
 		this.backend_ = backend;
-		this.add(getRooms(), BorderLayout.CENTER);
-		this.add(userControl(), BorderLayout.SOUTH);
-		this.add(gameInfo(), BorderLayout.EAST);
+		try {
+			this.add(getRooms(), BorderLayout.CENTER);
+			this.add(userControl(), BorderLayout.SOUTH);
+			this.add(gameInfo(), BorderLayout.EAST);
+		}catch (IOException e){
+			e.printStackTrace();
+		}catch (RequestTimedOutException e){
+			JOptionPane.showMessageDialog(this, "The connection to the server timed out", 
+					"Connection time out", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 	}
 	
 	public Box gameInfo() {
@@ -67,32 +76,25 @@ public class RoomMenu extends JPanel {
 		
 	}
 	
-	public void displayGameInfo(Game selected){
-		try {
-			team1_.setText(" ");
-			team2_.setText(" ");
-			List<Player> team1 = selected.getPlayersByTeam(1);
-			List<Player> team2 = selected.getPlayersByTeam(2);
-			team1_.getParent().setVisible(true);
-			team1_.append("Team 1 :"+"\n");
-			team2_.append("Team 2 :"+"\n");
-			for (Player player : team1){
-				team1_.append(player.getName()+"\n");
-			}
-			for (Player player: team2){
-				team2_.append(player.getName()+"\n");
-			}
-			team1_.repaint();
-			team2_.repaint();
-		} catch (IOException | RequestTimedOutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public void displayGameInfo(Game selected) throws IOException, RequestTimedOutException{
+		team1_.setText(" ");
+		team2_.setText(" ");
+		List<Player> team1 = selected.getPlayersByTeam(1);
+		List<Player> team2 = selected.getPlayersByTeam(2);
+		team1_.getParent().setVisible(true);
+		team1_.append("Team 1 :"+"\n");
+		team2_.append("Team 2 :"+"\n");
+		for (Player player : team1){
+			team1_.append(player.getName()+"\n");
 		}
-		
-		
+		for (Player player: team2){
+			team2_.append(player.getName()+"\n");
+		}
+		team1_.repaint();
+		team2_.repaint();
 	}
 	
-	public JPanel getRooms(){
+	public JPanel getRooms() throws IOException, RequestTimedOutException{
 		roomList_  = new JPanel();
 		list_ = new JList<>();
 		list_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -100,19 +102,22 @@ public class RoomMenu extends JPanel {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				// TODO Auto-generated method stub
 				if (!list_.isSelectionEmpty()){
 					selectedGameID_ = new Integer(list_.getSelectedValue());
 					Game selected = activeGames_.get(list_.getSelectedIndex());
-					displayGameInfo(selected);
+					try {
+						displayGameInfo(selected);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (RequestTimedOutException e1) {
+						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 				}
-			}
-				
-				
-			
+			}		
 		});
 		roomList_.add(list_);
-		try {
 			if (backend_.getActiveGames().isEmpty()){
 				list_.setEnabled(false);
 				roomList_.add(new JLabel("No rooms available"));
@@ -121,10 +126,6 @@ public class RoomMenu extends JPanel {
 			else {
 				updateGames();
 			}
-		} catch (IOException | RequestTimedOutException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		return roomList_;
 	}
 	
@@ -135,13 +136,15 @@ public class RoomMenu extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				try {
 					backend_.createGame();
 					updateGames();
-				} catch (IOException | RequestTimedOutException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				} catch (IOException e2){
+					e2.printStackTrace();
+				}catch (RequestTimedOutException e1){
+					JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+							"Connection time out", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 				
 			}
@@ -150,22 +153,23 @@ public class RoomMenu extends JPanel {
 		start.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 						try {
 							backend_.startGame();
 							front_.gameStarted();
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						} catch (RequestTimedOutException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+									"Connection time out", JOptionPane.ERROR_MESSAGE);
+							return;
 						} catch (GameNotReadyException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+									"Cannot start game", JOptionPane.ERROR_MESSAGE);
+							return;
 						} catch (UnauthorizedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+							JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
+									"Authorization error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
 					
 			}
@@ -176,20 +180,16 @@ public class RoomMenu extends JPanel {
 		
 	}
 	
-	public void updateGames(){
-		try {
-			 list_.setEnabled(true);
-		//	 roomList_.removeAll();
-		     DefaultListModel<String> options = new DefaultListModel<>();
-			 activeGames_ = backend_.getActiveGames();
-			 for (Game activeGame : activeGames_){
-					options.addElement(Integer.toString(activeGame.getId()));
-				}
-			 list_.setModel(options);
-		} catch (IOException | RequestTimedOutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void updateGames() throws IOException, RequestTimedOutException{
+
+		 list_.setEnabled(true);
+	//	 roomList_.removeAll();
+	     DefaultListModel<String> options = new DefaultListModel<>();
+		 activeGames_ = backend_.getActiveGames();
+		 for (Game activeGame : activeGames_){
+				options.addElement(Integer.toString(activeGame.getId()));
+			}
+		 list_.setModel(options);
 		roomList_.add(list_);
 		roomList_.revalidate();
 		roomList_.repaint();
@@ -209,15 +209,21 @@ public class RoomMenu extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
 			selectedTeamID_ = teamID_;
 			try {
 				backend_.joinGame(selectedGameID_, selectedTeamID_);
 				updateGames();
 				//displayGameInfo(activeGames_.get(list_.getSelectedIndex()));
-			} catch (IOException | RequestTimedOutException | TeamFullException e1) {
-				// TODO Auto-generated catch block
+			} catch (IOException e1){
 				e1.printStackTrace();
+			}catch (RequestTimedOutException e1){
+				JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
+						"Authorization error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}catch(TeamFullException e1){
+				JOptionPane.showMessageDialog(null, "You can't join that team", 
+						"Team is full", JOptionPane.ERROR_MESSAGE);
+				return;
 			}
 		}
 		
