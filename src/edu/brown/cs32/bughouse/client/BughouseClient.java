@@ -16,23 +16,25 @@ public class BughouseClient implements Client {
 	private ClientSocket socket;
 	public BughouseClient(String host, int port, BackEnd backend) throws UnknownHostException, IllegalArgumentException, IOException {
 		this.socket = new ClientSocket(host,port,this);
+		this.socket.run();
 		this.backend = backend;
 	}
 	@Override
 	public int createGame(int userId) throws IOException, RequestTimedOutException {
 		String response = socket.getResponse(String.format("CREATE_GAME:%s\n",userId));
-		String[] splitted = response.split(":");
-		int gameId = Integer.parseInt(splitted[1].trim());
+		int gameId = Integer.parseInt(response.trim());
 		return gameId;
 		
 	}
 
 	@Override
 	public List<Integer> getGames() throws IOException, RequestTimedOutException {
-		String response = socket.getResponse("GET_GAMES:m\n");
 		
-		String[] lines = response.split(":")[1].split("\t");
 		List<Integer> toReturn = new ArrayList<Integer>();
+		String response = socket.getResponse("GET_GAMES:\n");
+		if (response.length()==0) return toReturn;
+		String[] lines = response.split("\t");
+
 		for (String line: lines) {
 			int gameId = Integer.parseInt(line);
 			toReturn.add(gameId);
@@ -43,13 +45,13 @@ public class BughouseClient implements Client {
 	@Override
 	public boolean gameIsActive(int gameId) throws IOException, RequestTimedOutException {
 		String response = socket.getResponse(String.format("GAME_IS_ACTIVE:%d\n",gameId));
-		return (response.split("\t")[1].trim().equals("true"));
+		return (response.trim().equals("true"));
 	}
 
 	@Override
 	public List<Integer> getPlayers(int gameId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getPlayers\t%d\n",gameId));
-		String[] lines = response.split("\n");
+		String response = socket.getResponse(String.format("GET_PLAYERS:%d\n",gameId));
+		String[] lines = response.split("\t");
 		List<Integer> toReturn = new ArrayList<Integer>();
 		for (String line: lines) {
 			int userId = Integer.parseInt(line);
@@ -60,7 +62,7 @@ public class BughouseClient implements Client {
 
 	@Override
 	public int getOwnerId(int gameId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getOwnerId\t%d\n",gameId));
+		String response = socket.getResponse(String.format("GET_OWNER:%d\n",gameId));
 		int ownerId = Integer.parseInt(response);
 		return ownerId;
 	}
@@ -68,8 +70,8 @@ public class BughouseClient implements Client {
 
 	@Override
 	public List<Integer> getBoards(int gameId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getBoards\t%d\n",gameId));
-		String[] lines = response.split("\n");
+		String response = socket.getResponse(String.format("GET_BOARDS:%d\n",gameId));
+		String[] lines = response.split("\t");
 		List<Integer> toReturn = new ArrayList<Integer>();
 		for (String line: lines) {
 			int boardId = Integer.parseInt(line);
@@ -81,8 +83,8 @@ public class BughouseClient implements Client {
 
 	@Override
 	public void startGame(int gameId) throws IOException, RequestTimedOutException, GameNotReadyException {
-		String response = socket.getResponse(String.format("startGame\t%d\n",gameId));
-		if (response.trim().equals("Not ready.")) {
+		String response = socket.getResponse(String.format("START_GAME:%d\n",gameId));
+		if (response.split(":")[0].trim().equals("NOT_READY")) {
 			throw new GameNotReadyException();
 		}
 		
@@ -90,42 +92,42 @@ public class BughouseClient implements Client {
 
 	@Override
 	public int addNewPlayer(String name) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("addNewPlayer\t%s\n",name));
+		String response = socket.getResponse(String.format("ADD_PLAYER:%s\n",name));
 		int playerId = Integer.parseInt(response.trim());
 		return playerId;
 	}
 
 	@Override
 	public String getName(int playerId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getName\t%d\n",playerId));
+		String response = socket.getResponse(String.format("GET_NAME:%d\n",playerId));
 		String name = response.trim();
 		return name;
 	}
 
 	@Override
 	public boolean isWhite(int playerId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("isWhite\t%d\n",playerId));
+		String response = socket.getResponse(String.format("IS_WHITE:%d\n",playerId));
 		return (response.trim().equals("true"));
 	}
 
 	@Override
 	public int getCurrentTeam(int playerId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getCurrentTeam\t%d\n",playerId));
+		String response = socket.getResponse(String.format("GET_TEAM:%d\n",playerId));
 		int team = Integer.parseInt(response);
 		return team;
 	}
 
 	@Override
 	public void joinGame(int playerId, int gameId, int team) throws TeamFullException, IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("joinGame\t%d\t%d\t%d\n",playerId,gameId,team));
-		if (response.trim().equals("Full")) {
+		String response = socket.getResponse(String.format("JOIN_GAME:%d\t%d\t%d\n",playerId,gameId,team));
+		if (response.trim().equals("GAME_FULL")) {
 			throw new TeamFullException();
 		}
 	}
 
 	@Override
 	public int getBoardId(int playerId) throws IOException, RequestTimedOutException {
-		String response = socket.getResponse(String.format("getBoardId\t%d\n",playerId));
+		String response = socket.getResponse(String.format("GET_CURRENT_BOARD:%d\n",playerId));
 		int boardId = Integer.parseInt(response);
 		return boardId;
 	}
@@ -133,24 +135,64 @@ public class BughouseClient implements Client {
 	@Override
 	public void move(int boardId, int from_x, int from_y, int to_x,
 			int to_y) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("move\t%d\t%d\t%d\t%d\t%d\n", boardId,from_x,from_y,to_x,to_y));
+		socket.getResponse(String.format("MOVE:%d\t%d\t%d\t%d\t%d\n", boardId,from_x,from_y,to_x,to_y));
 		
 	}
 	@Override
 	public void quit(int playerId) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("quit\t%d\\n", playerId));
+		socket.getResponse(String.format("QUIT:%d\\n", playerId));
 	}
 	@Override
-	public void receive(String message) {
+	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String[] splitted = message.split("\t");
 		switch (splitted[1]) {
-			case "move":
+			case "MOVE":
 				broadcastMove(message);
+				break;
+			case "JOIN_GAME":
+				broadcastJoinGame(message);
+				break;
+			case "QUIT_GAME":
+				broadcastQuitGame(message);
+				break;
+			case "NEW_GAME":
+				broadcastNewGame(message);
+				break;
+			case "GAME_STARTED":
+				broadcastGameStarted(message);
+				break;
 			default:
+				System.out.println("Unknown broadcast message: "+message);
 				return;
 		}
 	}
 
+	private void broadcastGameStarted(String message) {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+
+		System.out.printf("Game #%d has started!\n",splitted[0]);
+	}
+	private void broadcastNewGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		String name = getName(Integer.parseInt(splitted[0]));
+		System.out.printf("%s created game #%d\n",name,splitted[1]);
+	}
+	private void broadcastQuitGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		String name = getName(Integer.parseInt(splitted[0]));
+		System.out.printf("%s quited game #%d\n",name,splitted[1]);
+		
+	}
+	private void broadcastJoinGame(String message) throws NumberFormatException, IOException, RequestTimedOutException {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		String name = getName(Integer.parseInt(splitted[0]));
+		System.out.printf("%s joined game #%d\n",name,splitted[1]);
+		
+	}
 	private void broadcastMove(String message) {
 		String[] splitted = message.split("\t");
 		int boardId = Integer.parseInt(splitted[2]);
@@ -161,4 +203,20 @@ public class BughouseClient implements Client {
 		
 		backend.updateBoard(boardId, from_x , from_y, to_x, to_y);
 	}
+	
+	public static void main(String[] args) throws UnknownHostException, IllegalArgumentException, IOException, RequestTimedOutException {
+		BughouseClient client = new BughouseClient("localhost",3333,null);
+		client.addNewPlayer("Chau");
+		System.out.println(client.getName(0));
+		
+	}
+	@Override
+	public void shutdown() throws IOException {
+		socket.kill();
+	}
+	@Override
+	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException {
+		socket.getResponse(String.format("GAME_OVER:%d\t%d",gameId,team));
+	}
+	
 }

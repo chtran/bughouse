@@ -1,0 +1,16 @@
+show_games:
+    list all games
+create_game\t:
+    create new game
+join\t[gameId]\t[team]:
+    join a game
+show_players:
+    show list of player in current room
+start:
+    start the game
+get_name\t[playerId]:
+    get name of player
+move\t[from_x]\t[from_y]\t[to_x]\t[to_y]:
+    move a chess piece
+
+

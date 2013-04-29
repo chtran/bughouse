@@ -31,6 +31,7 @@ public interface Client {
 	public void quit(int playerId) throws IOException, RequestTimedOutException;
 	
 	public void move(int boardId, int from_x, int from_y, int to_x, int to_y) throws IOException, RequestTimedOutException;
-	
-	public void receive(String message);
+	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException;
+	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException;
+	public void shutdown() throws IOException;
 }

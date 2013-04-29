@@ -30,7 +30,6 @@ public class ClientSocket{
 
 		this.socket  = new Socket(hostname, port);
 		this.client = client;
-		System.out.println("Connected to "+hostname+" at "+port);
 		this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.output = new PrintWriter(socket.getOutputStream());
 		this.running = true;
@@ -55,6 +54,11 @@ public class ClientSocket{
 					} catch (IOException e) {
 						System.out.println("ERROR: IO Error in traffic handling thread");
 						e.printStackTrace();
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					} catch (RequestTimedOutException e) {
+						System.out.println("ERROR: Request timed out in traffic handling thread");
+						e.printStackTrace();
 					}
 				}
 			}
@@ -75,14 +79,15 @@ public class ClientSocket{
 
 		output.print(message);
 		output.flush();
-		String line = foreground.readLine();
-		StringBuilder builder = new StringBuilder();
+		String response = foreground.readLine();
+		/*StringBuilder builder = new StringBuilder();
 		while(!line.isEmpty()) {
 			//System.out.println("line:" +line);
 			builder.append(String.format("%s\n", line));
 			line = foreground.readLine();
 		}
-		String response = new String(builder);
+		String response = new String(builder);*/
+		//System.out.println("Response:"+response+".Size: "+response.length());
 		if (response.equals("Request timed out\n")) {
 			System.out.println("Server response timed out");
 			throw new RequestTimedOutException();
@@ -92,11 +97,11 @@ public class ClientSocket{
 	
 	public void kill() throws IOException {
 		running = false;
-		socket.close();
 		input.close();
 		output.close();
 		foreground.close();
 		background.close();
+		socket.close();
 	}
 	/**
 	 * The thread that reads everything from the server and forwards the response to the corresponding stream.
