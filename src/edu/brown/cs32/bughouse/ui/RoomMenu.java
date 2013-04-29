@@ -1,6 +1,7 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -96,6 +97,9 @@ public class RoomMenu extends JPanel {
 	
 	public JPanel getRooms() throws IOException, RequestTimedOutException{
 		roomList_  = new JPanel();
+		JLabel header = new JLabel("List of active games to join");
+		header.setFont(new Font("Serif", Font.PLAIN, 24));
+		roomList_.add(header);
 		list_ = new JList<>();
 		list_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list_.addListSelectionListener(new ListSelectionListener() {
@@ -120,8 +124,6 @@ public class RoomMenu extends JPanel {
 		roomList_.add(list_);
 			if (backend_.getActiveGames().isEmpty()){
 				list_.setEnabled(false);
-				roomList_.add(new JLabel("No rooms available"));
-				roomList_.repaint();
 			}
 			else {
 				updateGames();
@@ -183,7 +185,7 @@ public class RoomMenu extends JPanel {
 	public void updateGames() throws IOException, RequestTimedOutException{
 
 		 list_.setEnabled(true);
-	//	 roomList_.removeAll();
+		 roomList_.remove(list_);
 	     DefaultListModel<String> options = new DefaultListModel<>();
 		 activeGames_ = backend_.getActiveGames();
 		 for (Game activeGame : activeGames_){
@@ -191,6 +193,7 @@ public class RoomMenu extends JPanel {
 			}
 		 list_.setModel(options);
 		roomList_.add(list_);
+		list_.setSelectedValue(selectedGameID_, true);
 		roomList_.revalidate();
 		roomList_.repaint();
 		if (!(list_.isSelectionEmpty())){

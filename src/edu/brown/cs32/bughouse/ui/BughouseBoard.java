@@ -37,6 +37,7 @@ public class BughouseBoard extends JPanel {
 		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.setPreferredSize(new Dimension(400,400));
+		this.turn_ = false;
 		Color current = Color.GRAY;
 		for (int i = 0; i<8;i++){
 			for (int j = 0; j<8;j++){
@@ -65,6 +66,7 @@ public class BughouseBoard extends JPanel {
 	
 	public void startTurn(){
 		turn_ = true;
+		JOptionPane.showMessageDialog(this, "Your turn");
 	}
 	
 	
@@ -167,7 +169,7 @@ public class BughouseBoard extends JPanel {
 				destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
 				System.out.println("Dest x "+destX_+ " "+destY_);
 					 try {
-						//turn_ = false;
+						turn_ = false;
 						backend_.me().move(originX_, originY_, destX_, destY_);
 					} catch (IllegalMoveException e) {
 						JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
@@ -180,16 +182,13 @@ public class BughouseBoard extends JPanel {
 						JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
 								"Timeout Error", JOptionPane.ERROR_MESSAGE);
 						return;
-					}
-					//JDialog illegalMove = new JOptionPane("That move is illegal", ERROR_MESSAGE);
- catch (WrongColorException e) {
+					}catch (WrongColorException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please" +
+								"move another chess piece of yours", 
+								"Piece Error", JOptionPane.ERROR_MESSAGE);
+						return;
 					}
-				
-				
-
-				// notify backend/server/user that the current turn has ended
 			}
 		}
 
