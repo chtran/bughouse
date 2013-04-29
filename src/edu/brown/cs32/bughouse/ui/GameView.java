@@ -82,9 +82,9 @@ public class GameView extends JPanel {
 
 	public void getBoardID() throws IOException, RequestTimedOutException, GameNotReadyException{
 		myBoardID_ = backend_.me().getCurrentBoardId();
-		for (int id: backend_.getBoards().keySet()) {
-			if (id!=myBoardID_) {
-				otherBoardID_ = id;
+		for (ChessBoard board: backend_.getCurrentBoards()) {
+			if (board.getId()!=myBoardID_) {
+				otherBoardID_ = board.getId();
 				return;
 			}
 		}

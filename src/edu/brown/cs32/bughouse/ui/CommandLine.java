@@ -23,7 +23,7 @@ import edu.brown.cs32.bughouse.models.Player;
 public class CommandLine implements FrontEnd{
 	BackEnd backend;
 	List<Game> currentGames;
-	Map<Integer, ChessBoard> currentBoards;
+	
 	public CommandLine(String host, int port) {
 		try {
 			this.backend = new BughouseBackEnd(this,host,port);
@@ -77,22 +77,13 @@ public class CommandLine implements FrontEnd{
 	private void startGame() throws IOException, RequestTimedOutException, GameNotReadyException {
 		try {
 			backend.startGame();
-			currentBoards = backend.getBoards();
 		} catch (UnauthorizedException e) {
 			System.out.println("You are not authorized to start game");
 		}
 	}
 	//When server starts the game (client not owner)
 	public void gameStarted() {
-		try {
-			currentBoards = backend.getBoards();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RequestTimedOutException e) {
-			System.out.println("Request timed out");
-		} catch (GameNotReadyException e) {
-			System.out.println("Game not ready");
-		}
+		System.out.println("Your game started!");
 	}
 	private void movePiece(String line) throws IllegalMoveException, IOException, RequestTimedOutException, WrongColorException {
 		String[] splitted = line.split(" ");
@@ -184,7 +175,7 @@ public class CommandLine implements FrontEnd{
 	}
 	public void printBoards() throws IOException, RequestTimedOutException {
 		System.out.printf("You are %s in board %d\n",backend.me().isWhite() ? "white" : "black", backend.me().getCurrentBoardId());
-		for (ChessBoard board: currentBoards.values())
+		for (ChessBoard board: backend.getCurrentBoards())
 			System.out.println(board);
 	}
 	public static void main(String[] args) {
@@ -210,7 +201,6 @@ public class CommandLine implements FrontEnd{
 	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
 			int to_y) {
 		System.out.printf("Board #%d: (%d,%d) moved to (%d,%d)\n",boardId,from_x,from_y,to_x,to_y);
-		currentBoards.get(boardId).pieceMoved(from_x, from_y, to_x, to_y);
 	}
 	@Override
 	public void gameListUpdated() {

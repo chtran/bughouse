@@ -2,6 +2,7 @@ package edu.brown.cs32.bughouse.interfaces;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,9 @@ public interface BackEnd {
 	public List<Game> getActiveGames() throws IOException, RequestTimedOutException;
 	public void joinGame(int gameId, int team) throws IOException, RequestTimedOutException, TeamFullException;
 	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException, UnauthorizedException;
-	public Map<Integer,ChessBoard> getBoards() throws IOException, RequestTimedOutException, GameNotReadyException;
+	public void setBoards() throws IOException, RequestTimedOutException;
+	public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y);
+	public Collection<ChessBoard> getCurrentBoards();
 	public void createGame() throws IOException, RequestTimedOutException;
 	public void quit() throws IOException, RequestTimedOutException;
 	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException;
