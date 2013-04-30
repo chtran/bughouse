@@ -187,6 +187,7 @@ public class BughouseBoard extends JPanel {
 						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please " +
 								"move another chess piece of yours", 
 								"Piece Error", JOptionPane.ERROR_MESSAGE);
+						turn_ = true;
 						return;
 					}
 			}

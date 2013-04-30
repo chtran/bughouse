@@ -161,7 +161,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void prisonersUpdated() {
 		// TODO Auto-generated method stub
-		
+		game_.updatePrison();
 	}
 
 	@Override

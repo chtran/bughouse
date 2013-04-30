@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.interfaces.Client;
 
@@ -58,6 +59,9 @@ public class ClientSocket{
 						e.printStackTrace();
 					} catch (RequestTimedOutException e) {
 						System.out.println("ERROR: Request timed out in traffic handling thread");
+						e.printStackTrace();
+					} catch (IllegalPlacementException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
