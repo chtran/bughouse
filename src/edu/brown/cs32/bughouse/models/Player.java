@@ -53,12 +53,8 @@ public class Player extends Model {
 		}
 		return null;
 	}
-	public void put(ChessPiece piece, int x, int y) throws IllegalPlacementException {
-		//TODO
-		/*if (prisoners.contains(piece)) throw new IllegalPlacementException();
-		if (currentBoard==null) return;
-		currentBoard.put(piece, x, y);
-		prisoners.remove(piece);*/
+	public void put(int index, int x, int y) throws IllegalPlacementException, IOException, RequestTimedOutException {
+		client.put(getCurrentBoardId(), id, index, x, y);
 	}
 	public void pass(ChessPiece piece) throws IOException, RequestTimedOutException {
 		client.pass(id, getTeammate().getId(), piece.getType());
