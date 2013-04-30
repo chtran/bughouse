@@ -135,11 +135,7 @@ public class BughouseClientHandler extends Thread {
 								break;
 							// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 							case "MOVE":
-								msgSplit = headerSplit[1].split("\t");
-								if (msgSplit.length == 5) {
-									id = Integer.parseInt(msgSplit[0]);
-									move(id, msg);
-								}
+								move(msg);
 								break;
 							// PUT:[boardId]\t[userId]\t[pieceType]\t[pieceIsWhite]\t[toX]\t[toY]\n
 							case "PUT":
@@ -206,12 +202,11 @@ public class BughouseClientHandler extends Thread {
 	/**
 	 * Sends message about chess move to all players in game
 	 * Sends response to player making move:
-	 * "MOVE_OK:[boardId]\n" if everything went well
-       "MOVE_FAILED:[boardId]\n" if move failed
-	 * @param id Board id
+	 * "MOVE_OK\n" if everything went well
+       "MOVE_FAILED\n" if move failed
 	 * @param msg Message to broadcast to other players in game
 	 */
-	private void move(int id, String msg) {
+	private void move(String msg) {
 		//chtran: Commented out the boardId check because getBoardId seems to return the wrong value
 		//if (m_playerInfo.getBoardId() == id) {
 			int gameID = m_playerInfo.getGameId();
