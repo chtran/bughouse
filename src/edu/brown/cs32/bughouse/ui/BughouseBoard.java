@@ -172,10 +172,9 @@ public class BughouseBoard extends JPanel {
 						turn_ = false;
 						backend_.me().move(originX_, originY_, destX_, destY_);
 					} catch (IllegalMoveException e) {
-						JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
-								"Illegal Move Error", JOptionPane.ERROR_MESSAGE);
 						turn_ = true;
-						return;
+						JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
+								"Illegal Move Error", JOptionPane.ERROR_MESSAGE);					
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (RequestTimedOutException e) {
@@ -184,10 +183,10 @@ public class BughouseBoard extends JPanel {
 						return;
 					}catch (WrongColorException e) {
 						// TODO Auto-generated catch block
+						turn_ = true;
 						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please " +
 								"move another chess piece of yours", 
 								"Piece Error", JOptionPane.ERROR_MESSAGE);
-						turn_ = true;
 						return;
 					}
 			}
