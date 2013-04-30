@@ -111,12 +111,10 @@ public class CommandLine implements FrontEnd{
 	}
 	
 	private void put(String line) throws IllegalPlacementException, IOException, RequestTimedOutException {
-		List<ChessPiece> prisoners = backend.getPrisoners(backend.me().getId());
 		String[] splitted = line.split(" ");
 		int index = Integer.parseInt(splitted[1]);
 		int x = Integer.parseInt(splitted[2]);
 		int y = Integer.parseInt(splitted[3]);
-		prisoners.remove(index);
 		backend.me().put(index, x, y);
 	}
  	public void run() throws IOException, RequestTimedOutException {
@@ -240,6 +238,17 @@ public class CommandLine implements FrontEnd{
 	}
 	@Override
 	public void prisonersUpdated() {
-		
+		System.out.println("Prisoner list updated");
+	}
+	@Override
+	public void piecePut(int boardId, int playerId, ChessPiece piece, int x, int y) {
+		Player player = new Player(playerId);
+		try {
+			System.out.printf("%s put a %s to (%d, %d)\n",player.getName(),piece.getName(), x,y);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			System.out.println("Request timed out");
+		}
 	}
 }

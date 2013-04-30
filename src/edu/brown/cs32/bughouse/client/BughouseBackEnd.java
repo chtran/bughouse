@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
+import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
@@ -99,6 +100,8 @@ public class BughouseBackEnd implements BackEnd {
 			pieces.add(toAdd);
 			prisoners.put(playerId, pieces);
 		}
+		frontEnd.addPrisoner(playerId, toAdd);
+		frontEnd.prisonersUpdated();
 	}
 
 	@Override
@@ -138,6 +141,13 @@ public class BughouseBackEnd implements BackEnd {
 	@Override
 	public Collection<ChessBoard> getCurrentBoards() {
 		return currentBoards.values();
+	}
+
+	@Override
+	public void notifyPut(int boardId, int playerId, int index,int x, int y) throws IllegalPlacementException, IOException, RequestTimedOutException {
+		ChessPiece piece = prisoners.get(playerId).remove(index);
+		frontEnd.piecePut(boardId, playerId, piece, x, y);
+		currentBoards.get(new Player(playerId).getCurrentBoardId()).put(piece, x, y);
 	}
 	
 }

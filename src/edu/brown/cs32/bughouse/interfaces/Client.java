@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
+import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
@@ -34,6 +35,6 @@ public interface Client {
 	public void put(int boardID, int playerId, int pieceIndex, int x, int y) throws IOException, RequestTimedOutException;
 	public void move(int boardId, int from_x, int from_y, int to_x, int to_y) throws IOException, RequestTimedOutException;
 	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException;
-	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException;
+	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException, IllegalPlacementException;
 	public void shutdown() throws IOException;
 }

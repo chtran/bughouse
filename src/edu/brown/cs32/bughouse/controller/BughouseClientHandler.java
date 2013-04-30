@@ -156,7 +156,7 @@ public class BughouseClientHandler extends Thread {
 								send("\n");
 								if (msgSplit.length == 3) {
 									id = Integer.parseInt(msgSplit[1]);
-									m_pool.sendToPlayer(id, msg);
+									m_pool.broadcastToGame(m_data.getCurrentGame(id),"BROADCAST:"+msg+"\n",this);
 								}
 								break;
 							default:
@@ -176,6 +176,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	private void sendPutMessage(String msg) {
 		int gameId = m_playerInfo.getGameId();
+		send("\n");
 		m_pool.broadcastToGame(gameId, "BROADCAST:" + msg + "\n", this);
 	}
 

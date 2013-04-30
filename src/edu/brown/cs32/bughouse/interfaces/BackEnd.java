@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
+import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
@@ -27,6 +28,7 @@ public interface BackEnd {
 	public void createGame() throws IOException, RequestTimedOutException;
 	public void quit() throws IOException, RequestTimedOutException;
 	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException;
+	public void notifyPut(int boardId, int playerId, int index,int x, int y) throws IllegalPlacementException, IOException, RequestTimedOutException;
 	public Player me();
 	public void shutdown() throws IOException;
 	public List<ChessPiece> getPrisoners(int playerId);

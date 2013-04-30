@@ -163,10 +163,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		// TODO Auto-generated method stub
 		
 	}
-	
 
-	
-
-
+	@Override
+	public void piecePut(int boardId, int playerId, ChessPiece piece, int x,
+			int y) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
