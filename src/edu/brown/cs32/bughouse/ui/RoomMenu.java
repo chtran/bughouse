@@ -183,6 +183,7 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public void updateGames() throws IOException, RequestTimedOutException{
+		System.out.printf("Currently selected value %d from client ", selectedGameID_);
 		 list_.setEnabled(true);
 		 roomList_.remove(list_);
 	     DefaultListModel<String> options = new DefaultListModel<>();
@@ -193,9 +194,11 @@ public class RoomMenu extends JPanel {
 		 list_.setModel(options);
 		roomList_.add(list_);
 		list_.setSelectedValue(selectedGameID_, true);
+		System.out.printf("Selected value after update %d from client ", selectedGameID_);
 		roomList_.revalidate();
 		roomList_.repaint();
 		if (!(list_.isSelectionEmpty())){
+			System.out.println("Currently selected value before change "+ selectedGameID_);
 			displayGameInfo(activeGames_.get(list_.getSelectedIndex()));
 		}
 		
@@ -215,7 +218,6 @@ public class RoomMenu extends JPanel {
 			try {
 				backend_.joinGame(selectedGameID_, selectedTeamID_);
 				updateGames();
-				//displayGameInfo(activeGames_.get(list_.getSelectedIndex()));
 			} catch (IOException e1){
 				e1.printStackTrace();
 			}catch (RequestTimedOutException e1){
