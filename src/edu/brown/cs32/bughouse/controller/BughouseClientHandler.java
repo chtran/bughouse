@@ -225,7 +225,7 @@ public class BughouseClientHandler extends Thread {
 				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			} else {
 				System.out.println("GameId incorrect: "+gameID);
-				send("MOVE_FAILED" + id + "\n");
+				send("MOVE_FAILED:" + id + "\n");
 			}
 		//} else {
 		//	System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
