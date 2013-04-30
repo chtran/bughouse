@@ -1,3 +1,5 @@
+me:
+    print out your id and your name
 show_games:
     list all games
 create_game:
@@ -12,5 +14,9 @@ get_name [playerId]:
     get name of player
 move [from_x] [from_y] [to_x] [to_y]:
     move a chess piece
+show_prisoners [playerId]:
+    show your prisoners
+put [prisonerId] [x] [y]:
+    put a prisoner on the board
 
 

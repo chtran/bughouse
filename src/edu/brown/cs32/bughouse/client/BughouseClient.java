@@ -187,7 +187,7 @@ public class BughouseClient implements Client {
 		String body = message.split(":")[2];
 		int gameId = Integer.parseInt(body.trim());
 		if (backend.me().getCurrentGame().getId()==gameId) {
-			backend.setBoards();
+			backend.gameStarted();
 			backend.frontEnd().gameStarted();
 		} else {
 			backend.frontEnd().gameListUpdated();
@@ -256,8 +256,8 @@ public class BughouseClient implements Client {
 		socket.getResponse(String.format("PASS:%d\t%d\t%d\n", fromId, toId, chessPieceType));
 	}
 	@Override
-	public void put(int chessPieceType, int color, int x, int y) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("PUT:%d\t%d\t%d\t%d\n", chessPieceType, color, x,y));
+	public void put(int boardId, int playerId, int index, int x, int y) throws IOException, RequestTimedOutException {
+		socket.getResponse(String.format("PUT:%d\t%d\t%d\t%d\n", boardId, playerId, index, x,y));
 	}
 
 	

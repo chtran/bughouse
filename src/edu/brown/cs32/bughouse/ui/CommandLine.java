@@ -3,12 +3,12 @@ package edu.brown.cs32.bughouse.ui;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import edu.brown.cs32.bughouse.client.BughouseBackEnd;
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
+import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
@@ -22,7 +22,6 @@ import edu.brown.cs32.bughouse.models.Player;
 
 public class CommandLine implements FrontEnd{
 	BackEnd backend;
-	List<Game> currentGames;
 	
 	public CommandLine(String host, int port) {
 		try {
@@ -94,6 +93,32 @@ public class CommandLine implements FrontEnd{
 		backend.me().move(from_x, from_y, to_x, to_y);
 		System.out.println("Moved successfully");
 	}
+	private void showPrisoners(String line) {
+		String[] splitted = line.split(" ");
+		int playerId = Integer.parseInt(splitted[1]);
+		List<ChessPiece> prisoners = backend.getPrisoners(playerId);
+		if (prisoners==null) {
+			System.out.println("Player not in game");
+			return;
+		} else if (prisoners.isEmpty()) {
+			System.out.println("Player doesn't have any prisoner");
+			return;
+		}
+		System.out.println("Prisoners of player #"+playerId);
+		for (int i=0; i<prisoners.size();i++) {
+			System.out.printf("%d. %s\n",i,prisoners.get(i));
+		}
+	}
+	
+	private void put(String line) throws IllegalPlacementException, IOException, RequestTimedOutException {
+		List<ChessPiece> prisoners = backend.getPrisoners(backend.me().getId());
+		String[] splitted = line.split(" ");
+		int index = Integer.parseInt(splitted[1]);
+		int x = Integer.parseInt(splitted[2]);
+		int y = Integer.parseInt(splitted[3]);
+		prisoners.remove(index);
+		backend.me().put(index, x, y);
+	}
  	public void run() throws IOException, RequestTimedOutException {
 		System.out.print("Enter your name: ");
 		Scanner stdIn = new Scanner(System.in);
@@ -132,6 +157,12 @@ public class CommandLine implements FrontEnd{
 					case "print_board":
 						printBoards();
 						break;
+					case "show_prisoners":
+						showPrisoners(line);
+						break;
+					case "put":
+						put(line);
+						break;
 					default:
 						System.out.println("Unknown command: "+line);
 				}
@@ -147,9 +178,10 @@ public class CommandLine implements FrontEnd{
 				System.out.println("ERROR: Game not ready");
 			} catch (IllegalMoveException e) {
 				System.out.println("ERROR: Move not legal");
-				e.printStackTrace();
 			} catch (WrongColorException e) {
 				System.out.println("ERROR: Wrong color");
+			} catch (IllegalPlacementException e) {
+				System.out.println("ERROR: You cannot put the piece there");
 			}
 		}
 		

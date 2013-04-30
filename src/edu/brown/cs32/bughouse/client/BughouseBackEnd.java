@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
-import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
-import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.interfaces.Client;
 import edu.brown.cs32.bughouse.interfaces.FrontEnd;
@@ -28,20 +25,20 @@ public class BughouseBackEnd implements BackEnd {
 	private Player me;
 	private FrontEnd frontEnd;
 	private HashMap<Integer, List<ChessPiece>> prisoners;
-	private Map<Integer, ChessBoard> currentBoards;
+	private HashMap<Integer, ChessBoard> currentBoards;
 	public BughouseBackEnd(FrontEnd frontEnd,String host, int port) throws UnknownHostException, IllegalArgumentException, IOException {
 		this.frontEnd = frontEnd;
 		this.client = new BughouseClient(host,port,this);
 		Model.setClient(client);
 		this.prisoners = new HashMap<Integer, List<ChessPiece>>();
+		this.currentBoards = new HashMap<Integer, ChessBoard>();
 	}
-	
-
-	
 
 	@Override
 	public void quit() throws IOException, RequestTimedOutException {
 		client.quit(me.getId());
+		prisoners.clear();
+		currentBoards.clear();
 	}
 
 	@Override
@@ -80,20 +77,16 @@ public class BughouseBackEnd implements BackEnd {
 			throw new UnauthorizedException();
 		}
 	}
-	
 
 	@Override
 	public Player me() {
 		return me;
 	}
-	
 
 	@Override
 	public void shutdown() throws IOException {
 		client.shutdown();
 	}
-
-
 
 	@Override
 	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException {
@@ -114,28 +107,27 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public void setBoards() throws IOException,	RequestTimedOutException {
-		List<Integer> boardIds = client.getBoards(me.getCurrentGame().getId());
-		Map<Integer,ChessBoard> toReturn = new HashMap<Integer,ChessBoard>();
+	public void gameStarted() throws IOException,	RequestTimedOutException {
+		int gameId = me.getCurrentGame().getId();
+		List<Integer> boardIds = client.getBoards(gameId);
 		for (int boardId: boardIds) {
 			ChessBoard board = new ChessBoard(boardId);
 			if (boardId==me.getCurrentBoardId()) {
 				me.setBoard(board);
 			}
-			toReturn.put(boardId,board);
+			currentBoards.put(boardId,board);
 		}
-		System.out.println("Setting currentBoards to: "+toReturn);
-		currentBoards= toReturn;
-	}
+		List<Integer> team1 = client.getPlayers(gameId, 1);
+		List<Integer> team2 = client.getPlayers(gameId, 2);
+		for (int playerId: team1) prisoners.put(playerId, new ArrayList<ChessPiece>());
+		for (int playerId: team2) prisoners.put(playerId, new ArrayList<ChessPiece>());
 
+	}
 
 	@Override
 	public FrontEnd frontEnd() {
 		return this.frontEnd;
 	}
-
-
-
 
 	@Override
 	public void updateBoard(int boardId, int from_x, int from_y, int to_x,
@@ -143,12 +135,8 @@ public class BughouseBackEnd implements BackEnd {
 		currentBoards.get(boardId).pieceMoved(from_x, from_y, to_x, to_y);
 	}
 
-
-
-
 	@Override
 	public Collection<ChessBoard> getCurrentBoards() {
-		
 		return currentBoards.values();
 	}
 	

@@ -121,7 +121,7 @@ pass:
         - Broadcast the ADD_PRISONER message to toPlayer
 
 put:
-    + Request: put:[chessPieceType]\t[chessPieceColor]\t[x_position]\t[y_position]
+    + Request: PUT:[boardId]\t[playerId]\t[pieceIndex]\t[x_position]\t[y_position]
     + Action:
         - Broadcast the above message to players in the game
 
