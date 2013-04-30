@@ -15,8 +15,8 @@ get_name [playerId]:
 move [from_x] [from_y] [to_x] [to_y]:
     move a chess piece
 show_prisoners [playerId]:
-    show your prisoners
-put [prisonerId] [x] [y]:
+    show your prisoners. the number indicates index
+put [index] [x] [y]:
     put a prisoner on the board
 
 
