@@ -212,7 +212,8 @@ public class BughouseClientHandler extends Thread {
 	 * @param msg Message to broadcast to other players in game
 	 */
 	private void move(int id, String msg) {
-		if (m_playerInfo.getBoardId() == id) {
+		//chtran: Commented out the boardId check because getBoardId seems to return the wrong value
+		//if (m_playerInfo.getBoardId() == id) {
 			int gameID = m_playerInfo.getGameId();
 			if (gameID > 0) {
 				m_pool.broadcastToGame(gameID, "BROADCAST:" + msg + "\n", this);
@@ -226,10 +227,10 @@ public class BughouseClientHandler extends Thread {
 				System.out.println("GameId incorrect: "+gameID);
 				send("MOVE_FAILED" + id + "\n");
 			}
-		} else {
-			System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
-			send("MOVE_FAILED:" + id + "\n");
-		}
+		//} else {
+		//	System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
+		//	send("MOVE_FAILED:" + id + "\n");
+		//}
 	}
 
 	/**
