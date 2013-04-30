@@ -146,9 +146,11 @@ public class GameView extends JPanel {
 		return prison_;
 	}
 	
-	private void updatePrison(){
+	public void updatePrison(){
+		JOptionPane.showMessageDialog(this, "You have received a piece from your teammate!");
+		/*myPrisoners_ = backend_.getPrisoners(backend_.me().getId());
 		for (ChessPiece piece : myPrisoners_){
 			JLabel img = new JLabel();
-		}
+		}*/
 	}
 }

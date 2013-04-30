@@ -39,12 +39,14 @@ public class RoomMenu extends JPanel {
 	private JPanel roomList_;
 	private int selectedGameID_, selectedTeamID_;
 	private BughouseGUI front_;
+	private boolean lockScreen_;
 	
 	public RoomMenu(BughouseGUI frame,BackEnd backend){
 		super();
 		this.setLayout(new BorderLayout());
 		this.front_ = frame;
 		this.backend_ = backend;
+		this.lockScreen_= false;
 		try {
 			this.add(getRooms(), BorderLayout.CENTER);
 			this.add(userControl(), BorderLayout.SOUTH);
@@ -138,15 +140,19 @@ public class RoomMenu extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					backend_.createGame();
-					updateGames();
-				} catch (IOException e2){
-					e2.printStackTrace();
-				}catch (RequestTimedOutException e1){
-					JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-							"Connection time out", JOptionPane.ERROR_MESSAGE);
-					return;
+				if (!(lockScreen_)){
+					try {
+						backend_.createGame();
+						lockScreen_ = true;
+						updateGames();
+					} catch (IOException e2){
+						e2.printStackTrace();
+					}catch (RequestTimedOutException e1){
+						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						lockScreen_ = false;
+						return;
+					}
 				}
 				
 			}
@@ -183,6 +189,7 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public void updateGames() throws IOException, RequestTimedOutException{
+		System.out.printf("Currently selected value %d from client \n", selectedGameID_);
 		 list_.setEnabled(true);
 		 roomList_.remove(list_);
 	     DefaultListModel<String> options = new DefaultListModel<>();
@@ -193,9 +200,12 @@ public class RoomMenu extends JPanel {
 		 list_.setModel(options);
 		roomList_.add(list_);
 		list_.setSelectedValue(selectedGameID_, true);
+		System.out.printf("Selected value after update %d from client \n", selectedGameID_);
+		System.out.println(list_.isSelectionEmpty());
 		roomList_.revalidate();
 		roomList_.repaint();
 		if (!(list_.isSelectionEmpty())){
+			System.out.println("Currently selected value before change "+ selectedGameID_);
 			displayGameInfo(activeGames_.get(list_.getSelectedIndex()));
 		}
 		
@@ -211,21 +221,32 @@ public class RoomMenu extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			selectedTeamID_ = teamID_;
-			try {
-				backend_.joinGame(selectedGameID_, selectedTeamID_);
-				updateGames();
-				//displayGameInfo(activeGames_.get(list_.getSelectedIndex()));
-			} catch (IOException e1){
-				e1.printStackTrace();
-			}catch (RequestTimedOutException e1){
-				JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
-						"Authorization error", JOptionPane.ERROR_MESSAGE);
-				return;
-			}catch(TeamFullException e1){
-				JOptionPane.showMessageDialog(null, "You can't join that team", 
-						"Team is full", JOptionPane.ERROR_MESSAGE);
-				return;
+			if (!lockScreen_){
+				selectedTeamID_ = teamID_;
+				try {
+					backend_.joinGame(selectedGameID_, selectedTeamID_);
+					updateGames();
+					String player = backend_.me().getName();
+					if (teamID_ == 1){
+						team1_.append(player+"\n");
+					}
+					else {
+						team2_.append(player+"\n");
+					}
+					lockScreen_ = true;
+				} catch (IOException e1){
+					e1.printStackTrace();
+				}catch (RequestTimedOutException e1){
+					JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
+							"Authorization error", JOptionPane.ERROR_MESSAGE);
+					lockScreen_ = false;
+					return;
+				}catch(TeamFullException e1){
+					JOptionPane.showMessageDialog(null, "You can't join that team", 
+							"Team is full", JOptionPane.ERROR_MESSAGE);
+					lockScreen_ = false;
+					return;
+				}
 			}
 		}
 		
