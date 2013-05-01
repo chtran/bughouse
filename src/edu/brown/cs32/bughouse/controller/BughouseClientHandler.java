@@ -326,11 +326,8 @@ public class BughouseClientHandler extends Thread {
 		int id = m_data.addGame(ownerId);
 		send(id + "\n");
 		
-//		// send new game option to all other clients
-//		String msg = getGameList();
-//		m_pool.broadcast(msg, this);
-		
-		m_pool.broadcast("BROADCAST:NEW_GAME:" + ownerId + "\t" + id + "\n", this);
+		if (id != -1)
+			m_pool.broadcast("BROADCAST:NEW_GAME:" + ownerId + "\t" + id + "\n", this);
 	}
 
 	/**
@@ -491,6 +488,7 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	public void quit(int id) {
+		// TODO: check if game 
 		m_data.playerQuit(id);
 		int gameId = m_playerInfo.getGameId();
 		if (gameId > 0) {

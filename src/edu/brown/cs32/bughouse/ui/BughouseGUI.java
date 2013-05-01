@@ -61,8 +61,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public static void main(String[] argv){
 		BughouseGUI ui = new BughouseGUI(argv);
 		BughouseGUI ui2 = new BughouseGUI(argv);
-		BughouseGUI ui3 = new BughouseGUI(argv);
-		BughouseGUI ui4 = new BughouseGUI(argv);
 	}
 	
 	@Override
