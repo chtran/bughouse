@@ -144,9 +144,9 @@ public class BughouseClient implements Client {
 	}
 
 	@Override
-	public void move(int boardId, int from_x, int from_y, int to_x,
+	public void move(int from_x, int from_y, int to_x,
 			int to_y) throws IOException, RequestTimedOutException {
-		socket.getResponse(String.format("MOVE:%d\t%d\t%d\t%d\t%d\n", boardId,from_x,from_y,to_x,to_y));
+		socket.getResponse(String.format("MOVE:%d\t%d\t%d\t%d\n", from_x,from_y,to_x,to_y));
 		
 	}
 	@Override
