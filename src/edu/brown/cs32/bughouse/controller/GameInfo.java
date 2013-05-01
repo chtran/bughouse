@@ -21,6 +21,7 @@ public class GameInfo {
 		m_team2 = new ArrayList<PlayerInfo>(); // ids of players in team2
 		m_boards = new HashMap<Integer, Integer[]>();
 		m_boardIds = new int[]{board1Id, board2Id};
+		System.out.println("BOARD 1: " + board1Id + " BOARD 2: " + board2Id);
 	}
 	
 	// Getters
@@ -199,6 +200,7 @@ public class GameInfo {
 			p = team.get(0).getColor() ? team.get(1) : team.get(0);
 		
 		p.setBoardId(boardID);
+		System.out.println("Set player " + p.getId() + " board: " + boardID);
 		return p.getId();
 	}
 
