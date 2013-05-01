@@ -33,7 +33,7 @@ public interface Client {
 	public void quit(int playerId) throws IOException, RequestTimedOutException;
 	public void pass(int fromId, int toId, int chessPieceType) throws IOException, RequestTimedOutException;
 	public void put(int boardID, int playerId, int pieceIndex, int x, int y) throws IOException, RequestTimedOutException;
-	public void move(int boardId, int from_x, int from_y, int to_x, int to_y) throws IOException, RequestTimedOutException;
+	public void move(int from_x, int from_y, int to_x, int to_y) throws IOException, RequestTimedOutException;
 	public void gameOver(int gameId, int team) throws IOException, RequestTimedOutException;
 	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException, IllegalPlacementException;
 	public void shutdown() throws IOException;

@@ -54,6 +54,8 @@ public class BughouseClientHandler extends Thread {
 			while (true) {
 				if ((msg = m_input.readLine()) != null) {
 					System.out.println("RECEIVED: " + msg);
+					if (m_playerInfo != null)
+						System.out.println("m_playerInfo " + m_playerInfo.getId() + " " + m_playerInfo.getName());
 					headerSplit = msg.split(":");
 					if (msg.compareTo("GET_GAMES:") ==0)
 						sendGameList();
@@ -133,13 +135,9 @@ public class BughouseClientHandler extends Thread {
 								id = Integer.parseInt(headerSplit[1]);
 								sendCurrentBoard(id);
 								break;
-							// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+							// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 							case "MOVE":
-								msgSplit = headerSplit[1].split("\t");
-								if (msgSplit.length == 5) {
-									id = Integer.parseInt(msgSplit[0]);
-									move(id, msg);
-								}
+								move(msg);
 								break;
 							// PUT:[boardId]\t[userId]\t[pieceType]\t[pieceIsWhite]\t[toX]\t[toY]\n
 							case "PUT":
@@ -164,7 +162,7 @@ public class BughouseClientHandler extends Thread {
 						}
 					}
 				}
-			}
+			}// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -206,31 +204,34 @@ public class BughouseClientHandler extends Thread {
 	/**
 	 * Sends message about chess move to all players in game
 	 * Sends response to player making move:
-	 * "MOVE_OK:[boardId]\n" if everything went well
-       "MOVE_FAILED:[boardId]\n" if move failed
-	 * @param id Board id
+	 * "MOVE_OK\n" if everything went well
+       "MOVE_FAILED\n" if move failed
 	 * @param msg Message to broadcast to other players in game
 	 */
-	private void move(int id, String msg) {
-		//chtran: Commented out the boardId check because getBoardId seems to return the wrong value
-		//if (m_playerInfo.getBoardId() == id) {
-			int gameID = m_playerInfo.getGameId();
-			if (gameID > 0) {
-				m_pool.broadcastToGame(gameID, "BROADCAST:" + msg + "\n", this);
-				send("MOVE_OK:" + id + "\n");
-				
+	private void move(String msg) {
+		System.out.println("Player " + m_playerInfo.getId() + " " + m_playerInfo.getName() + " moved");
+		int gameID = m_playerInfo.getGameId();
+		if (gameID > 0) {
+			// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+			String[] split = msg.split(":");
+			if (split.length == 2 && m_playerInfo.getBoardId() >= 0) {
+				String ret = String.format("BROADCAST:MOVE:%d\t%s\n", m_playerInfo.getBoardId(), split[1]);
+				m_pool.broadcastToGame(gameID, ret, this);
+				send("MOVE_OK\n");
+					
 				// notify player with next turn
 				int next = m_data.getNextTurn(gameID);
 				System.out.println("Next turn: " + next);
 				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			} else {
-				System.out.println("GameId incorrect: "+gameID);
-				send("MOVE_FAILED:" + id + "\n");
+				System.out.println("Move message in wrong format: " + msg);
+				send("MOVE_FAILED\n");
 			}
-		//} else {
-		//	System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
-		//	send("MOVE_FAILED:" + id + "\n");
-		//}
+			
+		} else {
+			System.out.println("GameId incorrect: "+gameID);
+			send("MOVE_FAILED\n");
+		}
 	}
 
 	/**
@@ -291,9 +292,9 @@ public class BughouseClientHandler extends Thread {
 	 * Adds player to server data and this handler and sends response to client with id
 	 * @param name Name of new player
 	 */
-	public void addPlayer(String name) {
+	private void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
-		System.out.println("Setting m_playerInfo to "+p);
+		System.out.println("Setting m_playerInfo to "+ p.getId() + " " + p.getName());
 		m_playerInfo = p;
 		int id = p.getId();
 		m_pool.addToMap(id, this);
@@ -325,11 +326,8 @@ public class BughouseClientHandler extends Thread {
 		int id = m_data.addGame(ownerId);
 		send(id + "\n");
 		
-//		// send new game option to all other clients
-//		String msg = getGameList();
-//		m_pool.broadcast(msg, this);
-		
-		m_pool.broadcast("BROADCAST:NEW_GAME:" + ownerId + "\t" + id + "\n", this);
+		if (id != -1)
+			m_pool.broadcast("BROADCAST:NEW_GAME:" + ownerId + "\t" + id + "\n", this);
 	}
 
 	/**
@@ -347,6 +345,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void startGame(int gameId) {
 		// send unauthorized message if client not game owner
+		System.out.println("m_playerInfo: " + m_playerInfo.getId() + " " + m_playerInfo.getName());
 		if (m_data.getGameOwner(gameId) != m_playerInfo.getId()) {
 			send("UNAUTHORIZED:" + gameId + "\n");
 		} else if (m_data.startGame(gameId)) {
@@ -489,6 +488,7 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	public void quit(int id) {
+		// TODO: check if game 
 		m_data.playerQuit(id);
 		int gameId = m_playerInfo.getGameId();
 		if (gameId > 0) {
