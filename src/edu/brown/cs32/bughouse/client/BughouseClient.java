@@ -26,7 +26,6 @@ public class BughouseClient implements Client {
 		String response = socket.getResponse(String.format("CREATE_GAME:%s\n",userId));
 		int gameId = Integer.parseInt(response.trim());
 		return gameId;
-		
 	}
 
 	@Override
