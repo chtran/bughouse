@@ -133,7 +133,7 @@ public class BughouseClientHandler extends Thread {
 								id = Integer.parseInt(headerSplit[1]);
 								sendCurrentBoard(id);
 								break;
-							// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+							// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 							case "MOVE":
 								move(msg);
 								break;
@@ -160,7 +160,7 @@ public class BughouseClientHandler extends Thread {
 						}
 					}
 				}
-			}
+			}// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -207,25 +207,28 @@ public class BughouseClientHandler extends Thread {
 	 * @param msg Message to broadcast to other players in game
 	 */
 	private void move(String msg) {
-		//chtran: Commented out the boardId check because getBoardId seems to return the wrong value
-		//if (m_playerInfo.getBoardId() == id) {
-			int gameID = m_playerInfo.getGameId();
-			if (gameID > 0) {
-				m_pool.broadcastToGame(gameID, "BROADCAST:" + msg + "\n", this);
+		int gameID = m_playerInfo.getGameId();
+		if (gameID > 0) {
+			// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+			String[] split = msg.split(":");
+			if (split.length == 2 && m_playerInfo.getBoardId() >= 0) {
+				String ret = String.format("BROADCAST:MOVE:%d\t%s\n", m_playerInfo.getBoardId(), split[1]);
+				m_pool.broadcastToGame(gameID, ret, this);
 				send("MOVE_OK\n");
-				
+					
 				// notify player with next turn
 				int next = m_data.getNextTurn(gameID);
 				System.out.println("Next turn: " + next);
 				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			} else {
-				System.out.println("GameId incorrect: "+gameID);
+				System.out.println("Move message in wrong format: " + msg);
 				send("MOVE_FAILED\n");
 			}
-		//} else {
-		//	System.out.printf("Client #%d's boardId is %d, not %d\n",m_playerInfo.getId(),m_playerInfo.getBoardId(),id);
-		//	send("MOVE_FAILED:" + id + "\n");
-		//}
+			
+		} else {
+			System.out.println("GameId incorrect: "+gameID);
+			send("MOVE_FAILED\n");
+		}
 	}
 
 	/**
