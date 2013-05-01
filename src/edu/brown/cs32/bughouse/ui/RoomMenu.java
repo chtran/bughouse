@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -37,7 +38,6 @@ public class RoomMenu extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private BackEnd backend_;
-	private JList<String> list_;
 	private JTextArea team1_, team2_;
 	private List<Game> activeGames_;
 	private JPanel roomList_, roomPanel_;
@@ -127,7 +127,7 @@ public class RoomMenu extends JPanel {
 		header.setFont(new Font("Serif", Font.PLAIN,24));
 		roomList_.add(header,BorderLayout.NORTH);
 		rooms_ = new JScrollPane();
-		roomPanel_ = new JPanel(new GridLayout(0,1));
+		roomPanel_ = new JPanel();
 		rooms_.setViewportView(roomPanel_);
 		roomList_.add(rooms_,BorderLayout.CENTER);
 		if (!backend_.getActiveGames().isEmpty()){
@@ -140,7 +140,7 @@ public class RoomMenu extends JPanel {
 		if (backend_.me()!= null ){
 			System.out.println(backend_.me().getName());
 		}
-		activeGames_ = backend_.getActiveGames();
+		activeGames_ = backend_.getActiveGames();;
 		roomPanel_.removeAll();
 		for (Game game : activeGames_){
 			int gameID = game.getId();
@@ -216,6 +216,7 @@ public class RoomMenu extends JPanel {
 	private class ChooseRoomListener implements ActionListener{
 		
 		private Game game_;
+		private Border currentBorder_;
 		
 		public ChooseRoomListener(Game game) {
 			this.game_ = game;
@@ -224,9 +225,11 @@ public class RoomMenu extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (currentRoom_!= null){
-				currentRoom_.setBorder(null);
+				currentRoom_.setBorder(currentBorder_);
+				currentRoom_.repaint();
 			}
 			currentRoom_ = (JButton) e.getSource();
+			currentBorder_ = currentRoom_.getBorder();
 			currentRoom_.setBorder(new LineBorder(Color.RED,3));
 			selectedGameID_ = game_.getId();
 			try {
