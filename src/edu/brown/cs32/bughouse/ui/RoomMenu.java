@@ -46,6 +46,7 @@ public class RoomMenu extends JPanel {
 	private JScrollPane rooms_;
 	private boolean lockScreen_;
 	private JButton currentRoom_;
+	private RoomMenu mainPanel_;
 	
 	public RoomMenu(BughouseGUI frame,BackEnd backend){
 		super();
@@ -53,6 +54,7 @@ public class RoomMenu extends JPanel {
 		this.front_ = frame;
 		this.backend_ = backend;
 		this.lockScreen_= false;
+		this.mainPanel_ = this;
 		try {
 			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
@@ -150,6 +152,10 @@ public class RoomMenu extends JPanel {
 		displayGameInfo();
 		roomPanel_.revalidate();
 		roomPanel_.repaint();
+	}
+	
+	private void launchGameCreatorScreen(){
+		
 	}
 	
 	
