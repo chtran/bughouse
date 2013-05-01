@@ -54,6 +54,8 @@ public class BughouseClientHandler extends Thread {
 			while (true) {
 				if ((msg = m_input.readLine()) != null) {
 					System.out.println("RECEIVED: " + msg);
+					if (m_playerInfo != null)
+						System.out.println("m_playerInfo " + m_playerInfo.getId() + " " + m_playerInfo.getName());
 					headerSplit = msg.split(":");
 					if (msg.compareTo("GET_GAMES:") ==0)
 						sendGameList();
@@ -207,6 +209,7 @@ public class BughouseClientHandler extends Thread {
 	 * @param msg Message to broadcast to other players in game
 	 */
 	private void move(String msg) {
+		System.out.println("Player " + m_playerInfo.getId() + " " + m_playerInfo.getName() + " moved");
 		int gameID = m_playerInfo.getGameId();
 		if (gameID > 0) {
 			// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
@@ -291,7 +294,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	private void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
-		System.out.println("Setting m_playerInfo to "+p);
+		System.out.println("Setting m_playerInfo to "+ p.getId() + " " + p.getName());
 		m_playerInfo = p;
 		int id = p.getId();
 		m_pool.addToMap(id, this);
@@ -345,6 +348,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void startGame(int gameId) {
 		// send unauthorized message if client not game owner
+		System.out.println("m_playerInfo: " + m_playerInfo.getId() + " " + m_playerInfo.getName());
 		if (m_data.getGameOwner(gameId) != m_playerInfo.getId()) {
 			send("UNAUTHORIZED:" + gameId + "\n");
 		} else if (m_data.startGame(gameId)) {
