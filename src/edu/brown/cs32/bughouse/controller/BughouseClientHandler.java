@@ -289,7 +289,7 @@ public class BughouseClientHandler extends Thread {
 	 * Adds player to server data and this handler and sends response to client with id
 	 * @param name Name of new player
 	 */
-	public void addPlayer(String name) {
+	private void addPlayer(String name) {
 		PlayerInfo p = m_data.addPlayer(name);
 		System.out.println("Setting m_playerInfo to "+p);
 		m_playerInfo = p;
