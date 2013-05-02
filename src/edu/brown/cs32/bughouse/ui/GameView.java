@@ -38,7 +38,7 @@ public class GameView extends JPanel {
 	private BughouseBoard userBoard_, otherBoard_;
 	private ChessPieceImageFactory imgFactory_;
 	private JTextArea messageBox_,clock_;
-	private JScrollPane prison_;
+	private JPanel prison_;
 	private List<ChessPiece> myPrisoners_;
 	private BackEnd backend_;
 	private int myBoardID_, otherBoardID_;
@@ -140,14 +140,13 @@ public class GameView extends JPanel {
 	}
 	
 	private JComponent createPieceHolder(){
-		prison_ = new JScrollPane();
+		prison_ = new JPanel();
 		prison_.setPreferredSize(new Dimension(200,110));
-		prison_.setBackground(Color.YELLOW);
 		return prison_;
 	}
 	
 	public void updatePrison(){
-		JOptionPane.showMessageDialog(this, "You have received a piece from your teammate!");
+		JOptionPane.showMessageDialog(null, "You have received a piece from your teammate!");
 		/*myPrisoners_ = backend_.getPrisoners(backend_.me().getId());
 		for (ChessPiece piece : myPrisoners_){
 			JLabel img = new JLabel();

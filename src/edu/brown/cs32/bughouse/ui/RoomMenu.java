@@ -1,7 +1,9 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -13,8 +15,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -33,13 +38,15 @@ public class RoomMenu extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private BackEnd backend_;
-	private JList<String> list_;
 	private JTextArea team1_, team2_;
 	private List<Game> activeGames_;
-	private JPanel roomList_;
+	private JPanel roomList_, roomPanel_;
 	private int selectedGameID_, selectedTeamID_;
 	private BughouseGUI front_;
+	private JScrollPane rooms_;
 	private boolean lockScreen_;
+	private JButton currentRoom_;
+	private RoomMenu mainPanel_;
 	
 	public RoomMenu(BughouseGUI frame,BackEnd backend){
 		super();
@@ -47,10 +54,12 @@ public class RoomMenu extends JPanel {
 		this.front_ = frame;
 		this.backend_ = backend;
 		this.lockScreen_= false;
+		this.mainPanel_ = this;
 		try {
+			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
 			this.add(userControl(), BorderLayout.SOUTH);
-			this.add(gameInfo(), BorderLayout.EAST);
+			
 		}catch (IOException e){
 			e.printStackTrace();
 		}catch (RequestTimedOutException e){
@@ -79,59 +88,76 @@ public class RoomMenu extends JPanel {
 		
 	}
 	
-	public void displayGameInfo(Game selected) throws IOException, RequestTimedOutException{
+	public void displayGameInfoPanel(Game selected) throws IOException, RequestTimedOutException{
 		team1_.setText(" ");
 		team2_.setText(" ");
-		List<Player> team1 = selected.getPlayersByTeam(1);
-		List<Player> team2 = selected.getPlayersByTeam(2);
 		team1_.getParent().setVisible(true);
 		team1_.append("Team 1 :"+"\n");
 		team2_.append("Team 2 :"+"\n");
-		for (Player player : team1){
+		for (Player player :selected.getPlayersByTeam(1)){
 			team1_.append(player.getName()+"\n");
 		}
-		for (Player player: team2){
-			team2_.append(player.getName()+"\n");
-		}
 		team1_.repaint();
+		for (Player player2: selected.getPlayersByTeam(2)){
+			team2_.append(player2.getName()+"\n");
+		}
 		team2_.repaint();
 	}
 	
+	public void displayGameInfo() throws IOException, RequestTimedOutException{
+		if (team1_.getParent().isVisible()){
+			team1_.setText(" ");
+			team2_.setText(" ");
+			team1_.append("Team 1 :"+"\n");
+			team2_.append("Team 2 :"+"\n");
+			for (Player player : backend_.me().getCurrentGame().getPlayersByTeam(1)){
+				team1_.append(player.getName()+"\n");
+			}
+			team1_.repaint();
+			for (Player player2: backend_.me().getCurrentGame().getPlayersByTeam(2)){
+				team2_.append(player2.getName()+"\n");
+			}
+			team2_.repaint();
+		}
+	}
+	
 	public JPanel getRooms() throws IOException, RequestTimedOutException{
-		roomList_  = new JPanel();
-		JLabel header = new JLabel("List of active games to join");
-		header.setFont(new Font("Serif", Font.PLAIN, 24));
-		roomList_.add(header);
-		list_ = new JList<>();
-		list_.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list_.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (!list_.isSelectionEmpty()){
-					selectedGameID_ = new Integer(list_.getSelectedValue());
-					Game selected = activeGames_.get(list_.getSelectedIndex());
-					try {
-						displayGameInfo(selected);
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					} catch (RequestTimedOutException e1) {
-						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-								"Connection time out", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-				}
-			}		
-		});
-		roomList_.add(list_);
-			if (backend_.getActiveGames().isEmpty()){
-				list_.setEnabled(false);
-			}
-			else {
-				updateGames();
-			}
+		roomList_ = new JPanel(new BorderLayout());
+		JLabel header =  new JLabel("List of active games to join");
+		header.setFont(new Font("Serif", Font.PLAIN,24));
+		roomList_.add(header,BorderLayout.NORTH);
+		rooms_ = new JScrollPane();
+		roomPanel_ = new JPanel();
+		rooms_.setViewportView(roomPanel_);
+		roomList_.add(rooms_,BorderLayout.CENTER);
+		if (!backend_.getActiveGames().isEmpty()){
+			updateGames();
+		}
 		return roomList_;
 	}
+	
+	public void updateGames () throws IOException, RequestTimedOutException{
+		if (backend_.me()!= null ){
+			System.out.println(backend_.me().getName());
+		}
+		activeGames_ = backend_.getActiveGames();;
+		roomPanel_.removeAll();
+		for (Game game : activeGames_){
+			int gameID = game.getId();
+			JButton room =  new JButton("Room "+Integer.toString(gameID));
+			room.setFont(new Font("Serif", Font.PLAIN,20));
+			room.addActionListener(new ChooseRoomListener(game));
+			roomPanel_.add(room);
+		}
+		displayGameInfo();
+		roomPanel_.revalidate();
+		roomPanel_.repaint();
+	}
+	
+	private void launchGameCreatorScreen(){
+		
+	}
+	
 	
 	public JPanel userControl() {
 		JPanel buttonPanel = new JPanel();
@@ -144,7 +170,6 @@ public class RoomMenu extends JPanel {
 					try {
 						backend_.createGame();
 						lockScreen_ = true;
-						updateGames();
 					} catch (IOException e2){
 						e2.printStackTrace();
 					}catch (RequestTimedOutException e1){
@@ -188,26 +213,36 @@ public class RoomMenu extends JPanel {
 		
 	}
 	
-	public void updateGames() throws IOException, RequestTimedOutException{
-		System.out.printf("Currently selected value %d from client \n", selectedGameID_);
-		 list_.setEnabled(true);
-		 roomList_.remove(list_);
-	     DefaultListModel<String> options = new DefaultListModel<>();
-		 activeGames_ = backend_.getActiveGames();
-		 for (Game activeGame : activeGames_){
-				options.addElement(Integer.toString(activeGame.getId()));
-			}
-		 list_.setModel(options);
-		roomList_.add(list_);
-		list_.setSelectedValue(selectedGameID_, true);
-		System.out.printf("Selected value after update %d from client \n", selectedGameID_);
-		System.out.println(list_.isSelectionEmpty());
-		roomList_.revalidate();
-		roomList_.repaint();
-		if (!(list_.isSelectionEmpty())){
-			System.out.println("Currently selected value before change "+ selectedGameID_);
-			displayGameInfo(activeGames_.get(list_.getSelectedIndex()));
+	private class ChooseRoomListener implements ActionListener{
+		
+		private Game game_;
+		private Border currentBorder_;
+		
+		public ChooseRoomListener(Game game) {
+			this.game_ = game;
 		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (currentRoom_!= null){
+				currentRoom_.setBorder(currentBorder_);
+				currentRoom_.repaint();
+			}
+			currentRoom_ = (JButton) e.getSource();
+			currentBorder_ = currentRoom_.getBorder();
+			currentRoom_.setBorder(new LineBorder(Color.RED,3));
+			selectedGameID_ = game_.getId();
+			try {
+				displayGameInfoPanel(game_);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			} catch (RequestTimedOutException e1) {
+				JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
+						"Authorization error", JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}
+		
 		
 	}
 	
@@ -225,14 +260,6 @@ public class RoomMenu extends JPanel {
 				selectedTeamID_ = teamID_;
 				try {
 					backend_.joinGame(selectedGameID_, selectedTeamID_);
-					updateGames();
-					String player = backend_.me().getName();
-					if (teamID_ == 1){
-						team1_.append(player+"\n");
-					}
-					else {
-						team2_.append(player+"\n");
-					}
 					lockScreen_ = true;
 				} catch (IOException e1){
 					e1.printStackTrace();
@@ -240,12 +267,10 @@ public class RoomMenu extends JPanel {
 					JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
 							"Authorization error", JOptionPane.ERROR_MESSAGE);
 					lockScreen_ = false;
-					return;
 				}catch(TeamFullException e1){
 					JOptionPane.showMessageDialog(null, "You can't join that team", 
 							"Team is full", JOptionPane.ERROR_MESSAGE);
-					lockScreen_ = false;
-					return;
+					lockScreen_ = false;	
 				}
 			}
 		}

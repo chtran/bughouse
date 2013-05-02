@@ -66,7 +66,7 @@ public class ChessBoard extends Model {
 		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y)) throw new IllegalMoveException();
 		ChessPiece captured = board[to_x][to_y];
 
-		client.move(getId(), from_x, from_y, to_x, to_y);
+		client.move(from_x, from_y, to_x, to_y);
 
 		return captured;
 	}

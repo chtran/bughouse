@@ -58,11 +58,44 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setVisible(true);
 	}
 	
-	public static void main(String[] argv){
-		BughouseGUI ui = new BughouseGUI(argv);
-		BughouseGUI ui2 = new BughouseGUI(argv);
-		BughouseGUI ui3 = new BughouseGUI(argv);
-		BughouseGUI ui4 = new BughouseGUI(argv);
+	public static void main(final String[] argv){
+		Runnable r1 = new Runnable() {
+
+			@Override
+			public void run() {
+				BughouseGUI u1 = new BughouseGUI(argv);
+			}
+			
+		};
+		Runnable r2 = new Runnable() {
+
+			@Override
+			public void run() {
+				BughouseGUI u1 = new BughouseGUI(argv);
+			}
+			
+		};
+		Runnable r3 = new Runnable() {
+
+			@Override
+			public void run() {
+				BughouseGUI u1 = new BughouseGUI(argv);
+			}
+			
+		};
+		Runnable r4 = new Runnable() {
+
+			@Override
+			public void run() {
+				BughouseGUI u1 = new BughouseGUI(argv);
+			}
+			
+		};
+		new Thread(r1).start();
+		new Thread(r2).start();
+		new Thread(r3).start();
+		new Thread(r4).start();
+
 	}
 	
 	@Override

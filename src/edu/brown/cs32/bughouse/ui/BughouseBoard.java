@@ -11,6 +11,8 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
@@ -26,6 +28,7 @@ public class BughouseBoard extends JPanel {
 	private int originX_, originY_, destX_, destY_;
 	private ChessPieceImageFactory imgFactory_;
 	private BackEnd backend_;
+	private Border unselected_;
 	private JLabel [][] board_;
 	private boolean turn_;
 
@@ -144,16 +147,30 @@ public class BughouseBoard extends JPanel {
 	}
 	
 	private class UserInputListener implements MouseListener {	
+		private Border  currentSquareBorder_;
+		
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
 			current_ = (JLabel) arg0.getSource();
+			/*if (source_ != null && turn_){
+				JPanel parent = (JPanel) current_.getParent();
+				currentSquareBorder_ = parent.getBorder();
+				parent.setBorder(new LineBorder(Color.GREEN,3));
+			}*/
 		}
 
 		@Override
 		public void mousePressed(MouseEvent arg0) {
 			if (turn_){
+				if (source_ != null){
+					JPanel oldPanel = (JPanel) source_.getParent();
+					oldPanel.setBorder(unselected_);
+					unselected_ = null;
+				}
 				source_  = (JLabel) arg0.getSource();
 				JPanel square = (JPanel) source_.getParent();
+				unselected_ = square.getBorder();
+				square.setBorder(new LineBorder(Color.RED,3));
 				originX_ = (int) Math.round((square.getLocation().getX()-2)/69);
 				originY_ = (int) Math.round((-square.getLocation().getY()-2)/68)+7;
 				piece_ = source_.getIcon();
@@ -180,23 +197,33 @@ public class BughouseBoard extends JPanel {
 					} catch (RequestTimedOutException e) {
 						JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
 								"Timeout Error", JOptionPane.ERROR_MESSAGE);
-						return;
 					}catch (WrongColorException e) {
 						// TODO Auto-generated catch block
 						turn_ = true;
 						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please " +
 								"move another chess piece of yours", 
 								"Piece Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					}finally {
+						JPanel originPanel = (JPanel)source_.getParent();
+						originPanel.setBorder(unselected_);
+						unselected_ = null;
 					}
 			}
 		}
 
 		@Override
-		public void mouseExited(MouseEvent arg0) {}
+		public void mouseExited(MouseEvent arg0) {
+			if (source_ != null){
+				/*JLabel current = (JLabel) arg0.getSource();
+				JPanel parent = (JPanel) current.getParent();
+				parent.setBorder(currentSquareBorder_);
+				currentSquareBorder_= null;*/
+			}
+		}
 
 		@Override
-		public void mouseClicked(MouseEvent arg0) {}
+		public void mouseClicked(MouseEvent arg0) {
+		}
 	}
 	
 }

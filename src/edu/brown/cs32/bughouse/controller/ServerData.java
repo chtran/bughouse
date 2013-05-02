@@ -32,6 +32,9 @@ public class ServerData {
 			GameInfo g = m_games.get(gameId);
 			PlayerInfo p = m_players.get(playerId);
 			if (g != null && p != null) {
+				if (p.getGameId() != -1)
+					return false;
+				
 				if (!g.addPlayer(p, teamNum))
 					return false;
 				
@@ -52,6 +55,8 @@ public class ServerData {
 		synchronized (m_lock) {
 			PlayerInfo p = m_players.get(ownerId);
 			if (p == null)
+				return -1;
+			if (p.getGameId() != -1)
 				return -1;
 			
 			int board1Id = m_nextBoardId;
