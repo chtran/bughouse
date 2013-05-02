@@ -174,9 +174,6 @@ public class BughouseClient implements Client {
 			case "YOUR_TURN":
 				backend.frontEnd().notifyUserTurn();
 				break;
-			case "ADD_PRISONER":
-				addPrisoner(message);
-				break;
 			case "PASS":
 				pass(message);
 				break;
@@ -241,21 +238,15 @@ public class BughouseClient implements Client {
 		backend.frontEnd().pieceMoved(boardId, from_x, from_y, to_x, to_y);
 		backend.updateBoard(boardId, from_x, from_y, to_x, to_y);
 	}
-	private void addPrisoner(String message) throws IOException, RequestTimedOutException {
-		String body = message.split(":")[2];
-		String[] splitted = body.split("\t");
-		int playerId = Integer.parseInt(splitted[0]);
-		int chessPieceType = Integer.parseInt(splitted[1]);
-		backend.notifyNewPrisoner(playerId,chessPieceType);
-	}
 	private void put(String message) throws IllegalPlacementException, IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
-		String[] splitted = body.split("\t");
+		String[] splitted = body.split("\t"); 
 		int boardId = Integer.parseInt(splitted[0]);
 		int playerId = Integer.parseInt(splitted[1]);
 		int index = Integer.parseInt(splitted[2]);
 		int x = Integer.parseInt(splitted[3]);
 		int y = Integer.parseInt(splitted[4]);
+		System.out.println("Got a put message");
 		backend.notifyPut(boardId, playerId, index, x, y);
 	}
 	private void pass(String message) throws IOException, RequestTimedOutException {

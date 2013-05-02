@@ -61,8 +61,9 @@ public class GameView extends JPanel {
 	}
 	
 	
-	public void addPrisoner (int playerID, ChessPiece prisoner){
-		myPrisoners_.add(prisoner);
+	public void addPrisoner (ChessPiece prisoner){
+		JOptionPane.showMessageDialog(userBoard_, "You have received a "+prisoner.getName()+" from your teammate!");
+
 	}
 	
 	public void notifyEndGame(){
@@ -155,8 +156,8 @@ public class GameView extends JPanel {
 	}
 	
 	public void updatePrison(){
-		JOptionPane.showMessageDialog(this, "You have received a piece from your teammate!");
 		myPrisoners_ = backend_.getPrisoners(backend_.me().getId());
+		prison_.removeAll();
 		for (ChessPiece piece : myPrisoners_){
 			JLabel img = new JLabel();
 			img.setIcon(getIcon(piece));
@@ -170,14 +171,14 @@ public class GameView extends JPanel {
 	}
 	
 	public void piecePut(int boardId, int playerId, ChessPiece piece, int x,
-			int y) {
-			if (boardId == myBoardID_){
-				userBoard_.piecePut(this.getIcon(piece),playerId,x,y);
-			}
-			else {
-				otherBoard_.piecePut(this.getIcon(piece),playerId,x,y);
-			}
-			
+		int y) {
+		if (boardId == myBoardID_){
+			userBoard_.piecePut(this.getIcon(piece),playerId,x,y);
+		}
+		else {
+			otherBoard_.piecePut(this.getIcon(piece),playerId,x,y);
+		}
+		updatePrison();
 	}
 	
 	private Icon getIcon(ChessPiece piece){

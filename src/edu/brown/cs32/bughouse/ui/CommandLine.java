@@ -216,12 +216,10 @@ public class CommandLine implements FrontEnd{
 		new CommandLine(host,port);
 		
 	}
-	@Override
-	public void addPrisoner(int playerId, ChessPiece piece) {
+	public void addPrisoner(ChessPiece piece) {
 		String name;
 		try {
-			name = (new Player(playerId)).getName();
-			System.out.printf("%s got a new %s\n",name,piece.getName());
+			System.out.printf("%s got a new %s\n",backend.me().getName(),piece.getName());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {

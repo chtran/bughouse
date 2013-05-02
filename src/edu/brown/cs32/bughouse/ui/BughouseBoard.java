@@ -76,11 +76,9 @@ public class BughouseBoard extends JPanel {
 	}
 	
 	public void piecePut(Icon piece,int playerId, int x, int y){
-		if (backend_.me().getId()==playerId){
-			board_[y][x].setIcon(piece);
-			this.revalidate();
-			this.repaint();
-		}
+		board_[y][x].setIcon(piece);
+		this.revalidate();
+		this.repaint();
 	}
 	
 	
@@ -168,15 +166,37 @@ public class BughouseBoard extends JPanel {
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
 			current_ = (JLabel) arg0.getSource();
-			/*if (source_ != null && turn_){
-				JPanel parent = (JPanel) current_.getParent();
-				currentSquareBorder_ = parent.getBorder();
-				parent.setBorder(new LineBorder(Color.GREEN,3));
-			}*/
 		}
 
 		@Override
 		public void mousePressed(MouseEvent arg0) {
+			JLabel label = (JLabel) arg0.getSource();
+			JPanel parent = (JPanel) label.getParent();
+			int destX = (int) Math.round((parent.getLocation().getX()-2)/69);
+			int destY = (int) Math.round((-parent.getLocation().getY()-2)/68)+7;
+			if (isPuttingPrisoner_ && turn_){
+				System.out.println("Attempting to put prisoner down");
+				try {
+					backend_.me().put(index_,destX,destY);
+					turn_ = false;
+					isPuttingPrisoner_ = false;
+				} catch (IllegalPlacementException e) {
+					turn_ = true;
+					isPuttingPrisoner_ = true;
+					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
+							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
+				} catch (IOException e) {
+					e.printStackTrace();
+					turn_ = true;
+					isPuttingPrisoner_ = true;
+				} catch (RequestTimedOutException e) {
+					turn_ = true;
+					isPuttingPrisoner_ = true;
+					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+							"Timeout Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			else
 			if (turn_){
 				if (source_ != null){
 					JPanel oldPanel = (JPanel) source_.getParent();
@@ -199,28 +219,8 @@ public class BughouseBoard extends JPanel {
 			JPanel curSquare = (JPanel) current_.getParent();
 			destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
 			destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
-			if (isPuttingPrisoner_ && turn_){
-				try {
-					backend_.me().put(index_,destX_,destY_);
-					turn_ = false;
-					isPuttingPrisoner_ = false;
-				} catch (IllegalPlacementException e) {
-					turn_ = true;
-					isPuttingPrisoner_ = true;
-					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
-							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
-				} catch (IOException e) {
-					e.printStackTrace();
-					turn_ = true;
-					isPuttingPrisoner_ = true;
-				} catch (RequestTimedOutException e) {
-					turn_ = true;
-					isPuttingPrisoner_ = true;
-					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-							"Timeout Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-			else if (source_ != null && (!(source_.equals(current_))) && turn_){
+			 if (source_ != null && (!(source_.equals(current_))) && turn_){
+				System.out.println("Moving an existing piece on the board");
 				System.out.println("Dest x "+destX_+ " "+destY_);
 					 try {
 						turn_ = false;
@@ -250,12 +250,6 @@ public class BughouseBoard extends JPanel {
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {
-			if (source_ != null){
-				/*JLabel current = (JLabel) arg0.getSource();
-				JPanel parent = (JPanel) current.getParent();
-				parent.setBorder(currentSquareBorder_);
-				currentSquareBorder_= null;*/
-			}
 		}
 
 		@Override

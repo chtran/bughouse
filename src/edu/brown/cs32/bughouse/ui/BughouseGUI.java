@@ -100,9 +100,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	}
 	
 	@Override
-	public void addPrisoner(int playerId, ChessPiece piece) {
+	public void addPrisoner(ChessPiece piece) {
 		// TODO generate image for piece and add it the display + notify user
-		game_.addPrisoner(playerId,piece);
+		game_.addPrisoner(piece);
 	}
 
 	

@@ -100,7 +100,8 @@ public class BughouseBackEnd implements BackEnd {
 			pieces.add(toAdd);
 			prisoners.put(playerId, pieces);
 		}
-		frontEnd.addPrisoner(playerId, toAdd);
+		if (playerId!=me.getId()) return;
+		frontEnd.addPrisoner(toAdd);
 		frontEnd.prisonersUpdated();
 	}
 
