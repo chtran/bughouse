@@ -49,6 +49,7 @@ public class CommandLine implements FrontEnd{
 	private void createGame() throws IOException, RequestTimedOutException {
 		backend.createGame();
 		System.out.println("Created new game. You are now in game #"+backend.me().getCurrentGame().getId());
+		System.out.println("Newly created game has the following players "+ backend.me().getCurrentGame().getPlayersByTeam(1).get(0).getName());
 	}
 	
 	private void showPlayers() throws IOException, RequestTimedOutException {

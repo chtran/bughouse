@@ -1,6 +1,7 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -38,15 +39,15 @@ public class RoomMenu extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private BackEnd backend_;
-	private JTextArea team1_, team2_;
+	private JTextArea team1_, team2_, cteam1_,cteam2_;
 	private List<Game> activeGames_;
-	private JPanel roomList_, roomPanel_;
+	private JPanel roomList_, roomPanel_, creatorView_;
 	private int selectedGameID_, selectedTeamID_;
 	private BughouseGUI front_;
 	private JScrollPane rooms_;
-	private boolean lockScreen_;
+	private boolean lockScreen_, isCreator_;
 	private JButton currentRoom_;
-	private RoomMenu mainPanel_;
+	private Box gameinfo_;
 	
 	public RoomMenu(BughouseGUI frame,BackEnd backend){
 		super();
@@ -54,12 +55,12 @@ public class RoomMenu extends JPanel {
 		this.front_ = frame;
 		this.backend_ = backend;
 		this.lockScreen_= false;
-		this.mainPanel_ = this;
+		this.isCreator_ = false;
 		try {
 			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
 			this.add(userControl(), BorderLayout.SOUTH);
-			
+			this.createGameCreatorScreen();			
 		}catch (IOException e){
 			e.printStackTrace();
 		}catch (RequestTimedOutException e){
@@ -70,8 +71,8 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public Box gameInfo() {
-		Box gameinfo = Box.createVerticalBox(); 
-		gameinfo.setVisible(false);
+		gameinfo_ = Box.createVerticalBox(); 
+		gameinfo_.setVisible(false);
 		team1_ = new JTextArea(3,20);
 		team2_ = new JTextArea(3,20);
 		team1_.setEditable(false);
@@ -80,11 +81,11 @@ public class RoomMenu extends JPanel {
 		joinTeam1.addActionListener(new JoinTeamListener(1));
 		JButton joinTeam2 =  new JButton("Join Team 2");
 		joinTeam2.addActionListener(new JoinTeamListener(2));
-		gameinfo.add(team1_);
-		gameinfo.add(joinTeam1);
-		gameinfo.add(team2_);
-		gameinfo.add(joinTeam2);
-		return gameinfo;
+		gameinfo_.add(team1_);
+		gameinfo_.add(joinTeam1);
+		gameinfo_.add(team2_);
+		gameinfo_.add(joinTeam2);
+		return gameinfo_;
 		
 	}
 	
@@ -105,6 +106,10 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public void displayGameInfo() throws IOException, RequestTimedOutException{
+		if (isCreator_){
+			displayCreatorInfo();
+			return;
+		}
 		if (team1_.getParent().isVisible()){
 			team1_.setText(" ");
 			team2_.setText(" ");
@@ -119,6 +124,21 @@ public class RoomMenu extends JPanel {
 			}
 			team2_.repaint();
 		}
+	}
+	
+	private void displayCreatorInfo() throws IOException, RequestTimedOutException{
+		cteam1_.setText(" ");
+		cteam2_.setText(" ");
+		cteam1_.append("Team 1 :"+"\n");
+		cteam2_.append("Team 2 :"+"\n");
+		for (Player player : backend_.me().getCurrentGame().getPlayersByTeam(1)){
+			cteam1_.append(player.getName()+"\n");
+		}
+		cteam1_.repaint();
+		for (Player player2: backend_.me().getCurrentGame().getPlayersByTeam(2)){
+			cteam2_.append(player2.getName()+"\n");
+		}
+		cteam2_.repaint();
 	}
 	
 	public JPanel getRooms() throws IOException, RequestTimedOutException{
@@ -154,8 +174,69 @@ public class RoomMenu extends JPanel {
 		roomPanel_.repaint();
 	}
 	
-	private void launchGameCreatorScreen(){
-		
+	private void createGameCreatorScreen(){
+		JPanel contentScreen = new JPanel(new BorderLayout());
+		JLabel title = new JLabel("Waiting for players to join...");
+		title.setFont(new Font("Serif", Font.PLAIN,18));
+		contentScreen.add(title,BorderLayout.NORTH);
+		contentScreen.add(this.creatorView(),BorderLayout.CENTER);
+		contentScreen.add(this.creatorControl(),BorderLayout.SOUTH);
+		front_.add(contentScreen,"Creator");
+	}
+	
+	private JPanel creatorView(){
+		creatorView_ = new JPanel();
+		Box holder = Box.createVerticalBox();
+		cteam1_ = new JTextArea(3,20);
+		cteam2_ = new JTextArea(3,20);
+		cteam1_.setEditable(false);
+		cteam2_.setEditable(false);
+		holder.add(cteam1_);
+		holder.add(cteam2_);
+		creatorView_.add(holder);
+		return creatorView_;
+	}
+	
+	private JPanel creatorControl(){
+		JPanel buttonPanel = new JPanel();
+		JButton start = new JButton("Start Game");
+		start.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+					try {
+						backend_.startGame();
+						front_.gameStarted();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					} catch (RequestTimedOutException e1) {
+						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						return;
+					} catch (GameNotReadyException e1) {
+						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+								"Cannot start game", JOptionPane.ERROR_MESSAGE);
+						return;
+					} catch (UnauthorizedException e1) {
+						JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
+								"Authorization error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+			}
+		});
+		JButton cancel = new JButton("Cancel Game");
+		cancel.addActionListener(new ActionListener(){
+			//	lockScreen_ = true;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				isCreator_ = false;
+				front_.displayCard("Rooms");
+			}
+			
+		});
+		buttonPanel.add(start);
+		buttonPanel.add(cancel);
+		return buttonPanel;
 	}
 	
 	
@@ -169,14 +250,16 @@ public class RoomMenu extends JPanel {
 				if (!(lockScreen_)){
 					try {
 						backend_.createGame();
-						lockScreen_ = true;
+						//front_.displayCard("Creator");
+						//isCreator_ = true;
+						// System.out.println(backend_.me().getCurrentGame().getPlayersByTeam(1).get(0).getName()+" created a game");
 					} catch (IOException e2){
 						e2.printStackTrace();
 					}catch (RequestTimedOutException e1){
 						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
 								"Connection time out", JOptionPane.ERROR_MESSAGE);
-						lockScreen_ = false;
-						return;
+						front_.displayCard("Rooms");
+						isCreator_ = false;
 					}
 				}
 				
@@ -207,8 +290,8 @@ public class RoomMenu extends JPanel {
 					
 			}
 		});
-		buttonPanel.add(create);
 		buttonPanel.add(start);
+		buttonPanel.add(create);
 		return buttonPanel;
 		
 	}

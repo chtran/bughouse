@@ -53,20 +53,23 @@ public class ChessBoard extends Model {
 	public boolean isOccupied(int x, int y) {
 		return (this.board[x][y]!=null);
 	}
-	
-	public ChessPiece movePiece(boolean isWhite, int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, WrongColorException, IOException, RequestTimedOutException {
-		System.out.println(toString());
-		if (!isOccupied(from_x, from_y)) throw new IllegalMoveException();
+	public boolean canMove(int from_x, int from_y, int to_x, int to_y) {
+		if (!isOccupied(from_x, from_y)) return false;
 		if (isOccupied(to_x,to_y)) {
 			if (board[from_x][from_y].isWhite()==board[to_x][to_y].isWhite()) {
-				throw new IllegalMoveException();
+				return false;
 			}
 		}
+		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y)) return false;
+		return true;
+	}
+	public ChessPiece movePiece(boolean isWhite, int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, WrongColorException, IOException, RequestTimedOutException {
+		if (!canMove(from_x,from_y,to_x,to_y)) throw new IllegalMoveException();
 		if (board[from_x][from_y].isWhite()!=isWhite) throw new WrongColorException();
-		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y)) throw new IllegalMoveException();
+
 		ChessPiece captured = board[to_x][to_y];
 
-		client.move(from_x, from_y, to_x, to_y);
+		client.move(id,from_x, from_y, to_x, to_y);
 
 		return captured;
 	}

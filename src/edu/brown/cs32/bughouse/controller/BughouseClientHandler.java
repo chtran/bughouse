@@ -135,7 +135,7 @@ public class BughouseClientHandler extends Thread {
 								id = Integer.parseInt(headerSplit[1]);
 								sendCurrentBoard(id);
 								break;
-							// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+							// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 							case "MOVE":
 								move(msg);
 								break;

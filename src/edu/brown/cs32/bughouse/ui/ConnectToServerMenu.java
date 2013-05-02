@@ -24,7 +24,7 @@ public class ConnectToServerMenu extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BackEnd backend_;
 	private BughouseGUI parent_;
-	private JTextField input_;
+	private JTextField name_, localhost_, port_;
 
 	public ConnectToServerMenu(BughouseGUI parent,BackEnd backend){
 		super();
@@ -49,17 +49,40 @@ public class ConnectToServerMenu extends JPanel {
 	}
 	
 	private void setTextField(){
-		JLabel instruct = new JLabel("Enter name here:");
-		input_ = new JTextField(20);
-		GridBagConstraints c =  new GridBagConstraints();
-		GridBagConstraints c1 = new GridBagConstraints();
-		c1.gridx = 0;
-		c1.gridy = 1;
-		c.gridx = 1;
-		c.gridy = 1;
-		c.insets = new Insets(2, 1,10, 2);
-		this.add(instruct,c1);
-		this.add(input_,c);
+		JLabel name = new JLabel("Enter name here ");
+		name_ = new JTextField(20);
+/*		JLabel localhost = new JLabel("Enter localhost ");
+		localhost_ = new JTextField(20);
+		JLabel port = new JLabel("Enter port");
+		port_ = new JTextField(20);*/
+		GridBagConstraints label1 =  new GridBagConstraints();
+		GridBagConstraints field1 = new GridBagConstraints();
+		label1.gridx = 0;
+		label1.gridy = 1;
+		field1.gridx = 1;
+		field1.gridy = 1;
+		field1.insets = new Insets(2, 1,10, 2);
+		this.add(name,label1);
+		this.add(name_,field1);
+/*		GridBagConstraints label2 =  new GridBagConstraints();
+		GridBagConstraints field2 = new GridBagConstraints();
+		label2.gridx = 0;
+		label2.gridy = 2;
+		field2.gridx = 1;
+		field2.gridy = 2;
+		field2.insets = new Insets(2, 1,5, 2);
+		this.add(localhost, label2);
+		this.add(localhost_, field2);
+		GridBagConstraints label3 = new GridBagConstraints();
+		GridBagConstraints field3 = new GridBagConstraints();
+		label3.gridx = 0;
+		label3.gridy = 3;
+		field3.gridx = 1;
+		field3.gridy = 3;
+		field3.insets = new Insets(2, 1,5, 2);
+		this.add(port, label3);
+		this.add(port_, field3);*/
+		
 	}
 	
 	private void setLoginButton(){
@@ -67,7 +90,7 @@ public class ConnectToServerMenu extends JPanel {
 		connect.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-				String name = input_.getText();
+				String name = name_.getText();
 				if (name.length()==0){
 					JOptionPane.showMessageDialog(null, "Type in a name", "Name needed", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -80,8 +103,6 @@ public class ConnectToServerMenu extends JPanel {
 					JOptionPane.showMessageDialog(null, "The connection to the " +
 							"server timed out.Please try connecting again",
 							"Connection timed out",	JOptionPane.ERROR_MESSAGE);
-					return;
-					
 				}
 				parent_.joinServer();
 			}
