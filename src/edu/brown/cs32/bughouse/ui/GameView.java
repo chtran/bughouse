@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -22,6 +25,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
@@ -42,6 +47,8 @@ public class GameView extends JPanel {
 	private List<ChessPiece> myPrisoners_;
 	private BackEnd backend_;
 	private int myBoardID_, otherBoardID_;
+	private JPanel selectedPrisoner_;
+	private Border unselectedPrisonerBorder_;
 
 	public GameView(BackEnd backend){
 		super(new BorderLayout());
@@ -51,7 +58,6 @@ public class GameView extends JPanel {
 		this.add(this.createBoard(), BorderLayout.CENTER);
 		this.add(this.createOptionMenu(),BorderLayout.EAST);
 		this.add(this.createPieceHolder(),BorderLayout.SOUTH);
-
 	}
 	
 	
@@ -60,16 +66,23 @@ public class GameView extends JPanel {
 	}
 	
 	public void notifyEndGame(){
-		//TODO: return user to lobby room
 		JOptionPane.showMessageDialog(null, "Game Over", "Finished", JOptionPane.OK_OPTION);
 		
 	} 
 	
 	public void notifyUser(){
 		userBoard_.startTurn();
+		ChessPiece test = new ChessPiece.Builder().black().pawn().build();
+		this.addPrisoner(backend_.me().getId(), test);
+		this.updatePrison();
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){
+		messageBox_.setText(" ");
+		messageBox_.setText("This board id is "+ Integer.toString(myBoardID_)+"\n");
+		messageBox_.append("This move is to update board "+ Integer.toString(boardId)+"\n");
+		messageBox_.revalidate();
+		messageBox_.repaint();
 		if (boardId == myBoardID_){
 			System.out.println("Moving piece");
 			userBoard_.updatePieceMoved(from_x, from_y, to_x, to_y);
@@ -121,7 +134,6 @@ public class GameView extends JPanel {
 		messageBox_ = new JTextArea();
 		messageBox_.setPreferredSize(new Dimension(200,190));
 		messageBox_.setEditable(false);
-		messageBox_.setText("Template text");
 		JButton quit  = new JButton("Click me!");
 		quit.addActionListener(new ActionListener() {
 
@@ -147,9 +159,92 @@ public class GameView extends JPanel {
 	
 	public void updatePrison(){
 		JOptionPane.showMessageDialog(null, "You have received a piece from your teammate!");
-		/*myPrisoners_ = backend_.getPrisoners(backend_.me().getId());
+		myPrisoners_ = backend_.getPrisoners(backend_.me().getId());
 		for (ChessPiece piece : myPrisoners_){
 			JLabel img = new JLabel();
-		}*/
+			img.setIcon(getIcon(piece));
+			JPanel piecePanel = new JPanel();
+			piecePanel.add(img);
+			piecePanel.addMouseListener(new PrisonPieceListener(piece));
+			prison_.add(piecePanel);
+		}
+	}
+	
+	private Icon getIcon(ChessPiece piece){
+		switch(piece.getType()){
+		case 1:
+			if (piece.isWhite()){
+				return imgFactory_.getPawn(Color.WHITE);
+			}
+			return imgFactory_.getPawn(Color.BLACK);
+		case 2:
+			if (piece.isWhite()){
+				return imgFactory_.getKnight(Color.WHITE);
+			}
+			return imgFactory_.getKnight(Color.BLACK);
+		
+		case 3:
+			if (piece.isWhite()){
+				return imgFactory_.getBishop(Color.WHITE);
+			}
+			return imgFactory_.getBishop(Color.BLACK);
+		case 4:
+			if (piece.isWhite()){
+				return imgFactory_.getRook(Color.WHITE);
+			}
+			return imgFactory_.getRook(Color.BLACK);
+		case 5:
+			if (piece.isWhite()){
+				return imgFactory_.getQueen(Color.WHITE);
+			}
+			return imgFactory_.getQueen(Color.BLACK);
+		}
+		return null;
+	}
+	
+	
+	private class PrisonPieceListener implements MouseListener{
+		
+		private ChessPiece piece_;
+		
+		public PrisonPieceListener(ChessPiece piece){
+			this.piece_ = piece;
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (selectedPrisoner_ != null){
+				selectedPrisoner_.setBorder(unselectedPrisonerBorder_);
+				unselectedPrisonerBorder_ =  null;
+			}
+			selectedPrisoner_ = (JPanel) e.getSource();
+			unselectedPrisonerBorder_ = selectedPrisoner_.getBorder();
+			selectedPrisoner_.setBorder(new LineBorder(Color.RED,3));	
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 }
