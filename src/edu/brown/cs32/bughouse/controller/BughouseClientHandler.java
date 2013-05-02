@@ -488,15 +488,33 @@ public class BughouseClientHandler extends Thread {
         - "QUIT_OK:[playerId]\n" if everything went well
 	 * @param id
 	 */
-	public void quit(int id) {
-		m_data.playerQuit(id);
-		int gameId = m_playerInfo.getGameId();
-		if (gameId > 0) {
-			String msg = "BROADCAST:QUIT_GAME:" + id + "\t" + gameId + "\n";			
-			m_pool.broadcastToGame(gameId, msg, this);
-			send("QUIT_OK\n");
-		} else {
-			send("QUIT_FAILED\n");
+	public void quit(int playerId) {
+		int gameID = m_data.getCurrentGame(playerId);
+		if (gameID >= 0) {
+			// TODO: broadcast message for everyone: BROADCAST:LEAVE_GAME:[playerId]\t[gameId]
+			String msg = String.format("BROADCAST:LEAVE_GAME:%d\t%d\n", playerId, gameID);
+			
+			boolean isOwner = m_data.getGameOwner(gameID) == playerId ? true : false;
+			boolean gameStarted = m_data.gameIsActive(gameID) ? false : true;
+			boolean roomEmpty = m_data.numPlayers(gameID) == 1 ? true : false;
+			
+			if (gameStarted) {
+				// resets all players and deletes game
+				m_data.playerQuit(playerId);
+				msg = String.format("BROADCAST:GAME_CANCELED:%d\n", gameID);			
+				m_pool.broadcastToGame(gameID, msg, this);
+//				send("QUIT_OK\n");
+			} else if (!gameStarted && isOwner && roomEmpty) {
+				m_data.playerQuit(playerId);
+				msg = String.format("BROADCAST:GAME_DELETED:%d\n", gameID);
+				m_pool.broadcast(msg, this);
+			} else if (!gameStarted && isOwner && !roomEmpty) {
+				int newOwner = m_data.setNewOwner(gameID);
+				msg = String.format("BROADCAST:NEW_OWNER:%d\n", gameID);
+				m_pool.sendToPlayer(newOwner, msg);
+			} else {
+				m_data.removePlayerFromGame(playerId);
+			}
 		}
 	}
 	

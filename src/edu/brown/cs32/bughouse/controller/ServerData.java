@@ -269,6 +269,24 @@ public class ServerData {
 			}
 		}
 	}
+	
+	/**
+	 * Determines if given player is game owner of current game
+	 * @param playerId
+	 * @return true if player is game owner, false if not owner or not currently in a game
+	 */
+	public boolean isGameOwner(int playerId) {
+		PlayerInfo p = m_players.get(playerId);
+		if (p != null) {
+			int gameID = p.getGameId();
+			if (gameID >= 0) {
+				GameInfo g = m_games.get(gameID);
+				if (g != null && g.getOwner() == p.getId())
+					return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Returns id of player whose turn is next in game
@@ -296,5 +314,65 @@ public class ServerData {
 			return p.getGameId();
 		else
 			return -1;
+	}
+
+	/**
+	 * Determines if given player is playing game in progress
+	 * @param playerId
+	 * @return true if player currently in game that has started, false if not
+	 */
+	public boolean playerGameStarted(int playerId) {
+		PlayerInfo p = m_players.get(playerId);
+		if (p != null) {
+			int gameID = p.getGameId();
+			GameInfo g = m_games.get(gameID);
+			if (g != null && !g.isActive())
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns number of players in given game
+	 * @param gameID
+	 * @return
+	 */
+	public int numPlayers(int gameID) {
+		GameInfo g = m_games.get(gameID);
+		if (g != null) {
+			return g.numPlayers();
+		}
+		return 0;
+	}
+
+	/**
+	 * Sets new game owner and removes previous owner from game
+	 * @param gameID
+	 * @return playerID of new game owner
+	 */
+	public int setNewOwner(int gameID) {
+		GameInfo g = m_games.get(gameID);
+		if (g != null) 
+			return g.setNewOwner();
+		return -1;
+	}
+
+	/**
+	 * Removes player from game
+	 * @param playerId
+	 */
+	public void removePlayerFromGame(int playerId) {
+		PlayerInfo p = m_players.get(playerId);
+		int gameID;
+		if ((gameID = p.getGameId()) >= 0) {
+			GameInfo g = m_games.get(gameID);
+			// TODO: fancy logic to remove this player from game and keep board assignment logic ok aka
+			// shuffle people around
+			 
+			// reset player
+			p.setBoardId(-1);
+			p.setGameId(-1);
+			p.setTeamId(-1);
+		}
 	}
 }
