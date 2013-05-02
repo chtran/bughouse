@@ -3,9 +3,9 @@ package edu.brown.cs32.bughouse.client;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
@@ -140,8 +140,8 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public Collection<ChessBoard> getCurrentBoards() {
-		return currentBoards.values();
+	public Map<Integer,ChessBoard> getCurrentBoards() {
+		return currentBoards;
 	}
 
 	@Override

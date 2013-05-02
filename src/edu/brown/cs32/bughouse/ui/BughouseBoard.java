@@ -19,11 +19,13 @@ import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
+import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 
 public class BughouseBoard extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
+	private ChessBoard chessBoard_;
 	private boolean isManipulable_,turn_, isPuttingPrisoner_;
 	private JLabel source_, current_;
 	private Icon piece_;
@@ -35,8 +37,9 @@ public class BughouseBoard extends JPanel {
 	private ChessPiece selectedPrisoner_;
 
 
-	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable){
+	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable,ChessBoard chessBoard){
 		super(new GridLayout(8,8,1,0));
+		this.chessBoard_ = chessBoard;
 		this.imgFactory_ = imgFactory;
 		this.board_ = new JLabel [8][8];
 		this.backend_ = backend;
@@ -44,29 +47,15 @@ public class BughouseBoard extends JPanel {
 		this.isPuttingPrisoner_ = false;
 		this.setPreferredSize(new Dimension(400,400));
 		this.turn_ = false;
-		Color current = Color.GRAY;
 		for (int i = 0; i<8;i++){
 			for (int j = 0; j<8;j++){
 				JPanel box = new JPanel();
-				if (current == Color.GRAY){
-					box.setBackground(Color.WHITE);
-					current = Color.WHITE;
-				}
-				else {
-					box.setBackground(Color.GRAY);
-					current = Color.GRAY;
-				}
+				Color background = ((i+j)%2!=0) ? Color.WHITE : Color.GRAY;
+				box.setBackground(background);
 				box.setBorder(null);
 				box.add(this.createPiece(i,j));
 				this.add(box);		
 			}
-			if (current == Color.GRAY){
-				current = Color.WHITE;
-			}
-			else {
-				current = Color.GRAY;
-			}
-			
 		}
 	}
 	
@@ -106,55 +95,30 @@ public class BughouseBoard extends JPanel {
 			piece.addMouseListener(new UserInputListener());
 
 		}
-		if (row == 6){
-				piece.setIcon(imgFactory_.getPawn(Color.WHITE));	
-				return piece;
-		}
-		if (row == 1){
-			piece.setIcon(imgFactory_.getPawn(Color.BLACK));	
-			return piece;
-		}
-		if (row == 0 || row == 7) {
-			switch(col){
-			case 0: case 7:
-				if (row ==7){
-					piece.setIcon(imgFactory_.getRook(Color.WHITE));
-					return piece;
-				}
-				piece.setIcon(imgFactory_.getRook(Color.BLACK)); // add rook sprite
-				break;
-			
-			case 1: case 6:
-				if (row ==7){
-					piece.setIcon(imgFactory_.getKnight(Color.WHITE));
-					return piece;
-				}
-				piece.setIcon(imgFactory_.getKnight(Color.BLACK)); // add knight sprite
-				break;
-				
-			case 2: case 5:
-				if (row ==7){
-					piece.setIcon(imgFactory_.getBishop(Color.WHITE)); 
-					return piece;
-				}
-				piece.setIcon(imgFactory_.getBishop(Color.BLACK)); // add bishop sprite
-				break;
-				
-			case 3:
-				if (row ==7){
-					piece.setIcon(imgFactory_.getQueen(Color.WHITE));
-					return piece;
-				}
-				piece.setIcon(imgFactory_.getQueen(Color.BLACK)); // add queen sprite
-				break;
-			case 4: 
-				if (row ==7){
-					piece.setIcon(imgFactory_.getKing(Color.WHITE)); 
-					return piece;
-				}
-				piece.setIcon(imgFactory_.getKing(Color.BLACK)); // add king sprite
-				break;
-			}
+
+		ChessPiece chessPiece = chessBoard_.getPiece(col,7-row);
+		if (chessPiece==null) return piece;
+		Color c = chessPiece.isWhite() ? Color.WHITE : Color.BLACK;
+
+		switch (chessPiece.getType()) {
+		case 1:
+			piece.setIcon(imgFactory_.getPawn(c));
+			break;
+		case 2:
+			piece.setIcon(imgFactory_.getKnight(c));
+			break;
+		case 3:
+			piece.setIcon(imgFactory_.getBishop(c));
+			break;
+		case 4:
+			piece.setIcon(imgFactory_.getRook(c));
+			break;
+		case 5:
+			piece.setIcon(imgFactory_.getQueen(c));
+			break;
+		case 6:
+			piece.setIcon(imgFactory_.getKing(c));
+			break;
 		}
 		return piece;
 		
