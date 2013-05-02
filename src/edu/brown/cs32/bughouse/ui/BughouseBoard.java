@@ -82,9 +82,7 @@ public class BughouseBoard extends JPanel {
 			piece.addMouseListener(new UserInputListener());
 
 		}
-		System.out.println(chessBoard_);
 
-		System.out.println("row: "+row+". col: "+col);
 		ChessPiece chessPiece = chessBoard_.getPiece(col,7-row);
 		if (chessPiece==null) return piece;
 		Color c = chessPiece.isWhite() ? Color.WHITE : Color.BLACK;
