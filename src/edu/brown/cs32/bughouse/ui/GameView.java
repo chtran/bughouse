@@ -60,7 +60,7 @@ public class GameView extends JPanel {
 	}
 	
 	public void notifyEndGame(){
-		// To DO: return user to lobby room
+		//TODO: return user to lobby room
 		JOptionPane.showMessageDialog(null, "Game Over", "Finished", JOptionPane.OK_OPTION);
 		
 	} 

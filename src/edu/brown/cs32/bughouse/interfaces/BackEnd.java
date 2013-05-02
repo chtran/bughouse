@@ -32,5 +32,6 @@ public interface BackEnd {
 	public Player me();
 	public void shutdown() throws IOException;
 	public List<ChessPiece> getPrisoners(int playerId);
+	public boolean canMove(int boardId, int from_x, int from_y, int to_x, int to_y);
 	public FrontEnd frontEnd();
 }
