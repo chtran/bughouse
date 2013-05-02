@@ -40,6 +40,13 @@ public class GameInfo {
 			return false;
 	}
 	
+	/**
+	 * Gets number of players currently in game
+	 */
+	public int numPlayers() {
+		return m_team1.size() + m_team2.size();
+	}
+	
 	/*
 	 * Returns true if players can join team, false if not
 	 */
@@ -241,5 +248,30 @@ public class GameInfo {
 				m_turn = 0;
 				return m_team2.get(0).getId();
 		}
+	}
+
+	/**
+	 * Sets new owner in game and removes previous owner from game
+	 * @return playerID of new owner
+	 */
+	public int setNewOwner() {
+		PlayerInfo prev = m_team1.get(0);
+		
+		PlayerInfo p;
+		if (m_team1.size() == 2) {
+			p = m_team1.get(1);
+			p.setColor(true);
+		} else {
+			p = m_team2.get(0);
+		}
+		
+		// reset prev owner to remove from game
+		prev.setBoardId(-1);
+		prev.setGameId(-1);
+		prev.setTeamId(-1);
+		
+		m_team1.remove(0); // remove previous owner from game
+		m_ownerId = p.getId();
+		return m_ownerId;
 	}
 }
