@@ -2,8 +2,8 @@ package edu.brown.cs32.bughouse.interfaces;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
@@ -24,7 +24,7 @@ public interface BackEnd {
 	public void startGame() throws IOException, RequestTimedOutException, GameNotReadyException, UnauthorizedException;
 	public void gameStarted() throws IOException, RequestTimedOutException;
 	public void updateBoard(int boardId, int from_x, int from_y, int to_x, int to_y);
-	public Collection<ChessBoard> getCurrentBoards();
+	public Map<Integer,ChessBoard> getCurrentBoards();
 	public void createGame() throws IOException, RequestTimedOutException;
 	public void quit() throws IOException, RequestTimedOutException;
 	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException;

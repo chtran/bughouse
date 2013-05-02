@@ -52,7 +52,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setResizable(false);
 		content_.add(setupJoinServerMenu(),"Join");
 		content_.add(setupRoomMenu(), "Rooms");
-		content_.add(setupGameView(), "Game");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
 		this.setVisible(true);
@@ -150,8 +149,21 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 * sets up the game view for the user.
 	 */
 	private JPanel setupGameView(){
-		game_ =  new GameView(backend_);
-		return game_;
+		try {
+			game_ =  new GameView(backend_);
+			return game_;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+					"Connection timed out", JOptionPane.ERROR_MESSAGE);
+			return null;
+		} catch (GameNotReadyException e) {
+			JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+					"Cannot start game", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
 	}
 
 
@@ -165,21 +177,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void gameStarted() {
+		content_.add(setupGameView(), "Game");
 		CardLayout cards = (CardLayout) content_.getLayout();
 		cards.show(content_, "Game");
-		try {
-			game_.getBoardID();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RequestTimedOutException e) {
-			JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-					"Connection timed out", JOptionPane.ERROR_MESSAGE);
-			return;
-		} catch (GameNotReadyException e) {
-			JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
-					"Cannot start game", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+		
 	}
 	
 	public void displayCard(String cardName){

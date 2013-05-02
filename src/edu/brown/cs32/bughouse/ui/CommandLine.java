@@ -206,7 +206,7 @@ public class CommandLine implements FrontEnd{
 	}
 	public void printBoards() throws IOException, RequestTimedOutException {
 		System.out.printf("You are %s in board %d\n",backend.me().isWhite() ? "white" : "black", backend.me().getCurrentBoardId());
-		for (ChessBoard board: backend.getCurrentBoards())
+		for (ChessBoard board: backend.getCurrentBoards().values())
 			System.out.println(board);
 	}
 	public static void main(String[] args) {

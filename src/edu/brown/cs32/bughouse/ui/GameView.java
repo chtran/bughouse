@@ -50,9 +50,10 @@ public class GameView extends JPanel {
 	private JPanel selectedPrisoner_;
 	private Border unselectedPrisonerBorder_;
 
-	public GameView(BackEnd backend){
+	public GameView(BackEnd backend) throws IOException, RequestTimedOutException, GameNotReadyException{
 		super(new BorderLayout());
 		backend_ = backend;
+		setupBoardID();
 		myPrisoners_ = new ArrayList<>();
 		imgFactory_ = new ChessPieceImageFactory();
 		this.add(this.createBoard(), BorderLayout.CENTER);
@@ -93,11 +94,11 @@ public class GameView extends JPanel {
 	}
 	
 
-	public void getBoardID() throws IOException, RequestTimedOutException, GameNotReadyException{
+	public void setupBoardID() throws IOException, RequestTimedOutException, GameNotReadyException{
 		myBoardID_ = backend_.me().getCurrentBoardId();
-		for (ChessBoard board: backend_.getCurrentBoards()) {
-			if (board.getId()!=myBoardID_) {
-				otherBoardID_ = board.getId();
+		for (int boardId: backend_.getCurrentBoards().keySet()) {
+			if (boardId!=myBoardID_) {
+				otherBoardID_ = boardId;
 				return;
 			}
 		}
@@ -112,9 +113,9 @@ public class GameView extends JPanel {
 	 */
 	private JComponent createBoard(){
 		JTabbedPane boardContainer = new JTabbedPane();
-		userBoard_ = new BughouseBoard(backend_,imgFactory_,true);
+		userBoard_ = new BughouseBoard(backend_,imgFactory_,true, backend_.getCurrentBoards().get(myBoardID_));
 		boardContainer.addTab("Your Game", userBoard_);
-		otherBoard_ = new BughouseBoard(backend_,imgFactory_,false);
+		otherBoard_ = new BughouseBoard(backend_,imgFactory_,false,backend_.getCurrentBoards().get(myBoardID_));
 		boardContainer.addTab("Other Game", otherBoard_);
 		return boardContainer;
 	}
@@ -171,33 +172,18 @@ public class GameView extends JPanel {
 	}
 	
 	private Icon getIcon(ChessPiece piece){
+		Color c = (piece.isWhite()) ? Color.WHITE : Color.BLACK;
 		switch(piece.getType()){
 		case 1:
-			if (piece.isWhite()){
-				return imgFactory_.getPawn(Color.WHITE);
-			}
-			return imgFactory_.getPawn(Color.BLACK);
+			return imgFactory_.getPawn(c);
 		case 2:
-			if (piece.isWhite()){
-				return imgFactory_.getKnight(Color.WHITE);
-			}
-			return imgFactory_.getKnight(Color.BLACK);
-		
+			return imgFactory_.getKnight(c);
 		case 3:
-			if (piece.isWhite()){
-				return imgFactory_.getBishop(Color.WHITE);
-			}
-			return imgFactory_.getBishop(Color.BLACK);
+			return imgFactory_.getBishop(c);
 		case 4:
-			if (piece.isWhite()){
-				return imgFactory_.getRook(Color.WHITE);
-			}
-			return imgFactory_.getRook(Color.BLACK);
+			return imgFactory_.getRook(c);
 		case 5:
-			if (piece.isWhite()){
-				return imgFactory_.getQueen(Color.WHITE);
-			}
-			return imgFactory_.getQueen(Color.BLACK);
+			return imgFactory_.getQueen(c);
 		}
 		return null;
 	}

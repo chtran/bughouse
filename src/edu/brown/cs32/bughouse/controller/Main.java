@@ -7,7 +7,6 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO don't have this hard coded
 		Scanner scanner = new Scanner(System.in);
 		try {
 			int port = Integer.parseInt(args[0]);
