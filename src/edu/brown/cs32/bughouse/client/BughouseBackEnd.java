@@ -149,5 +149,10 @@ public class BughouseBackEnd implements BackEnd {
 		frontEnd.piecePut(boardId, playerId, piece, x, y);
 		currentBoards.get(new Player(playerId).getCurrentBoardId()).put(piece, x, y);
 	}
+
+	@Override
+	public boolean canMove(int boardId, int from_x, int from_y, int to_x, int to_y) {
+		return currentBoards.get(boardId).canMove(from_x, from_y, to_x, to_y);
+	}
 	
 }
