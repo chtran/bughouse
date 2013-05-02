@@ -58,24 +58,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setVisible(true);
 	}
 	
-	/*public void connectToBackend(String[] argv){
-		try {
-			this.backend_ = new BughouseBackEnd(this,argv[1],new Integer(argv[2]));
-			backend_.joinServer(argv[0]);
-			content_.add(setupRoomMenu(), "Rooms");
-			content_.add(setupGameView(), "Game");
-			this.joinServer();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RequestTimedOutException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}*/
 	
 	public static void main(final String[] argv){
 		Runnable r1 = new Runnable() {
@@ -223,7 +205,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void piecePut(int boardId, int playerId, ChessPiece piece, int x,
 			int y) {
-				
+			game_.piecePut(boardId, playerId, piece, x, y);
 	}
 
 }
