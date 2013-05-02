@@ -135,7 +135,7 @@ public class BughouseClientHandler extends Thread {
 								id = Integer.parseInt(headerSplit[1]);
 								sendCurrentBoard(id);
 								break;
-							// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+							// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 							case "MOVE":
 								move(msg);
 								break;
@@ -212,10 +212,10 @@ public class BughouseClientHandler extends Thread {
 		System.out.println("Player " + m_playerInfo.getId() + " " + m_playerInfo.getName() + " moved");
 		int gameID = m_playerInfo.getGameId();
 		if (gameID > 0) {
-			// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+			// MOVE:[boardId]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 			String[] split = msg.split(":");
 			if (split.length == 2 && m_playerInfo.getBoardId() >= 0) {
-				String ret = String.format("BROADCAST:MOVE:%d\t%s\n", m_playerInfo.getBoardId(), split[1]);
+				String ret = String.format("BROADCAST:MOVE:%s\n", split[1]);
 				m_pool.broadcastToGame(gameID, ret, this);
 				send("MOVE_OK\n");
 					

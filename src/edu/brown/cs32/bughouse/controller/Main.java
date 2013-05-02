@@ -8,9 +8,10 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// TODO don't have this hard coded
-		int port = 3333;
 		Scanner scanner = new Scanner(System.in);
 		try {
+			int port = Integer.parseInt(args[0]);
+
 			BughouseServer server = new BughouseServer(port);
 
 			// Listen for any commandline input; quit on "exit" or emptyline
