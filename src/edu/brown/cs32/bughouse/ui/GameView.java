@@ -73,9 +73,6 @@ public class GameView extends JPanel {
 	
 	public void notifyUser(){
 		userBoard_.startTurn();
-		ChessPiece test = new ChessPiece.Builder().black().pawn().build();
-		this.addPrisoner(backend_.me().getId(), test);
-		this.updatePrison();
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){
@@ -159,16 +156,29 @@ public class GameView extends JPanel {
 	}
 	
 	public void updatePrison(){
-		JOptionPane.showMessageDialog(null, "You have received a piece from your teammate!");
+		JOptionPane.showMessageDialog(this, "You have received a piece from your teammate!");
 		myPrisoners_ = backend_.getPrisoners(backend_.me().getId());
 		for (ChessPiece piece : myPrisoners_){
 			JLabel img = new JLabel();
 			img.setIcon(getIcon(piece));
 			JPanel piecePanel = new JPanel();
 			piecePanel.add(img);
-			piecePanel.addMouseListener(new PrisonPieceListener(piece));
+			piecePanel.addMouseListener(new PrisonPieceListener(piece,myPrisoners_.indexOf(piece)));
 			prison_.add(piecePanel);
 		}
+		prison_.revalidate();
+		prison_.repaint();
+	}
+	
+	public void piecePut(int boardId, int playerId, ChessPiece piece, int x,
+			int y) {
+			if (boardId == myBoardID_){
+				userBoard_.piecePut(this.getIcon(piece),playerId,x,y);
+			}
+			else {
+				otherBoard_.piecePut(this.getIcon(piece),playerId,x,y);
+			}
+			
 	}
 	
 	private Icon getIcon(ChessPiece piece){
@@ -192,9 +202,11 @@ public class GameView extends JPanel {
 	private class PrisonPieceListener implements MouseListener{
 		
 		private ChessPiece piece_;
+		private int index_;
 		
-		public PrisonPieceListener(ChessPiece piece){
+		public PrisonPieceListener(ChessPiece piece, int index){
 			this.piece_ = piece;
+			this.index_= index;
 		}
 
 		@Override
@@ -206,6 +218,7 @@ public class GameView extends JPanel {
 			selectedPrisoner_ = (JPanel) e.getSource();
 			unselectedPrisonerBorder_ = selectedPrisoner_.getBorder();
 			selectedPrisoner_.setBorder(new LineBorder(Color.RED,3));	
+			userBoard_.setPrisonertoPut(piece_,index_);
 		}
 
 		@Override

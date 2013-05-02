@@ -15,6 +15,7 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
+import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.WrongColorException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
@@ -25,15 +26,15 @@ public class BughouseBoard extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private ChessBoard chessBoard_;
-	private boolean isManipulable_;
+	private boolean isManipulable_,turn_, isPuttingPrisoner_;
 	private JLabel source_, current_;
 	private Icon piece_;
-	private int originX_, originY_, destX_, destY_;
+	private int originX_, originY_, destX_, destY_, index_;
 	private ChessPieceImageFactory imgFactory_;
 	private BackEnd backend_;
 	private Border unselected_;
 	private JLabel [][] board_;
-	private boolean turn_;
+	private ChessPiece selectedPrisoner_;
 
 
 	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable,ChessBoard chessBoard){
@@ -43,6 +44,7 @@ public class BughouseBoard extends JPanel {
 		this.board_ = new JLabel [8][8];
 		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
+		this.isPuttingPrisoner_ = false;
 		this.setPreferredSize(new Dimension(400,400));
 		this.turn_ = false;
 		for (int i = 0; i<8;i++){
@@ -62,6 +64,14 @@ public class BughouseBoard extends JPanel {
 		JOptionPane.showMessageDialog(this, "Your turn");
 	}
 	
+	public void piecePut(Icon piece,int playerId, int x, int y){
+		if (backend_.me().getId()==playerId){
+			board_[y][x].setIcon(piece);
+			this.revalidate();
+			this.repaint();
+		}
+	}
+	
 	
 	public void updatePieceMoved(int from_x, int from_y, int to_x, int to_y){
 		Icon piece = board_[from_y][from_x].getIcon();
@@ -70,6 +80,11 @@ public class BughouseBoard extends JPanel {
 		System.out.printf("Just moved piece from %d,%d to %d,%d", from_x,from_y,to_x,to_y);
 	}
 	
+	public void setPrisonertoPut(ChessPiece piece, int index)	{
+		this.selectedPrisoner_ = piece;
+		this.isPuttingPrisoner_ = true;
+		this.index_ = index;
+	}
 	
 /*
  * Helper method which sets up the pieces at the start of the game;
@@ -145,10 +160,31 @@ public class BughouseBoard extends JPanel {
 		
 		@Override
 		public void mouseReleased(MouseEvent arg0) {
-			if (source_ != null && (!(source_.equals(current_))) && turn_){
-				JPanel curSquare = (JPanel) current_.getParent();
-				destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
-				destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
+			JPanel curSquare = (JPanel) current_.getParent();
+			destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
+			destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
+			if (isPuttingPrisoner_ && turn_){
+				try {
+					backend_.me().put(index_,destX_,destY_);
+					turn_ = false;
+					isPuttingPrisoner_ = false;
+				} catch (IllegalPlacementException e) {
+					turn_ = true;
+					isPuttingPrisoner_ = true;
+					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
+							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
+				} catch (IOException e) {
+					e.printStackTrace();
+					turn_ = true;
+					isPuttingPrisoner_ = true;
+				} catch (RequestTimedOutException e) {
+					turn_ = true;
+					isPuttingPrisoner_ = true;
+					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+							"Timeout Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			else if (source_ != null && (!(source_.equals(current_))) && turn_){
 				System.out.println("Dest x "+destX_+ " "+destY_);
 					 try {
 						turn_ = false;
