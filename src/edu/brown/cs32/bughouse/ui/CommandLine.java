@@ -252,4 +252,10 @@ public class CommandLine implements FrontEnd{
 			System.out.println("Request timed out");
 		}
 	}
+	@Override
+	public void notifyNewOwner(int gameId) {
+		// TODO Auto-generated method stub
+		System.out.println("You are now the owner of game #"+gameId);
+		
+	}
 }

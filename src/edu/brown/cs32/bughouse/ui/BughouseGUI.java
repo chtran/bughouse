@@ -209,4 +209,11 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			game_.piecePut(boardId, playerId, piece, x, y);
 	}
 
+
+	@Override
+	public void notifyNewOwner(int gameId) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -15,5 +15,5 @@ public interface FrontEnd {
 	public void gameListUpdated();
 	public void prisonersUpdated();
 	public void piecePut(int boardId, int playerId, ChessPiece piece, int x, int y);
-
+	public void notifyNewOwner(int gameId);
 }
