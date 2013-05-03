@@ -85,28 +85,41 @@ public class ChessPiece extends Model {
 		return this.isWhite;
 	}
 	
-	public boolean canMove(int from_x, int from_y, int to_x, int to_y) {
+	public boolean canMove(int from_x, int from_y, int to_x, int to_y, ChessBoard board) {
 		//TODO: fill
 		if (to_x>=8 || to_y>=8 || to_x<0 || to_y<0) return false;
+		if (from_x==to_x && from_y==to_y) return false;
+		int x_dist = Math.abs(to_x-from_x);
+		int y_dist = Math.abs(to_y-from_y);
 		switch (type) {
 			case PAWN:
-				return (from_x==to_x) && (to_y==from_y+1 || to_y==from_y-1);
+				return checkPawn(from_x, from_y, to_x, to_y,board);
 			case KNIGHT:
-				return true;
+				return (x_dist==2 && y_dist==1) || (x_dist==1 && y_dist==2);
 			case BISHOP:
-				return true;
+				return (x_dist==y_dist);
 			case ROOK:
-				return true;
+				return (x_dist==0 || y_dist==0);
 			case QUEEN:
-				return true;
+				return (x_dist==0 || y_dist==0 || x_dist==y_dist);
 			case KING:
-				return true;
+				return (x_dist<=1 && y_dist<=1);
 			default:
 				return false;
 			
 		}
 	}
-	
+	private boolean checkPawn(int from_x, int from_y, int to_x, int to_y, ChessBoard board) {
+		int sign = (isWhite) ? 1 : -1;
+		if (!board.isOccupied(to_x, to_y)) {
+			int distance = ((isWhite && from_y==1) || (!isWhite && from_y==6)) ? 2 : 1;
+			if (from_x==to_x && to_y-from_y<=distance*sign) return true;
+		} else {
+			if (to_y-from_y==sign && Math.abs(to_x-from_x)==1) return true;
+		}
+		
+		return false;
+	}
 	public int getType() {
 		return this.type;
 	}
