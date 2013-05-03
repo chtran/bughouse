@@ -16,8 +16,6 @@ import edu.brown.cs32.bughouse.exceptions.WrongColorException;
  */
 public class ChessBoard extends Model {
 	private ChessPiece[][] board;
-	private Player white;
-	private Player black;
 	
 	public ChessBoard(int id) {
 		super(id);
@@ -88,12 +86,7 @@ public class ChessBoard extends Model {
 		return board[x][y];
 	}
 
-	public Player getWhitePlayer() {
-		return this.white;
-	}
-	public Player getBlackPlayer() {
-		return this.black;
-	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

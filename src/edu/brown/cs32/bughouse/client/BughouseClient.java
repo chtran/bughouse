@@ -273,5 +273,6 @@ public class BughouseClient implements Client {
 		socket.getResponse(String.format("PUT:%d\t%d\t%d\t%d\t%d\n", boardId, playerId, index, x,y));
 	}
 
+
 	
 }

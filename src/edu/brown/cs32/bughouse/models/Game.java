@@ -38,4 +38,18 @@ public class Game extends Model {
 			toReturn.add(new Player(playerId));
 		return toReturn;
 	}
+	public Player getWhitePlayer(int boardId,int team) throws IOException, RequestTimedOutException {
+		List<Integer> players = client.getPlayers(id, team);
+		for (int playerId: players) {
+			if (client.isWhite(playerId)) return new Player(playerId);
+		}
+		return null;
+	}
+	public Player getBlackPlayer(int boardId,int team) throws IOException, RequestTimedOutException {
+		List<Integer> players = client.getPlayers(id, team);
+		for (int playerId: players) {
+			if (!client.isWhite(playerId)) return new Player(playerId);
+		}
+		return null;
+	}
 }
