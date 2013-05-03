@@ -1,28 +1,22 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
@@ -42,7 +36,7 @@ public class GameView extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BughouseBoard userBoard_, otherBoard_;
 	private ChessPieceImageFactory imgFactory_;
-	private JTextArea messageBox_,clock_;
+	private JTextArea messageBox_, blackP_, whiteP_;
 	private JPanel prison_;
 	private List<ChessPiece> myPrisoners_;
 	private BackEnd backend_;
@@ -59,11 +53,13 @@ public class GameView extends JPanel {
 		this.add(this.createBoard(), BorderLayout.CENTER);
 		this.add(this.createOptionMenu(),BorderLayout.EAST);
 		this.add(this.createPieceHolder(),BorderLayout.SOUTH);
+		this.displayPlayerName();
 	}
 	
 	
-	public void addPrisoner (int playerID, ChessPiece prisoner){
-		myPrisoners_.add(prisoner);
+	public void addPrisoner (ChessPiece prisoner){
+		JOptionPane.showMessageDialog(userBoard_, "You have received a "+prisoner.getName()+" from your teammate!");
+
 	}
 	
 	public void notifyEndGame(){
@@ -101,6 +97,19 @@ public class GameView extends JPanel {
 		}
 	}
 	
+	public void displayPlayerName() throws IOException, RequestTimedOutException{
+		/*List<ChessBoard> boards = backend_.me().getCurrentGame().getBoards();
+		System.out.println(boards.get(0).getBlackPlayer());
+		if (boards.get(0).getId()== myBoardID_){
+			blackP_.setText("BLACK : " +boards.get(0).getBlackPlayer().getName());
+			whiteP_.setText("WHITE : "+ boards.get(0).getWhitePlayer().getName());
+		}
+		else {
+			blackP_.setText("BLACK : " + boards.get(1).getBlackPlayer().getName());
+			whiteP_.setText("WHITE : "+ boards.get(1).getWhitePlayer().getName());
+		}*/
+	}
+	
 	
 	
 	/*
@@ -121,31 +130,46 @@ public class GameView extends JPanel {
 	 * sets up the option menu for users where information gets 
 	 * displayed
 	 */
-	private JComponent createOptionMenu(){
-		JPanel options = new JPanel();
+	private JComponent createOptionMenu() throws IOException, RequestTimedOutException{
+		JPanel options = new JPanel(new BorderLayout());
+		JPanel optionMiddle = new JPanel(new BorderLayout());
 		options.setPreferredSize(new Dimension(250,190));
-		clock_ = new JTextArea();
-		clock_.setPreferredSize(new Dimension(200,50));
-		clock_.setFont(new Font("Serif", Font.PLAIN,32));
-		clock_.setEditable(false);
-		clock_.setText("5:00");
+		blackP_ = new JTextArea();
+		 whiteP_ = new JTextArea();
+		blackP_.setEditable(false);
+		whiteP_.setEditable(false);
+		blackP_.setPreferredSize(new Dimension(200,50));
+		whiteP_.setPreferredSize(new Dimension(200,50));
 		messageBox_ = new JTextArea();
 		messageBox_.setPreferredSize(new Dimension(200,190));
 		messageBox_.setEditable(false);
-		JButton quit  = new JButton("Click me!");
+		JButton quit  = new JButton("Quit Game");
 		quit.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO call backend.quit();
+				//try {
+					JButton container = (JButton) e.getSource();
+					CardLayout card = (CardLayout) container.getRootPane().getContentPane().getLayout();
+					card.show(container.getRootPane().getContentPane(), "Rooms");
+				//	backend_.quit();
+				
+			/*	} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (RequestTimedOutException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}*/
 				
 			}
 			
 		});
 		quit.setPreferredSize(new Dimension(100,60));
-		options.add(clock_);
-		options.add(messageBox_);
-		options.add(quit);
+		optionMiddle.add(messageBox_, BorderLayout.CENTER);
+		optionMiddle.add(quit, BorderLayout.SOUTH);
+		options.add(optionMiddle,BorderLayout.CENTER);
+		options.add(blackP_, BorderLayout.NORTH);
+		options.add(whiteP_, BorderLayout.SOUTH);
 		return options;
 	}
 	
@@ -156,8 +180,8 @@ public class GameView extends JPanel {
 	}
 	
 	public void updatePrison(){
-		JOptionPane.showMessageDialog(this, "You have received a piece from your teammate!");
 		myPrisoners_ = backend_.getPrisoners(backend_.me().getId());
+		prison_.removeAll();
 		for (ChessPiece piece : myPrisoners_){
 			JLabel img = new JLabel();
 			img.setIcon(getIcon(piece));
@@ -171,14 +195,14 @@ public class GameView extends JPanel {
 	}
 	
 	public void piecePut(int boardId, int playerId, ChessPiece piece, int x,
-			int y) {
-			if (boardId == myBoardID_){
-				userBoard_.piecePut(this.getIcon(piece),playerId,x,y);
-			}
-			else {
-				otherBoard_.piecePut(this.getIcon(piece),playerId,x,y);
-			}
-			
+		int y) {
+		if (boardId == myBoardID_){
+			userBoard_.piecePut(this.getIcon(piece),playerId,x,y);
+		}
+		else {
+			otherBoard_.piecePut(this.getIcon(piece),playerId,x,y);
+		}
+		updatePrison();
 	}
 	
 	private Icon getIcon(ChessPiece piece){

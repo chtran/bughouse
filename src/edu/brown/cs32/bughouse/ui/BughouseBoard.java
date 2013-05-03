@@ -26,7 +26,7 @@ public class BughouseBoard extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private ChessBoard chessBoard_;
-	private boolean isManipulable_,turn_, isPuttingPrisoner_;
+	private boolean isManipulable_,turn_, isPuttingPrisoner_,isSelected_;
 	private JLabel source_, current_;
 	private Icon piece_;
 	private int originX_, originY_, destX_, destY_, index_;
@@ -45,6 +45,7 @@ public class BughouseBoard extends JPanel {
 		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.isPuttingPrisoner_ = false;
+		this.isSelected_ = false;
 		this.setPreferredSize(new Dimension(400,400));
 		this.turn_ = false;
 		for (int i = 0; i<8;i++){
@@ -65,11 +66,9 @@ public class BughouseBoard extends JPanel {
 	}
 	
 	public void piecePut(Icon piece,int playerId, int x, int y){
-		if (backend_.me().getId()==playerId){
-			board_[y][x].setIcon(piece);
-			this.revalidate();
-			this.repaint();
-		}
+		board_[y][x].setIcon(piece);
+		this.revalidate();
+		this.repaint();
 	}
 	
 	
@@ -132,15 +131,49 @@ public class BughouseBoard extends JPanel {
 		@Override
 		public void mouseEntered(MouseEvent arg0) {
 			current_ = (JLabel) arg0.getSource();
-			/*if (source_ != null && turn_){
+			if (isSelected_ && turn_ && !current_.equals(source_)){
 				JPanel parent = (JPanel) current_.getParent();
-				currentSquareBorder_ = parent.getBorder();
-				parent.setBorder(new LineBorder(Color.GREEN,3));
-			}*/
+				int potX = (int) Math.round((parent.getLocation().getX()-2)/69);
+				int potY = (int) Math.round((-parent.getLocation().getY()-2)/68)+7;
+				try {
+					if (backend_.canMove(backend_.me().getCurrentBoardId(), originX_, originY_, potX, potY)){
+						currentSquareBorder_ =  parent.getBorder();
+						parent.setBorder(new LineBorder(Color.GREEN,3));
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (RequestTimedOutException e) {
+					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+							"Timeout Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		}
 
 		@Override
 		public void mousePressed(MouseEvent arg0) {
+			JLabel label = (JLabel) arg0.getSource();
+			JPanel parent = (JPanel) label.getParent();
+			int destX = (int) Math.round((parent.getLocation().getX()-2)/69);
+			int destY = (int) Math.round((-parent.getLocation().getY()-2)/68)+7;
+			if (isPuttingPrisoner_ && turn_){
+				System.out.println("Attempting to put prisoner down");
+				try {
+					backend_.me().put(index_,destX,destY);
+					isPuttingPrisoner_ = false;
+				} catch (IllegalPlacementException e) {
+					isPuttingPrisoner_ = true;
+					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
+							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
+				} catch (IOException e) {
+					e.printStackTrace();
+					isPuttingPrisoner_ = true;
+				} catch (RequestTimedOutException e) {
+					isPuttingPrisoner_ = true;
+					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+							"Timeout Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+			else
 			if (turn_){
 				if (source_ != null){
 					JPanel oldPanel = (JPanel) source_.getParent();
@@ -154,6 +187,7 @@ public class BughouseBoard extends JPanel {
 				originX_ = (int) Math.round((square.getLocation().getX()-2)/69);
 				originY_ = (int) Math.round((-square.getLocation().getY()-2)/68)+7;
 				piece_ = source_.getIcon();
+				isSelected_ = true;
 				System.out.println("Coordinates to send x "+ originX_ + " "+originY_);
 			}
 		}
@@ -163,28 +197,8 @@ public class BughouseBoard extends JPanel {
 			JPanel curSquare = (JPanel) current_.getParent();
 			destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
 			destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
-			if (isPuttingPrisoner_ && turn_){
-				try {
-					backend_.me().put(index_,destX_,destY_);
-					turn_ = false;
-					isPuttingPrisoner_ = false;
-				} catch (IllegalPlacementException e) {
-					turn_ = true;
-					isPuttingPrisoner_ = true;
-					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
-							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
-				} catch (IOException e) {
-					e.printStackTrace();
-					turn_ = true;
-					isPuttingPrisoner_ = true;
-				} catch (RequestTimedOutException e) {
-					turn_ = true;
-					isPuttingPrisoner_ = true;
-					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-							"Timeout Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-			else if (source_ != null && (!(source_.equals(current_))) && turn_){
+			 if (source_ != null && (!(source_.equals(current_))) && turn_){
+				System.out.println("Moving an existing piece on the board");
 				System.out.println("Dest x "+destX_+ " "+destY_);
 					 try {
 						turn_ = false;
@@ -206,19 +220,21 @@ public class BughouseBoard extends JPanel {
 								"Piece Error", JOptionPane.ERROR_MESSAGE);
 					}finally {
 						JPanel originPanel = (JPanel)source_.getParent();
+						JPanel destPanel = (JPanel) current_.getParent();
 						originPanel.setBorder(unselected_);
+						destPanel.setBorder(currentSquareBorder_);
+						isSelected_ = false;
 						unselected_ = null;
+						currentSquareBorder_ = null;
 					}
 			}
 		}
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {
-			if (source_ != null){
-				/*JLabel current = (JLabel) arg0.getSource();
-				JPanel parent = (JPanel) current.getParent();
+			if (current_ != null && isSelected_ && turn_ && !current_.equals(source_)){
+				JPanel parent = (JPanel) current_.getParent();
 				parent.setBorder(currentSquareBorder_);
-				currentSquareBorder_= null;*/
 			}
 		}
 

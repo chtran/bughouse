@@ -126,6 +126,25 @@ public class RoomMenu extends JPanel {
 		}
 	}
 	
+	public void reset(){
+		this.lockScreen_ = false;
+		this.cteam1_.setText(" ");
+		this.cteam2_.setText(" ");
+		this.team1_.setText(" ");
+		this.team2_.setText(" ");
+		this.team1_.getParent().setVisible(false);
+		this.selectedGameID_ = -1;
+		this.selectedTeamID_ = -1;
+		try {
+			this.getRooms();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+					"Connection time out", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
 	private void displayCreatorInfo() throws IOException, RequestTimedOutException{
 		cteam1_.setText(" ");
 		cteam2_.setText(" ");
@@ -207,7 +226,9 @@ public class RoomMenu extends JPanel {
 						backend_.startGame();
 						front_.gameStarted();
 					} catch (IOException e1) {
-						e1.printStackTrace();
+						JOptionPane.showMessageDialog(null, "I/O error. Please check the server", 
+								"Failed to Start Game", JOptionPane.ERROR_MESSAGE);
+						return;
 					} catch (RequestTimedOutException e1) {
 						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
 								"Connection time out", JOptionPane.ERROR_MESSAGE);
@@ -217,7 +238,7 @@ public class RoomMenu extends JPanel {
 								"Cannot start game", JOptionPane.ERROR_MESSAGE);
 						return;
 					} catch (UnauthorizedException e1) {
-						JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
+						JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
 								"Authorization error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
@@ -252,7 +273,7 @@ public class RoomMenu extends JPanel {
 						backend_.createGame();
 						//front_.displayCard("Creator");
 						//isCreator_ = true;
-						// System.out.println(backend_.me().getCurrentGame().getPlayersByTeam(1).get(0).getName()+" created a game");
+						
 					} catch (IOException e2){
 						e2.printStackTrace();
 					}catch (RequestTimedOutException e1){
