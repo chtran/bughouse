@@ -160,9 +160,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void gameStarted() {
 		content_.add(setupGameView(), "Game");
-		CardLayout cards = (CardLayout) content_.getLayout();
-		cards.show(content_, "Game");
+		this.displayCard("Game");
 		
+	}
+	
+	public void resetRoomMenu(){
+		rooms_.reset();
 	}
 	
 	public void displayCard(String cardName){
