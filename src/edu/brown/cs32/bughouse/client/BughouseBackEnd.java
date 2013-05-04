@@ -155,5 +155,10 @@ public class BughouseBackEnd implements BackEnd {
 	public boolean canMove(int boardId, int from_x, int from_y, int to_x, int to_y) {
 		return currentBoards.get(boardId).canMove(from_x, from_y, to_x, to_y);
 	}
+
+	@Override
+	public boolean isMine(int boardId, int x, int y) throws IOException, RequestTimedOutException {
+		return (currentBoards.get(boardId).getPiece(x, y).isWhite()==me.isWhite());
+	}
 	
 }
