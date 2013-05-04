@@ -176,6 +176,9 @@ public class BughouseClientHandler extends Thread {
 		int gameId = m_playerInfo.getGameId();
 		send("\n");
 		m_pool.broadcastToGame(gameId, "BROADCAST:" + msg + "\n", this);
+		int next = m_data.getNextTurn(gameId);
+		System.out.println("Next turn: " + next);
+		m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 	}
 
 	/**
