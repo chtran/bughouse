@@ -58,7 +58,7 @@ public class ChessBoard extends Model {
 				return false;
 			}
 		}
-		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y)) return false;
+		if (!board[from_x][from_y].canMove(from_x, from_y, to_x, to_y,this)) return false;
 		return true;
 	}
 	public ChessPiece movePiece(boolean isWhite, int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, WrongColorException, IOException, RequestTimedOutException {
