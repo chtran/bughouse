@@ -97,11 +97,11 @@ public class ChessPiece extends Model {
 			case KNIGHT:
 				return (x_dist==2 && y_dist==1) || (x_dist==1 && y_dist==2);
 			case BISHOP:
-				return (x_dist==y_dist);
+				return (x_dist==y_dist) && checkJump(from_x, from_y, to_x, to_y, board);
 			case ROOK:
-				return (x_dist==0 || y_dist==0);
+				return (x_dist==0 || y_dist==0) && checkJump(from_x, from_y, to_x, to_y, board);
 			case QUEEN:
-				return (x_dist==0 || y_dist==0 || x_dist==y_dist);
+				return (x_dist==0 || y_dist==0 || x_dist==y_dist) && checkJump(from_x, from_y, to_x, to_y, board);
 			case KING:
 				return (x_dist<=1 && y_dist<=1);
 			default:
@@ -109,11 +109,30 @@ public class ChessPiece extends Model {
 			
 		}
 	}
+	private int sign(int n) {
+		if (n==0) return 0;
+		return (n>0) ? 1:-1;
+	}
+
+	private boolean checkJump(int from_x, int from_y, int to_x, int to_y, ChessBoard board) {
+		int x_dist = to_x - from_x;
+		int y_dist = to_y - from_y;
+		for (int i=1; i<Math.max(Math.abs(x_dist), Math.abs(y_dist));i++) {
+			int x = from_x+sign(x_dist)*i;
+			int y = from_y+sign(y_dist)*i;
+			if (board.isOccupied(x, y)) return false;
+		}
+		return true;
+	}
+	
 	private boolean checkPawn(int from_x, int from_y, int to_x, int to_y, ChessBoard board) {
 		int sign = (isWhite) ? 1 : -1;
 		if (!board.isOccupied(to_x, to_y)) {
 			int distance = ((isWhite && from_y==1) || (!isWhite && from_y==6)) ? 2 : 1;
-			if (from_x==to_x && to_y-from_y<=distance*sign) return true;
+			int x_dist = to_x - from_x;
+			int y_dist = to_y - from_y;
+			
+			if (x_dist==0 && y_dist*sign>=0 && Math.abs(y_dist)<=distance) return true;
 		} else {
 			if (to_y-from_y==sign && Math.abs(to_x-from_x)==1) return true;
 		}
