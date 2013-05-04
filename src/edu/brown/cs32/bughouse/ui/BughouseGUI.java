@@ -44,7 +44,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Failed to connect to the server.");
 		}
 		content_ = this.getContentPane();
 		content_.setLayout(new CardLayout());
@@ -97,6 +97,11 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	}
 	
+	/* 
+	 * (non-Javadoc)
+	 * @see edu.brown.cs32.bughouse.interfaces.FrontEnd#addPrisoner(edu.brown.cs32.bughouse.models.ChessPiece)
+	 * Notifies that the user has just received a new piece
+	 */
 	@Override
 	public void addPrisoner(ChessPiece piece) {
 		if (game_!= null){

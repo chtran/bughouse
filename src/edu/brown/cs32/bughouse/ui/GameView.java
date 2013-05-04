@@ -63,7 +63,7 @@ public class GameView extends JPanel {
 	}
 	
 	public void notifyEndGame(){
-		JOptionPane.showMessageDialog(null, "Game Over", "Finished", JOptionPane.OK_OPTION);
+		JOptionPane.showMessageDialog(userBoard_, "Game Over", "Finished", JOptionPane.OK_OPTION);
 		
 	} 
 	
@@ -98,16 +98,7 @@ public class GameView extends JPanel {
 	}
 	
 	public void displayPlayerName() throws IOException, RequestTimedOutException{
-		/*List<ChessBoard> boards = backend_.me().getCurrentGame().getBoards();
-		System.out.println(boards.get(0).getBlackPlayer());
-		if (boards.get(0).getId()== myBoardID_){
-			blackP_.setText("BLACK : " +boards.get(0).getBlackPlayer().getName());
-			whiteP_.setText("WHITE : "+ boards.get(0).getWhitePlayer().getName());
-		}
-		else {
-			blackP_.setText("BLACK : " + boards.get(1).getBlackPlayer().getName());
-			whiteP_.setText("WHITE : "+ boards.get(1).getWhitePlayer().getName());
-		}*/
+		//To DO: Display name of player on board
 	}
 	
 	

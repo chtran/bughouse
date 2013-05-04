@@ -46,7 +46,7 @@ public class RoomMenu extends JPanel {
 	private BughouseGUI front_;
 	private JScrollPane rooms_;
 	private boolean lockScreen_, isCreator_;
-	private JButton currentRoom_;
+	private JButton currentRoom_, joinTeam1_, joinTeam2_;
 	private Box gameinfo_;
 	
 	public RoomMenu(BughouseGUI frame,BackEnd backend){
@@ -59,8 +59,7 @@ public class RoomMenu extends JPanel {
 		try {
 			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
-			this.add(userControl(), BorderLayout.SOUTH);
-			this.createGameCreatorScreen();			
+			this.add(userControl(), BorderLayout.SOUTH);		
 		}catch (IOException e){
 			e.printStackTrace();
 		}catch (RequestTimedOutException e){
@@ -77,14 +76,14 @@ public class RoomMenu extends JPanel {
 		team2_ = new JTextArea(3,20);
 		team1_.setEditable(false);
 		team2_.setEditable(false);
-		JButton joinTeam1 =  new JButton("Join Team 1");
-		joinTeam1.addActionListener(new JoinTeamListener(1));
-		JButton joinTeam2 =  new JButton("Join Team 2");
-		joinTeam2.addActionListener(new JoinTeamListener(2));
+		joinTeam1_ =  new JButton("Join Team 1");
+		joinTeam1_.addActionListener(new JoinTeamListener(1));
+		joinTeam2_ =  new JButton("Join Team 2");
+		joinTeam2_.addActionListener(new JoinTeamListener(2));
 		gameinfo_.add(team1_);
-		gameinfo_.add(joinTeam1);
+		gameinfo_.add(joinTeam1_);
 		gameinfo_.add(team2_);
-		gameinfo_.add(joinTeam2);
+		gameinfo_.add(joinTeam2_);
 		return gameinfo_;
 		
 	}
@@ -106,24 +105,21 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public void displayGameInfo() throws IOException, RequestTimedOutException{
-		if (isCreator_){
-			displayCreatorInfo();
-			return;
-		}
 		System.out.println("Displaying info for client named "+backend_.me().getName());
 		if (team1_.getParent().isVisible()){
 			team1_.setText(" ");
 			team2_.setText(" ");
 			team1_.append("Team 1 :"+"\n");
 			team2_.append("Team 2 :"+"\n");
-			System.out.println("Printing team 1");
+			System.out.println("Printing team 1 for client named "+backend_.me().getName());
 			List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
+			System.out.println("TEAM SIZE: "+team.size());
 			for (Player player : team){
 				System.out.println("Printing player's name "+player.getName());
 				team1_.append(player.getName()+"\n");
 			}
 			team1_.repaint();
-			System.out.println("Printing team 2");
+			System.out.println("Printing team 2 for client named "+backend_.me().getName());
 			team = backend_.me().getCurrentGame().getPlayersByTeam(2);
 			for (Player player2: team){
 				System.out.println("Printing player's name "+player2.getName());
@@ -153,21 +149,23 @@ public class RoomMenu extends JPanel {
 		}
 	}
 	
-	private void displayCreatorInfo() throws IOException, RequestTimedOutException{
-		cteam1_.setText(" ");
-		cteam2_.setText(" ");
-		cteam1_.append("Team 1 :"+"\n");
-		cteam2_.append("Team 2 :"+"\n");
-		for (Player player : backend_.me().getCurrentGame().getPlayersByTeam(1)){
-			cteam1_.append(player.getName()+"\n");
-		}
-		cteam1_.repaint();
-		for (Player player2: backend_.me().getCurrentGame().getPlayersByTeam(2)){
-			cteam2_.append(player2.getName()+"\n");
-		}
-		cteam2_.repaint();
+	private void displayLockedRoom() throws IOException, RequestTimedOutException{
+		this.removeAll();
+		int gameID = backend_.me().getCurrentGame().getId();
+		String headerMessage = new String("Welcome to Game # "+gameID+". Waiting for other players....");
+		JLabel header =  new JLabel(headerMessage);
+		header.setFont(new Font("Serif", Font.BOLD, 18));
+		this.add(header,BorderLayout.NORTH);
+		gameinfo_.remove(joinTeam1_);
+		gameinfo_.remove(joinTeam2_);
+		gameinfo_.setVisible(true);
+		this.add(gameinfo_,BorderLayout.CENTER);
+		this.add(creatorControl(),BorderLayout.SOUTH);
+		this.revalidate();
+		this.repaint();
+		updateGames();
 	}
-	
+
 	public JPanel getRooms() throws IOException, RequestTimedOutException{
 		roomList_ = new JPanel(new BorderLayout());
 		JLabel header =  new JLabel("List of active games to join");
@@ -205,28 +203,6 @@ public class RoomMenu extends JPanel {
 		roomPanel_.repaint();
 	}
 	
-	private void createGameCreatorScreen(){
-		JPanel contentScreen = new JPanel(new BorderLayout());
-		JLabel title = new JLabel("Waiting for players to join...");
-		title.setFont(new Font("Serif", Font.PLAIN,18));
-		contentScreen.add(title,BorderLayout.NORTH);
-		contentScreen.add(this.creatorView(),BorderLayout.CENTER);
-		contentScreen.add(this.creatorControl(),BorderLayout.SOUTH);
-		front_.add(contentScreen,"Creator");
-	}
-	
-	private JPanel creatorView(){
-		creatorView_ = new JPanel();
-		Box holder = Box.createVerticalBox();
-		cteam1_ = new JTextArea(3,20);
-		cteam2_ = new JTextArea(3,20);
-		cteam1_.setEditable(false);
-		cteam2_.setEditable(false);
-		holder.add(cteam1_);
-		holder.add(cteam2_);
-		creatorView_.add(holder);
-		return creatorView_;
-	}
 	
 	private JPanel creatorControl(){
 		JPanel buttonPanel = new JPanel();
@@ -259,7 +235,6 @@ public class RoomMenu extends JPanel {
 		});
 		JButton cancel = new JButton("Cancel Game");
 		cancel.addActionListener(new ActionListener(){
-			//	lockScreen_ = true;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				isCreator_ = false;
@@ -283,9 +258,7 @@ public class RoomMenu extends JPanel {
 				if (!(lockScreen_)){
 					try {
 						backend_.createGame();
-						//front_.displayCard("Creator");
-						//isCreator_ = true;
-						
+						displayLockedRoom();
 					} catch (IOException e2){
 						e2.printStackTrace();
 					}catch (RequestTimedOutException e1){
@@ -298,32 +271,6 @@ public class RoomMenu extends JPanel {
 				
 			}
 		});
-		JButton start = new JButton("Start Game");
-		start.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-					try {
-						backend_.startGame();
-						front_.gameStarted();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					} catch (RequestTimedOutException e1) {
-						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-								"Connection time out", JOptionPane.ERROR_MESSAGE);
-						return;
-					} catch (GameNotReadyException e1) {
-						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
-								"Cannot start game", JOptionPane.ERROR_MESSAGE);
-						return;
-					} catch (UnauthorizedException e1) {
-						JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
-								"Authorization error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					
-			}
-		});
-		buttonPanel.add(start);
 		buttonPanel.add(create);
 		return buttonPanel;
 		

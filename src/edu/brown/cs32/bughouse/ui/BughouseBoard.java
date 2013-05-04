@@ -66,6 +66,10 @@ public class BughouseBoard extends JPanel {
 	public void startTurn(){
 		turn_ = true;
 		JOptionPane.showMessageDialog(this, "Your turn");
+		if (turn_){
+			System.out.println("ITS YOUR TURN");
+		}
+		this.requestFocus();
 	}
 	
 	public void piecePut(Icon piece,int playerId, int x, int y){
