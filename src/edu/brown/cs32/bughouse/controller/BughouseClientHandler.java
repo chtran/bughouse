@@ -465,12 +465,13 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	private void sendCurrentGame(int playerId) {
-		int gameId;
-		if (playerId == m_playerInfo.getId()) {
-			gameId = m_playerInfo.getGameId();
-		} else {
-			gameId = m_data.getCurrentGame(playerId);
-		}
+		//chtran: Sometimes, m_playerInfo just returns null =.=
+		//int gameId;
+		//if (playerId == m_playerInfo.getId()) {
+			//gameId = m_playerInfo.getGameId();
+		//} else {
+			int gameId = m_data.getCurrentGame(playerId);
+		//}
 		send(gameId + "\n");
 	}
 	/**
