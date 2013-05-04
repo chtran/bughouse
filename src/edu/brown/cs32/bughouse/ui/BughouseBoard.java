@@ -53,7 +53,7 @@ public class BughouseBoard extends JPanel {
 		for (int i = 0; i<8;i++){
 			for (int j = 0; j<8;j++){
 				JPanel box = new JPanel();
-				Color background = ((i+j)%2!=0) ? Color.WHITE : Color.GRAY;
+				Color background = ((i+j)%2==0) ? Color.WHITE : Color.GRAY;
 				box.setBackground(background);
 				box.setBorder(null);
 				box.add(this.createPiece(i,j));
