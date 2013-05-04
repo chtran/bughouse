@@ -51,7 +51,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setPreferredSize(new Dimension(800,700));
 		this.setResizable(false);
 		content_.add(setupJoinServerMenu(),"Join");
-		content_.add(setupRoomMenu(), "Rooms");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.pack();
 		this.setVisible(true);
@@ -100,8 +99,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	
 	@Override
 	public void addPrisoner(ChessPiece piece) {
-		// TODO generate image for piece and add it the display + notify user
-		game_.addPrisoner(piece);
+		if (game_!= null){
+			game_.addPrisoner(piece);
+		}
 	}
 
 	
@@ -112,7 +112,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	@Override
 	public void notifyUserTurn() {
-		game_.notifyUser();
+		if (game_ != null){
+			game_.notifyUser();
+		}
 	}
 	
 	/*
@@ -122,9 +124,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 */
 	@Override
 	public void showEndGameMessage() {
-		game_.notifyEndGame();
-		
-		
+		if (game_ != null){
+			game_.notifyEndGame();
+		}	
 	}
 	
 	/*
@@ -152,8 +154,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void pieceMoved(int boardId, int from_x, int from_y, int to_x,
 			int to_y) {
-		game_.pieceMoved(boardId,from_x, from_y,to_x,to_y);
-		
+		if (game_ != null){
+			game_.pieceMoved(boardId,from_x, from_y,to_x,to_y);
+		}
 		
 	}
 
@@ -174,7 +177,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	}
 	
 	public void joinServer(){
+		content_.add(setupRoomMenu(), "Rooms");
 		this.displayCard("Rooms");
+		System.out.println("Just displayed card for rooms");
 	}
 	
 	private JPanel setupJoinServerMenu(){
@@ -190,7 +195,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void gameListUpdated() {
 		try {
-			rooms_.updateGames();
+			if (rooms_ != null){
+				rooms_.updateGames();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
@@ -202,14 +209,17 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void prisonersUpdated() {
-		// TODO Auto-generated method stub
-		game_.updatePrison();
+		if (game_!= null){
+			game_.updatePrison();
+		}
 	}
 
 	@Override
 	public void piecePut(int boardId, int playerId, ChessPiece piece, int x,
 			int y) {
+		if (game_!= null){
 			game_.piecePut(boardId, playerId, piece, x, y);
+		}
 	}
 
 

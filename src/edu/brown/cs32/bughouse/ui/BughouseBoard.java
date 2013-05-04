@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
 
 import javax.swing.Icon;
@@ -13,6 +14,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.MouseInputListener;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
@@ -26,13 +29,12 @@ public class BughouseBoard extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private ChessBoard chessBoard_;
-	private boolean isManipulable_,turn_, isPuttingPrisoner_,isSelected_;
+	private boolean isManipulable_,turn_, isPuttingPrisoner_,isMovingPiece_;
 	private JLabel source_, current_;
 	private Icon piece_;
 	private int originX_, originY_, destX_, destY_, index_;
 	private ChessPieceImageFactory imgFactory_;
 	private BackEnd backend_;
-	private Border unselected_;
 	private JLabel [][] board_;
 	private ChessPiece selectedPrisoner_;
 
@@ -45,9 +47,9 @@ public class BughouseBoard extends JPanel {
 		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.isPuttingPrisoner_ = false;
-		this.isSelected_ = false;
-		this.setPreferredSize(new Dimension(400,400));
+		this.isMovingPiece_ = false;
 		this.turn_ = false;
+		this.setPreferredSize(new Dimension(400,400));
 		for (int i = 0; i<8;i++){
 			for (int j = 0; j<8;j++){
 				JPanel box = new JPanel();
@@ -56,6 +58,7 @@ public class BughouseBoard extends JPanel {
 				box.setBorder(null);
 				box.add(this.createPiece(i,j));
 				this.add(box);		
+				System.out.println(box.getMouseListeners());
 			}
 		}
 	}
@@ -93,8 +96,9 @@ public class BughouseBoard extends JPanel {
 		piece.setPreferredSize(new Dimension(50,50));
 		board_[7-row][col] = piece;
 		if (isManipulable_){
+			System.out.println("Panel has been added with InputListener");
 			piece.addMouseListener(new UserInputListener());
-
+			System.out.println("Added!");
 		}
 
 		ChessPiece chessPiece = chessBoard_.getPiece(col,7-row);
@@ -126,121 +130,153 @@ public class BughouseBoard extends JPanel {
 	}
 	
 	private class UserInputListener implements MouseListener {	
-		private Border  currentSquareBorder_;
 		
-		@Override
-		public void mouseEntered(MouseEvent arg0) {
-			current_ = (JLabel) arg0.getSource();
-			if (isSelected_ && turn_ && !current_.equals(source_)){
-				JPanel parent = (JPanel) current_.getParent();
-				int potX = (int) Math.round((parent.getLocation().getX()-2)/69);
-				int potY = (int) Math.round((-parent.getLocation().getY()-2)/68)+7;
-				try {
-					if (backend_.canMove(backend_.me().getCurrentBoardId(), originX_, originY_, potX, potY)){
-						currentSquareBorder_ =  parent.getBorder();
-						parent.setBorder(new LineBorder(Color.GREEN,3));
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (RequestTimedOutException e) {
-					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-							"Timeout Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		}
-
 		@Override
 		public void mousePressed(MouseEvent arg0) {
-			JLabel label = (JLabel) arg0.getSource();
-			JPanel parent = (JPanel) label.getParent();
-			int destX = (int) Math.round((parent.getLocation().getX()-2)/69);
-			int destY = (int) Math.round((-parent.getLocation().getY()-2)/68)+7;
-			if (isPuttingPrisoner_ && turn_){
-				System.out.println("Attempting to put prisoner down");
-				try {
-					backend_.me().put(index_,destX,destY);
-					isPuttingPrisoner_ = false;
-				} catch (IllegalPlacementException e) {
-					isPuttingPrisoner_ = true;
-					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
-							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
-				} catch (IOException e) {
-					e.printStackTrace();
-					isPuttingPrisoner_ = true;
-				} catch (RequestTimedOutException e) {
-					isPuttingPrisoner_ = true;
-					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-							"Timeout Error", JOptionPane.ERROR_MESSAGE);
+			if (turn_){
+				System.out.println("Detecting a mouse pressed event");
+				JLabel label = (JLabel) arg0.getSource();
+				JPanel parent = (JPanel) label.getParent();
+				destX_ = (int) Math.round((parent.getLocation().getX()-2)/69);
+				destY_ = (int) Math.round((-parent.getLocation().getY()-2)/68)+7;
+				if (isPuttingPrisoner_){
+					System.out.println("Putting down a prisoner");
+					this.putDownPrisoner();
+					return;
+				}
+				if (isMovingPiece_){
+					if (source_.equals(label)){
+						System.out.println("Deselecting a piece");
+						this.deselectPiece();
+						return;
+					}
+					System.out.println("Moving a piece");
+					current_ = label;
+					this.movePiece();
+					return;
+				}
+				if (label.getIcon()!= null){
+					source_ = label;
+					originX_ = destX_;
+					originY_ = destY_;
+					System.out.println("Grabbing a piece");
+					this.grabPiece();
+					return;
 				}
 			}
-			else
-			if (turn_){
-				if (source_ != null){
-					JPanel oldPanel = (JPanel) source_.getParent();
-					oldPanel.setBorder(unselected_);
-					unselected_ = null;
+				
+		}
+		
+
+		
+		private void deselectPiece(){
+			isMovingPiece_ = false;
+			piece_ = null;
+			JPanel parent = (JPanel) source_.getParent();
+			parent.setBorder(null);
+			originX_ = -1;
+			originY_ = -1;
+		}
+		
+		private void grabPiece(){
+			isMovingPiece_ = true;
+			piece_ = source_.getIcon();
+			JPanel parent = (JPanel) source_.getParent();
+			parent.setBorder(new LineBorder(Color.RED, 3));
+		}
+		
+		private void movePiece(){
+			System.out.println("Moving an existing piece on the board");
+			System.out.println("Dest x "+destX_+ " "+destY_);
+				 try {
+					turn_ = false;
+					backend_.me().move(originX_, originY_, destX_, destY_);
+				} catch (IllegalMoveException e) {
+					turn_ = true;
+					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
+							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);					
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (RequestTimedOutException e) {
+					JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+							"Timeout Error", JOptionPane.ERROR_MESSAGE);
+				}catch (WrongColorException e) {
+					// TODO Auto-generated catch block
+					turn_ = true;
+					JOptionPane.showMessageDialog(null, "You've attempted to move " +
+							"your opponent's piece. Please " +
+							"move another chess piece of yours", 
+							"Piece Error", JOptionPane.ERROR_MESSAGE);
+				}finally {
+					JPanel originPanel = (JPanel)source_.getParent();
+					JPanel destPanel = (JPanel) current_.getParent();
+					originPanel.setBorder(null);
+					destPanel.setBorder(null);
+					isMovingPiece_ = false;
 				}
-				source_  = (JLabel) arg0.getSource();
-				JPanel square = (JPanel) source_.getParent();
-				unselected_ = square.getBorder();
-				square.setBorder(new LineBorder(Color.RED,3));
-				originX_ = (int) Math.round((square.getLocation().getX()-2)/69);
-				originY_ = (int) Math.round((-square.getLocation().getY()-2)/68)+7;
-				piece_ = source_.getIcon();
-				isSelected_ = true;
-				System.out.println("Coordinates to send x "+ originX_ + " "+originY_);
+		}
+		
+		private void putDownPrisoner(){
+			System.out.println("Attempting to put prisoner down");
+			try {
+				backend_.me().put(index_,destX_,destY_);
+				isPuttingPrisoner_ = false;
+			} catch (IllegalPlacementException e) {
+				isPuttingPrisoner_ = true;
+				JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
+						"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
+			} catch (IOException e) {
+				e.printStackTrace();
+				isPuttingPrisoner_ = true;
+			} catch (RequestTimedOutException e) {
+				isPuttingPrisoner_ = true;
+				JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+						"Timeout Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		
 		@Override
-		public void mouseReleased(MouseEvent arg0) {
-			JPanel curSquare = (JPanel) current_.getParent();
-			destX_ = (int) Math.round((curSquare.getLocation().getX()-2)/69);
-			destY_ = (int) Math.round((-curSquare.getLocation().getY()-2)/68)+7;
-			 if (source_ != null && (!(source_.equals(current_))) && turn_){
-				System.out.println("Moving an existing piece on the board");
-				System.out.println("Dest x "+destX_+ " "+destY_);
-					 try {
-						turn_ = false;
-						backend_.me().move(originX_, originY_, destX_, destY_);
-					} catch (IllegalMoveException e) {
-						turn_ = true;
-						JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
-								"Illegal Move Error", JOptionPane.ERROR_MESSAGE);					
+		public void mouseEntered(MouseEvent arg0){
+			if (turn_ && isMovingPiece_){
+				JLabel temp = (JLabel) arg0.getSource();
+				if (!temp.equals(source_)){
+					JPanel parent = (JPanel) temp.getParent();
+					destX_ = (int) Math.round((parent.getLocation().getX()-2)/69);
+					destY_ = (int) Math.round((-parent.getLocation().getY()-2)/68)+7;
+					System.out.println("Entering "+destX_ + " "+destY_);
+					try {
+						if (backend_.canMove(backend_.me().getCurrentBoardId(), originX_, originY_,
+								destX_, destY_)){
+							parent.setBorder(new LineBorder(Color.GREEN,3));
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (RequestTimedOutException e) {
 						JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
 								"Timeout Error", JOptionPane.ERROR_MESSAGE);
-					}catch (WrongColorException e) {
-						// TODO Auto-generated catch block
-						turn_ = true;
-						JOptionPane.showMessageDialog(null, "You've attempted to move your opponent's piece. Please " +
-								"move another chess piece of yours", 
-								"Piece Error", JOptionPane.ERROR_MESSAGE);
-					}finally {
-						JPanel originPanel = (JPanel)source_.getParent();
-						JPanel destPanel = (JPanel) current_.getParent();
-						originPanel.setBorder(unselected_);
-						destPanel.setBorder(currentSquareBorder_);
-						isSelected_ = false;
-						unselected_ = null;
-						currentSquareBorder_ = null;
 					}
+				}
 			}
 		}
+		@Override
+		public void mouseClicked(MouseEvent arg0){}		
+		
+		@Override
+		public void mouseReleased(MouseEvent arg0) {}
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {
-			if (current_ != null && isSelected_ && turn_ && !current_.equals(source_)){
-				JPanel parent = (JPanel) current_.getParent();
-				parent.setBorder(currentSquareBorder_);
-			}
+				if (turn_ && isMovingPiece_){
+					JLabel exited = (JLabel)arg0.getSource();
+					JPanel parent = (JPanel)exited.getParent();
+					if (!exited.equals(source_)){
+						parent.setBorder(null);
+						
+					}
+				}
 		}
-
-		@Override
-		public void mouseClicked(MouseEvent arg0) {
-		}
+		
 	}
+	
 	
 }

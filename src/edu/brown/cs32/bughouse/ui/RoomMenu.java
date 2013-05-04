@@ -110,20 +110,28 @@ public class RoomMenu extends JPanel {
 			displayCreatorInfo();
 			return;
 		}
+		System.out.println("Displaying info for client named "+backend_.me().getName());
 		if (team1_.getParent().isVisible()){
 			team1_.setText(" ");
 			team2_.setText(" ");
 			team1_.append("Team 1 :"+"\n");
 			team2_.append("Team 2 :"+"\n");
-			for (Player player : backend_.me().getCurrentGame().getPlayersByTeam(1)){
+			System.out.println("Printing team 1");
+			List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
+			for (Player player : team){
+				System.out.println("Printing player's name "+player.getName());
 				team1_.append(player.getName()+"\n");
 			}
 			team1_.repaint();
-			for (Player player2: backend_.me().getCurrentGame().getPlayersByTeam(2)){
+			System.out.println("Printing team 2");
+			team = backend_.me().getCurrentGame().getPlayersByTeam(2);
+			for (Player player2: team){
+				System.out.println("Printing player's name "+player2.getName());
 				team2_.append(player2.getName()+"\n");
 			}
 			team2_.repaint();
 		}
+		System.out.println("Finished rendering text info for client named "+backend_.me().getName());
 	}
 	
 	public void reset(){
@@ -179,16 +187,20 @@ public class RoomMenu extends JPanel {
 		if (backend_.me()!= null ){
 			System.out.println(backend_.me().getName());
 		}
-		activeGames_ = backend_.getActiveGames();;
+		activeGames_ = backend_.getActiveGames();
 		roomPanel_.removeAll();
 		for (Game game : activeGames_){
 			int gameID = game.getId();
+			System.out.println("Adding game id "+gameID + " to the list");
 			JButton room =  new JButton("Room "+Integer.toString(gameID));
 			room.setFont(new Font("Serif", Font.PLAIN,20));
 			room.addActionListener(new ChooseRoomListener(game));
 			roomPanel_.add(room);
+			System.out.println("Adding room to display for client named "+backend_.me().getName());
 		}
+		System.out.println("Refreshing view "+backend_.me().getName());
 		displayGameInfo();
+		System.out.println("Revalidating and repainting "+backend_.me().getName());
 		roomPanel_.revalidate();
 		roomPanel_.repaint();
 	}
