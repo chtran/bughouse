@@ -157,8 +157,8 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public boolean isMine(int boardId, int x, int y) throws IOException, RequestTimedOutException {
-		return (currentBoards.get(boardId).getPiece(x, y).isWhite()==me.isWhite());
+	public boolean isMine(int x, int y) throws IOException, RequestTimedOutException {
+		return (currentBoards.get(me.getCurrentBoardId()).getPiece(x, y).isWhite()==me.isWhite());
 	}
 	
 }

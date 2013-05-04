@@ -160,12 +160,21 @@ public class BughouseBoard extends JPanel {
 					return;
 				}
 				if (label.getIcon()!= null){
-					source_ = label;
-					originX_ = destX_;
-					originY_ = destY_;
-					System.out.println("Grabbing a piece");
-					this.grabPiece();
-					return;
+					try {
+						if (backend_.isMine(destX_,destY_)){
+							source_ = label;
+							originX_ = destX_;
+							originY_ = destY_;
+							System.out.println("Grabbing a piece");
+							this.grabPiece();
+							return;
+						}
+					}catch (RequestTimedOutException e){
+						JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+								"Timeout Error", JOptionPane.ERROR_MESSAGE);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 				
@@ -225,15 +234,19 @@ public class BughouseBoard extends JPanel {
 			try {
 				backend_.me().put(index_,destX_,destY_);
 				isPuttingPrisoner_ = false;
+				turn_ = false;
 			} catch (IllegalPlacementException e) {
 				isPuttingPrisoner_ = true;
+				turn_ = true;
 				JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
 						"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		
 			} catch (IOException e) {
 				e.printStackTrace();
 				isPuttingPrisoner_ = true;
+				turn_ = true;
 			} catch (RequestTimedOutException e) {
 				isPuttingPrisoner_ = true;
+				turn_ = true;
 				JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
 						"Timeout Error", JOptionPane.ERROR_MESSAGE);
 			}
