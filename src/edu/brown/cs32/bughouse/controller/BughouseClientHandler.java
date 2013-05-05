@@ -148,6 +148,14 @@ public class BughouseClientHandler extends Thread {
 								id = Integer.parseInt(headerSplit[1]);
 								quit(id);
 								break;
+							case "GAME_OVER":
+								msgSplit = headerSplit[1].split("\t");
+								id = Integer.parseInt(msgSplit[0]);
+								team = Integer.parseInt(msgSplit[1]);
+								List<Integer> ids = m_data.getPlayerIdsByTeam(id, team);
+								String message = "BROADCAST:GAME_OVER:"+id;
+								for (int playerId: ids) message+="\t"+m_data.getPlayerName(playerId);
+								m_pool.broadcastToGame(id,message+"\n",this);
 							// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
 							case "PASS":
 								msgSplit = headerSplit[1].split("\t");

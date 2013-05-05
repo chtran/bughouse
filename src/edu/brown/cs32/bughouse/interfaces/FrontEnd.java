@@ -1,10 +1,12 @@
 package edu.brown.cs32.bughouse.interfaces;
 
+import java.util.List;
+
 import edu.brown.cs32.bughouse.models.ChessPiece;
 
 public interface FrontEnd {
 
-	public void showEndGameMessage();
+	public void showEndGameMessage(List<String> winners);
 	public void notifyUserTurn();
 	public void repaint();
 	//Add the piece on front end
