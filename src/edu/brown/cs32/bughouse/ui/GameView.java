@@ -27,6 +27,7 @@ import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
+import edu.brown.cs32.bughouse.models.Player;
 
 public class GameView extends JPanel {
 
@@ -36,13 +37,12 @@ public class GameView extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BughouseBoard userBoard_, otherBoard_;
 	private ChessPieceImageFactory imgFactory_;
-	private JTextArea messageBox_, blackP_, whiteP_;
+	private JTextArea messageBox_, playerList_, whiteP_;
 	private JPanel prison_;
 	private List<ChessPiece> myPrisoners_;
 	private BackEnd backend_;
 	private int myBoardID_, otherBoardID_;
 	private JPanel selectedPrisoner_;
-	private Border unselectedPrisonerBorder_;
 
 	public GameView(BackEnd backend) throws IOException, RequestTimedOutException, GameNotReadyException{
 		super(new BorderLayout());
@@ -63,7 +63,9 @@ public class GameView extends JPanel {
 	}
 	
 	public void notifyEndGame(){
-		JOptionPane.showMessageDialog(userBoard_, "Game Over", "Finished", JOptionPane.OK_OPTION);
+		System.out.println("The game has ended");
+		JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+				"Timeout Error", JOptionPane.ERROR_MESSAGE);
 		
 	} 
 	
@@ -98,7 +100,17 @@ public class GameView extends JPanel {
 	}
 	
 	public void displayPlayerName() throws IOException, RequestTimedOutException{
-		//To DO: Display name of player on board
+		List<Player> team1 = backend_.me().getCurrentGame().getPlayersByTeam(1);
+		List<Player> team2 = backend_.me().getCurrentGame().getPlayersByTeam(2);
+		playerList_.append("Team 1: \n");
+		for (Player player : team1){
+			playerList_.append(player.getName()+"\n");
+		}
+		playerList_.append("Team 2: \n");
+		for (Player player: team2){
+			playerList_.append(player.getName()+"\n");
+		}
+		
 	}
 	
 	
@@ -125,12 +137,10 @@ public class GameView extends JPanel {
 		JPanel options = new JPanel(new BorderLayout());
 		JPanel optionMiddle = new JPanel(new BorderLayout());
 		options.setPreferredSize(new Dimension(250,190));
-		blackP_ = new JTextArea();
-		 whiteP_ = new JTextArea();
-		blackP_.setEditable(false);
-		whiteP_.setEditable(false);
-		blackP_.setPreferredSize(new Dimension(200,50));
-		whiteP_.setPreferredSize(new Dimension(200,50));
+		playerList_ = new JTextArea();
+		playerList_.setEditable(false);
+		playerList_.setPreferredSize(new Dimension(200,150));
+		playerList_.setBorder(new LineBorder(Color.BLACK,1));
 		messageBox_ = new JTextArea();
 		messageBox_.setPreferredSize(new Dimension(200,190));
 		messageBox_.setEditable(false);
@@ -159,15 +169,18 @@ public class GameView extends JPanel {
 		optionMiddle.add(messageBox_, BorderLayout.CENTER);
 		optionMiddle.add(quit, BorderLayout.SOUTH);
 		options.add(optionMiddle,BorderLayout.CENTER);
-		options.add(blackP_, BorderLayout.NORTH);
-		options.add(whiteP_, BorderLayout.SOUTH);
+		options.add(playerList_, BorderLayout.NORTH);
 		return options;
 	}
 	
 	private JComponent createPieceHolder(){
+		JPanel prisonPanel = new JPanel(new BorderLayout());
+		JLabel prisonPanelHeader = new JLabel("Pieces that you can put down");
+		prisonPanel.add(prisonPanelHeader,BorderLayout.NORTH);
 		prison_ = new JPanel();
 		prison_.setPreferredSize(new Dimension(200,110));
-		return prison_;
+		prisonPanel.add(prison_);
+		return prisonPanel;
 	}
 	
 	public void updatePrison(){
@@ -226,14 +239,20 @@ public class GameView extends JPanel {
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			if (selectedPrisoner_ != null){
-				selectedPrisoner_.setBorder(unselectedPrisonerBorder_);
-				unselectedPrisonerBorder_ =  null;
+			if (userBoard_.isMyTurn()){
+				JPanel current = (JPanel) e.getSource();
+				if (selectedPrisoner_ != null){
+					selectedPrisoner_.setBorder(null);
+					if (selectedPrisoner_ == current){
+						selectedPrisoner_ = null;
+						userBoard_.setPrisonertoPut(null, 0, false);
+						return;
+					}					
+				}
+				selectedPrisoner_ = current;
+				selectedPrisoner_.setBorder(new LineBorder(Color.RED,3));	
+				userBoard_.setPrisonertoPut(piece_,index_,true);
 			}
-			selectedPrisoner_ = (JPanel) e.getSource();
-			unselectedPrisonerBorder_ = selectedPrisoner_.getBorder();
-			selectedPrisoner_.setBorder(new LineBorder(Color.RED,3));	
-			userBoard_.setPrisonertoPut(piece_,index_);
 		}
 
 		@Override

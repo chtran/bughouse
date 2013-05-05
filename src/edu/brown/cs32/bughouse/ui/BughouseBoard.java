@@ -69,7 +69,7 @@ public class BughouseBoard extends JPanel {
 		if (turn_){
 			System.out.println("ITS YOUR TURN");
 		}
-		this.requestFocus();
+		this.grabFocus();
 	}
 	
 	public void piecePut(Icon piece,int playerId, int x, int y){
@@ -86,10 +86,14 @@ public class BughouseBoard extends JPanel {
 		System.out.printf("Just moved piece from %d,%d to %d,%d", from_x,from_y,to_x,to_y);
 	}
 	
-	public void setPrisonertoPut(ChessPiece piece, int index)	{
+	public void setPrisonertoPut(ChessPiece piece, int index, boolean flag)	{
 		this.selectedPrisoner_ = piece;
-		this.isPuttingPrisoner_ = true;
+		this.isPuttingPrisoner_ = flag;
 		this.index_ = index;
+	}
+	
+	public boolean isMyTurn(){
+		return turn_;
 	}
 	
 /*
