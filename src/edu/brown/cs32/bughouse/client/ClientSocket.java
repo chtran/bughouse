@@ -59,10 +59,6 @@ public class ClientSocket{
 						e.printStackTrace();
 					} catch (RequestTimedOutException e) {
 						System.out.println("ERROR: Request timed out in traffic handling thread");
-						e.printStackTrace();
-					} catch (IllegalPlacementException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
 				}
 			}

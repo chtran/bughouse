@@ -54,6 +54,8 @@ public class Player extends Model {
 		return null;
 	}
 	public void put(int index, int x, int y) throws IllegalPlacementException, IOException, RequestTimedOutException {
+		if (currentBoard.isOccupied(x, y)) throw new IllegalPlacementException();
+
 		client.put(getCurrentBoardId(), id, index, x, y);
 	}
 	public void pass(ChessPiece piece) throws IOException, RequestTimedOutException {
