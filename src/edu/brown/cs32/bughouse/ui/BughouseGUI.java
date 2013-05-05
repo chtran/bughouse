@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -128,7 +129,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	 * notifies the user in the information box that the game has ended.
 	 */
 	@Override
-	public void showEndGameMessage() {
+	public void showEndGameMessage(List<String> winners) {
 		if (game_ != null){
 			game_.notifyEndGame();
 		}	

@@ -152,6 +152,7 @@ public class BughouseClient implements Client {
 	public void quit(int playerId) throws IOException, RequestTimedOutException {
 		socket.getResponse(String.format("QUIT:%d\n", playerId));
 	}
+	
 	@Override
 	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String[] splitted = message.split(":");
@@ -179,6 +180,9 @@ public class BughouseClient implements Client {
 				break;
 			case "PUT":
 				put(message);
+				break;
+			case "GAME_OVER":
+				notifyGameOver(message);
 				break;
 			default:
 				System.out.println("Unknown broadcast message: "+message);
@@ -255,6 +259,14 @@ public class BughouseClient implements Client {
 		int playerId = Integer.parseInt(splitted[1]);
 		int chessPieceType = Integer.parseInt(splitted[2]);
 		backend.notifyNewPrisoner(playerId, chessPieceType);
+	}
+	private void notifyGameOver(String message) {
+		String body = message.split(":")[2];
+		String[] splitted = body.split("\t");
+		List<String> winners = new ArrayList<String>();
+		winners.add(splitted[1]);
+		winners.add(splitted[2]);
+		backend.frontEnd().showEndGameMessage(winners);
 	}
 	@Override
 	public void shutdown() throws IOException {

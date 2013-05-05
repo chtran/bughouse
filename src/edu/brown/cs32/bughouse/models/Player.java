@@ -35,12 +35,12 @@ public class Player extends Model {
 	}
 	public void move(int from_x, int from_y, int to_x, int to_y) throws IllegalMoveException, IOException, RequestTimedOutException, WrongColorException {
 		ChessPiece captured = currentBoard.movePiece(isWhite(),from_x, from_y, to_x, to_y);
-		if (captured!=null) {
-			pass(captured);
-			if (captured.isKing()) {
-				client.gameOver(getCurrentGame().getId(), client.getCurrentTeam(getId()));
-			}
+		if (captured!=null && captured.isKing()) {
+			client.gameOver(getCurrentGame().getId(), client.getCurrentTeam(getId()));
+			return;
 		}
+		client.move(getCurrentBoardId(),from_x, from_y, to_x, to_y);
+		if (captured!=null)	pass(captured);
 	}
 	public boolean isWhite() throws IOException, RequestTimedOutException {
 		return client.isWhite(id);

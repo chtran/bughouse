@@ -65,11 +65,7 @@ public class ChessBoard extends Model {
 		if (!canMove(from_x,from_y,to_x,to_y)) throw new IllegalMoveException();
 		if (board[from_x][from_y].isWhite()!=isWhite) throw new WrongColorException();
 
-		ChessPiece captured = board[to_x][to_y];
-
-		client.move(id,from_x, from_y, to_x, to_y);
-
-		return captured;
+		return board[to_x][to_y];
 	}
 	
 	public void pieceMoved(int from_x, int from_y, int to_x, int to_y) {

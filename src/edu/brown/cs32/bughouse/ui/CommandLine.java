@@ -191,8 +191,8 @@ public class CommandLine implements FrontEnd{
 	}
  
 	@Override
-	public void showEndGameMessage() {
-		System.out.println("Game ended.");
+	public void showEndGameMessage(List<String> winners) {
+		System.out.printf("%s and %s won!",winners.get(0), winners.get(1));
 	}
 
 	@Override
@@ -217,7 +217,6 @@ public class CommandLine implements FrontEnd{
 		
 	}
 	public void addPrisoner(ChessPiece piece) {
-		String name;
 		try {
 			System.out.printf("%s got a new %s\n",backend.me().getName(),piece.getName());
 		} catch (IOException e) {

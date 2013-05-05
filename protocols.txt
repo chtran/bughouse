@@ -150,3 +150,6 @@ your_turn:
 add_prisoner:
     + Message: BROADCAST:ADD_PRISONER:[playerId]\t[chessPieceType]\n
 
+game_over:
+    + Message: BROADCAST:GAME_OVER:[gameId]\t[player1]\t[player2]\n
+
