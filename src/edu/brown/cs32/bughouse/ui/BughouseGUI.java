@@ -130,7 +130,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void showEndGameMessage() {
 		if (game_ != null){
-			game_.notifyEndGame();
+		//	game_.notifyEndGame();
 		}	
 	}
 	
