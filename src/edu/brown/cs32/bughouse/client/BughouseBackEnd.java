@@ -145,7 +145,7 @@ public class BughouseBackEnd implements BackEnd {
 	}
 
 	@Override
-	public void notifyPut(int boardId, int playerId, int index,int x, int y) throws IllegalPlacementException, IOException, RequestTimedOutException {
+	public void notifyPut(int boardId, int playerId, int index,int x, int y) throws IOException, RequestTimedOutException {
 		ChessPiece piece = prisoners.get(playerId).remove(index);
 		frontEnd.piecePut(boardId, playerId, piece, x, y);
 		currentBoards.get(new Player(playerId).getCurrentBoardId()).put(piece, x, y);

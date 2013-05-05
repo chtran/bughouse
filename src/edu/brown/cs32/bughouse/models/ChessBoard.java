@@ -77,8 +77,7 @@ public class ChessBoard extends Model {
 		board[from_x][from_y]=null;
 	}
 	
-	public void put(ChessPiece piece, int x, int y) throws IllegalPlacementException {
-		if (board[x][y]!=null) throw new IllegalPlacementException();
+	public void put(ChessPiece piece, int x, int y) {
 		board[x][y]=piece;
 		
 	}

@@ -153,7 +153,7 @@ public class BughouseClient implements Client {
 		socket.getResponse(String.format("QUIT:%d\n", playerId));
 	}
 	@Override
-	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException, IllegalPlacementException {
+	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String[] splitted = message.split(":");
 		switch (splitted[1]) {
 			case "MOVE":
@@ -238,7 +238,7 @@ public class BughouseClient implements Client {
 		backend.frontEnd().pieceMoved(boardId, from_x, from_y, to_x, to_y);
 		backend.updateBoard(boardId, from_x, from_y, to_x, to_y);
 	}
-	private void put(String message) throws IllegalPlacementException, IOException, RequestTimedOutException {
+	private void put(String message) throws IOException, RequestTimedOutException {
 		String body = message.split(":")[2];
 		String[] splitted = body.split("\t"); 
 		int boardId = Integer.parseInt(splitted[0]);

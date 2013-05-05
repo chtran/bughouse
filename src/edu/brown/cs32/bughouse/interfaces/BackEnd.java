@@ -28,7 +28,7 @@ public interface BackEnd {
 	public void createGame() throws IOException, RequestTimedOutException;
 	public void quit() throws IOException, RequestTimedOutException;
 	public void notifyNewPrisoner(int playerId, int chessPieceType) throws IOException, RequestTimedOutException;
-	public void notifyPut(int boardId, int playerId, int index,int x, int y) throws IllegalPlacementException, IOException, RequestTimedOutException;
+	public void notifyPut(int boardId, int playerId, int index,int x, int y) throws IOException, RequestTimedOutException;
 	public Player me();
 	public void shutdown() throws IOException;
 	public List<ChessPiece> getPrisoners(int playerId);
