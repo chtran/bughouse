@@ -1,6 +1,7 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.CardLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -68,8 +69,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (RequestTimedOutException e1) {
-					JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-							"Connection timed out", JOptionPane.ERROR_MESSAGE);
+					showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
+
 				}
 				System.exit(0);
 			}
@@ -127,16 +128,16 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void showEndGameMessage(List<String> winners) {
 		if (game_ != null){
-			showMyPane("End game", JOptionPane.INFORMATION_MESSAGE);
+			showMyPane(game_,"End game", JOptionPane.INFORMATION_MESSAGE);
 			System.out.println("Game ended");
 		}	
 	}
-	public static void showMyPane(final String TEXT, final int type) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	public synchronized static void showMyPane(final Component parent, final String text, final int type) {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(null, TEXT 
-                      + "\n is on EDT: " + SwingUtilities.isEventDispatchThread(), TEXT,
+                JOptionPane.showMessageDialog(parent, text 
+                      + "\n is on EDT: " + SwingUtilities.isEventDispatchThread(), text,
                         type);
             }
         });
@@ -152,12 +153,12 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			e.printStackTrace();
 			return null;
 		} catch (RequestTimedOutException e) {
-			showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+			showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
 			/*JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
 					"Connection timed out", JOptionPane.ERROR_MESSAGE);*/
 			return null;
 		} catch (GameNotReadyException e) {
-			showMyPane("not enough players", JOptionPane.ERROR_MESSAGE);
+			showMyPane(null, "not enough players", JOptionPane.ERROR_MESSAGE);
 			/*JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
 					"Cannot start game", JOptionPane.ERROR_MESSAGE);*/
 			return null;
@@ -215,7 +216,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
-			showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+			showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
 			/*JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
 					"Time out error", JOptionPane.ERROR_MESSAGE);
 			return;*/
@@ -243,7 +244,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		System.out.println("RECEIVING notifyNewOwner");
 		try {
 			if (backend_.me().getCurrentBoardId()== gameId){
-				showMyPane("New owner", JOptionPane.OK_OPTION);
+				showMyPane(game_,"New owner", JOptionPane.OK_OPTION);
 				/*JOptionPane.showMessageDialog(this, "You are currently the owner of the game. You can click on Start" +
 						"to begin the game once both teams are full", 
 					"Game Owner", JOptionPane.OK_OPTION);*/
@@ -253,7 +254,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
-			showMyPane("time out", JOptionPane.ERROR_MESSAGE);
+			showMyPane(null, "time out", JOptionPane.ERROR_MESSAGE);
 			/*JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
 					"Time out error", JOptionPane.ERROR_MESSAGE);*/
 		}
@@ -270,7 +271,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void updatePlayerList() {
 		//TO DO : update the player list
-		
 	}
 
 }

@@ -151,6 +151,7 @@ public class BughouseClientHandler extends Thread {
 								msgSplit = headerSplit[1].split("\t");
 								id = Integer.parseInt(msgSplit[0]);
 								team = Integer.parseInt(msgSplit[1]);
+								send("\n");
 								gameOver(id, team);
 								break;
 							// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
@@ -169,11 +170,12 @@ public class BughouseClientHandler extends Thread {
 				} else {
 					// client quit
 					kill();
+					break;
 				}
 			}
 		} catch (Exception e) {
 			try {
-				e.printStackTrace();
+				//e.printStackTrace();
 				kill();
 			} catch (Exception e2) {
 				e.printStackTrace();

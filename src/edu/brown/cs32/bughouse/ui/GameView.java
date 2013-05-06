@@ -60,9 +60,8 @@ public class GameView extends JPanel {
 	
 	
 	public void addPrisoner (ChessPiece prisoner){
-		JOptionPane.showMessageDialog(userBoard_, "You have received a "+prisoner.getName()+" " +
-				"from your teammate!");
-
+		BughouseGUI.showMyPane(userBoard_, "You have received a "+prisoner.getName()+" " +
+				"from your teammate!", JOptionPane.OK_CANCEL_OPTION);
 	}
 	
 	public void notifyEndGame(List<String> winners) {
@@ -165,17 +164,17 @@ public class GameView extends JPanel {
 						backend_.startGame();
 					} catch (IOException e1) {
 					} catch (RequestTimedOutException e1) {
-						BughouseGUI.showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
 						/*JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
 								"Connection time out", JOptionPane.ERROR_MESSAGE);
 						return;*/
 					} catch (GameNotReadyException e1) {
-						BughouseGUI.showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
 						/*JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
 								"Cannot start game", JOptionPane.ERROR_MESSAGE);
 						return;*/
 					} catch (UnauthorizedException e1) {
-						BughouseGUI.showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
 						/*JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
 								"Authorization error", JOptionPane.ERROR_MESSAGE);
 						return;*/
