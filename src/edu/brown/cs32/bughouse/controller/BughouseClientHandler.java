@@ -171,10 +171,17 @@ public class BughouseClientHandler extends Thread {
 						}
 						System.out.println("Unknown message " + msg);
 					}
+				} else {
+					// client quit
+					kill();
 				}
-			}// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				kill();
+			} catch (Exception e2) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -487,41 +494,50 @@ public class BughouseClientHandler extends Thread {
 		//}
 		send(gameId + "\n");
 	}
+	
 	/**
 	    - Set current gameId of the player to -1
         - Remove the player from the game's player list
         - Broadcast a quit message to all the players in the room
     + Response:
-        - "QUIT_OK:[playerId]\n" if everything went well
+        - "QUIT_OK\n" if everything went well
+        - "QUIT_FAILED\n" if failed
 	 * @param id
 	 */
 	public void quit(int playerId) {
 		int gameID = m_data.getCurrentGame(playerId);
 		if (gameID >= 0) {
-			// TODO: broadcast message for everyone: BROADCAST:LEAVE_GAME:[playerId]\t[gameId]
-			String msg = String.format("BROADCAST:LEAVE_GAME:%d\t%d\n", playerId, gameID);
-			
 			boolean isOwner = m_data.getGameOwner(gameID) == playerId ? true : false;
 			boolean gameStarted = m_data.gameIsActive(gameID) ? false : true;
 			boolean roomEmpty = m_data.numPlayers(gameID) == 1 ? true : false;
-			
+			String msg;
+					
 			if (gameStarted) {
 				// resets all players and deletes game
 				m_data.playerQuit(playerId);
 				msg = String.format("BROADCAST:GAME_CANCELED:%d\n", gameID);			
 				m_pool.broadcastToGame(gameID, msg, this);
-//				send("QUIT_OK\n");
 			} else if (!gameStarted && isOwner && roomEmpty) {
+				// game becomes empty so delete from server and reset owner
 				m_data.playerQuit(playerId);
 				msg = String.format("BROADCAST:GAME_DELETED:%d\n", gameID);
 				m_pool.broadcast(msg, this);
 			} else if (!gameStarted && isOwner && !roomEmpty) {
+				// game not started and player is owner so new owner must be assigned
+				// new owner color changes to white
 				int newOwner = m_data.setNewOwner(gameID);
 				msg = String.format("BROADCAST:NEW_OWNER:%d\n", gameID);
 				m_pool.sendToPlayer(newOwner, msg);
 			} else {
 				m_data.removePlayerFromGame(playerId);
 			}
+			send("QUIT_OK\n");
+			
+			// broadcast message for everyone: BROADCAST:LEAVE_GAME:[playerId]\t[gameId]
+			msg = String.format("BROADCAST:LEAVE_GAME:%d\t%d\n", playerId, gameID);
+			m_pool.broadcast(msg, this);
+		} else {
+			send("QUIT_FAILED\n");
 		}
 	}
 	
@@ -544,6 +560,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void kill() throws IOException {
 		//TODO: Close all the streams after the client disconnects.
+		System.out.println("Client disconnected.");
 		m_input.close();
 		m_output.close();
 		m_client.close();

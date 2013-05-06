@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class ServerData {
 	private Map<Integer, GameInfo> m_games;
@@ -371,8 +370,7 @@ public class ServerData {
 		int gameID;
 		if ((gameID = p.getGameId()) >= 0) {
 			GameInfo g = m_games.get(gameID);
-			// TODO: fancy logic to remove this player from game and keep board assignment logic ok aka
-			// shuffle people around
+			g.removePlayer(p);
 			 
 			// reset player
 			p.setBoardId(-1);
