@@ -75,18 +75,20 @@ public class GameInfo {
 		
 		boolean isWhite;
 		if (teamNum == 1) {
-			if (m_team1.size() > 0)
-				isWhite = false;
-			else
+			if (m_team1.size() > 0) {
+				isWhite = m_team1.get(0).getColor() ? false : true;
+			} else {
 				isWhite = true;
+			}
 			
 			player.setColor(isWhite);
 			m_team1.add(player);
 		} else {
-			if (m_team2.size() > 0)
-				isWhite = false;
-			else
+			if (m_team2.size() > 0) {
+				isWhite = m_team2.get(0).getColor() ? false : true;
+			} else {
 				isWhite = true;
+			}
 			
 			player.setColor(isWhite);
 			m_team2.add(player);
@@ -260,18 +262,33 @@ public class GameInfo {
 		PlayerInfo p;
 		if (m_team1.size() == 2) {
 			p = m_team1.get(1);
-			p.setColor(true);
 		} else {
 			p = m_team2.get(0);
+			m_team2.remove(p);
+			m_team1.add(0, p);
 		}
+		
+		// set to white because game owner
+		p.setColor(true);
 		
 		// reset prev owner to remove from game
 		prev.setBoardId(-1);
 		prev.setGameId(-1);
 		prev.setTeamId(-1);
 		
-		m_team1.remove(0); // remove previous owner from game
+		m_team1.remove(prev); // remove previous owner from game
 		m_ownerId = p.getId();
 		return m_ownerId;
+	}
+
+	/**
+	 * Removes player from game
+	 * @param playerId
+	 */
+	public void removePlayer(PlayerInfo p) {
+		if (m_team1.contains(p))
+			m_team1.remove(p);
+		else if (m_team2.contains(p))
+			m_team2.remove(p);		
 	}
 }
