@@ -13,6 +13,8 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import edu.brown.cs32.bughouse.client.BughouseBackEnd;
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
@@ -128,7 +130,16 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			game_.notifyEndGame(winners);
 		}	
 	}
-	
+	public static void showMyPane(final String TEXT) {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(null, TEXT 
+                      + "\n is on EDT: " + SwingUtilities.isEventDispatchThread(), TEXT,
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+    }
 	/*
 	 * sets up the game view for the user.
 	 */
