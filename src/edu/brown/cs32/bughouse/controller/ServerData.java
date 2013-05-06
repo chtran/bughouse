@@ -259,7 +259,7 @@ public class ServerData {
 	 * does nothing.
 	 * @param id
 	 */
-	public void playerQuit(int id) {
+	public void endGame(int id) {
 		synchronized (m_lock) {
 			PlayerInfo p = m_players.get(id);
 			if (p != null) {
