@@ -156,6 +156,7 @@ public class BughouseClientHandler extends Thread {
 								String message = "BROADCAST:GAME_OVER:"+id;
 								for (int playerId: ids) message+="\t"+m_data.getPlayerName(playerId);
 								m_pool.broadcastToGame(id,message+"\n",this);
+								break;
 							// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
 							case "PASS":
 								msgSplit = headerSplit[1].split("\t");
@@ -168,6 +169,7 @@ public class BughouseClientHandler extends Thread {
 							default:
 								System.out.println("Unknown message " + msg);
 						}
+						System.out.println("Unknown message " + msg);
 					}
 				}
 			}// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n

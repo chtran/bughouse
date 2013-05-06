@@ -42,10 +42,13 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			this.backend_ = new BughouseBackEnd(this,argv[0],new Integer(argv[1]));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
+			System.exit(1);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
+			System.exit(1);
 		} catch (IOException e) {
 			System.out.println("Failed to connect to the server.");
+			System.exit(1);
 		}
 		content_ = this.getContentPane();
 		content_.setLayout(new CardLayout());
@@ -67,34 +70,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			}
 			
 		};
-		Runnable r2 = new Runnable() {
-
-			@Override
-			public void run() {
-				BughouseGUI u1 = new BughouseGUI(argv);
-			}
-			
-		};
-		Runnable r3 = new Runnable() {
-
-			@Override
-			public void run() {
-				BughouseGUI u1 = new BughouseGUI(argv);
-			}
-			
-		};
-		Runnable r4 = new Runnable() {
-
-			@Override
-			public void run() {
-				BughouseGUI u1 = new BughouseGUI(argv);
-			}
-			
-		};
+		
 		new Thread(r1).start();
-		new Thread(r2).start();
-		new Thread(r3).start();
-		new Thread(r4).start();
+	
 
 	}
 	

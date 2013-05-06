@@ -65,7 +65,7 @@ public class BughouseBoard extends JPanel {
 	
 	public void startTurn(){
 		turn_ = true;
-	//JOptionPane.showMessageDialog(this, "Your turn");
+	JOptionPane.showMessageDialog(this, "Your turn");
 		if (turn_){
 			System.out.println("ITS YOUR TURN");
 		}
