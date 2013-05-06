@@ -364,7 +364,10 @@ public class BughouseClientHandler extends Thread {
 		} else if (m_data.startGame(gameId)) {
 			send("GAME_STARTED:" + gameId + "\n");
 			m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
-			send("BROADCAST:YOUR_TURN\n");
+			
+			int next = m_data.getNextTurn(gameId);
+			System.out.println("Next turn: " + next);
+			m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 		} else {
 			send("NOT_READY:" + gameId + "\n");
 		}
