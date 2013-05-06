@@ -74,14 +74,15 @@ public class ServerData {
 	/**
 	 * Adds new user to the server data
 	 * @param name Name of new player
+	 * @return ID of new player
 	 */
-	public PlayerInfo addPlayer(String name) {
+	public int addPlayer(String name) {
 		synchronized (m_lock) {
 			int id = m_nextPlayerId;
 			m_nextPlayerId++;
 			PlayerInfo p = new PlayerInfo(name, id);
 			m_players.put(id, p);
-			return p;
+			return id;
 		}
 	}
 	
@@ -256,9 +257,9 @@ public class ServerData {
 	 * Sets given player and all players in same game to initialized gameID, 
 	 * boardID, and teamNum values and deletes game. If given player not in game,
 	 * does nothing.
-	 * @param id
+	 * @param id ID of player ending game
 	 */
-	public void playerQuit(int id) {
+	public void endGame(int id) {
 		synchronized (m_lock) {
 			PlayerInfo p = m_players.get(id);
 			if (p != null) {
@@ -267,7 +268,7 @@ public class ServerData {
 					GameInfo g = m_games.get(gameID);
 					if (g != null) {
 						g.resetPlayers();
-						m_games.remove(g);
+						m_games.remove(gameID);
 					}
 				}
 			}
@@ -377,5 +378,13 @@ public class ServerData {
 			p.setGameId(-1);
 			p.setTeamId(-1);
 		}
+	}
+
+	/**
+	 * Removes player from server
+	 * @param id
+	 */
+	public void deletePlayer(int id) {
+		m_players.remove(id);
 	}
 }

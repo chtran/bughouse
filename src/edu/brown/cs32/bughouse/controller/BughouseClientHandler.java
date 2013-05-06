@@ -15,7 +15,8 @@ public class BughouseClientHandler extends Thread {
 	private PrintWriter m_output;
 	
 	private ServerData m_data;
-	private PlayerInfo m_playerInfo;
+	private int m_playerId = -1;
+	private int m_gameId = -1;
 	
 	/**
 	 * Constructs a {@link BughouseClientHandler} on the given client with the given pool.
@@ -33,7 +34,6 @@ public class BughouseClientHandler extends Thread {
 		m_pool = pool;
 		m_client = client;
 		m_data = data;
-		m_playerInfo = null;
 		
 		//TODO: Set up the buffered reader for the sockets to communicate with
 		m_input = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -54,8 +54,6 @@ public class BughouseClientHandler extends Thread {
 			while (true) {
 				if ((msg = m_input.readLine()) != null) {
 					System.out.println("RECEIVED: " + msg);
-					if (m_playerInfo != null)
-						System.out.println("m_playerInfo " + m_playerInfo.getId() + " " + m_playerInfo.getName());
 					headerSplit = msg.split(":");
 					if (msg.compareTo("GET_GAMES:") ==0)
 						sendGameList();
@@ -148,14 +146,12 @@ public class BughouseClientHandler extends Thread {
 								id = Integer.parseInt(headerSplit[1]);
 								quit(id);
 								break;
+							// GAME_OVER:[gameId]\t[teamId]\n
 							case "GAME_OVER":
 								msgSplit = headerSplit[1].split("\t");
 								id = Integer.parseInt(msgSplit[0]);
 								team = Integer.parseInt(msgSplit[1]);
-								List<Integer> ids = m_data.getPlayerIdsByTeam(id, team);
-								String message = "BROADCAST:GAME_OVER:"+id;
-								for (int playerId: ids) message+="\t"+m_data.getPlayerName(playerId);
-								m_pool.broadcastToGame(id,message+"\n",this);
+								gameOver(id, team);
 								break;
 							// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
 							case "PASS":
@@ -185,14 +181,30 @@ public class BughouseClientHandler extends Thread {
 	}
 
 	/**
+	 * Sends game over message to all players in game, removes game
+	 * from server and resets all players.
+	 * @param id gameID of game that ended
+	 * @param team Winning team
+	 */
+	private void gameOver(int id, int team) {
+		m_data.endGame(m_playerId);
+		
+		List<Integer> ids = m_data.getPlayerIdsByTeam(id, team);
+		String message = "BROADCAST:GAME_OVER:"+id;
+		for (int playerId: ids) 
+			message+="\t"+m_data.getPlayerName(playerId);
+		
+		m_pool.broadcastToGame(id,message+"\n",this);
+	}
+
+	/**
 	 * Broadcasts put message to all players in the game 
 	 * @param msg
 	 */
 	private void sendPutMessage(String msg) {
-		int gameId = m_playerInfo.getGameId();
 		send("\n");
-		m_pool.broadcastToGame(gameId, "BROADCAST:" + msg + "\n", this);
-		int next = m_data.getNextTurn(gameId);
+		m_pool.broadcastToGame(m_gameId, "BROADCAST:" + msg + "\n", this);
+		int next = m_data.getNextTurn(m_gameId);
 		System.out.println("Next turn: " + next);
 		m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 	}
@@ -202,11 +214,7 @@ public class BughouseClientHandler extends Thread {
 	 * @return ID or -1 if m_playerInfo not set
 	 */
 	public int getGameId() {
-		System.out.println("m_playerInfo: "+m_playerInfo);
-		if (m_playerInfo != null)
-			return m_playerInfo.getGameId();
-		else
-			return -1;
+		return m_gameId;
 	}
 	
 	/**
@@ -214,10 +222,7 @@ public class BughouseClientHandler extends Thread {
 	 * @return ID or -1 if m_playerInfo not set
 	 */
 	public int getPlayerId() {
-		if (m_playerInfo != null)
-			return m_playerInfo.getId();
-		else
-			return -1;
+		return m_playerId;
 	}
 	
 	/**
@@ -228,21 +233,19 @@ public class BughouseClientHandler extends Thread {
 	 * @param msg Message to broadcast to other players in game
 	 */
 	private void move(String msg) {
-		System.out.println("Player " + m_playerInfo.getId() + " " + m_playerInfo.getName() + " moved");
-		int gameID = m_playerInfo.getGameId();
-		if (gameID > 0) {
+		if (m_gameId > 0) {
 			// MOVE:[boardID]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 				String ret = "BROADCAST:" + msg + "\n";
-				m_pool.broadcastToGame(gameID, ret, this);
+				m_pool.broadcastToGame(m_gameId, ret, this);
 				send("MOVE_OK\n");
 					
 				// notify player with next turn
-				int next = m_data.getNextTurn(gameID);
+				int next = m_data.getNextTurn(m_gameId);
 				System.out.println("Next turn: " + next);
 				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			
 		} else {
-			System.out.println("GameId incorrect: "+gameID);
+			System.out.println("GameId incorrect: "+ m_gameId);
 			send("MOVE_FAILED\n");
 		}
 	}
@@ -306,12 +309,11 @@ public class BughouseClientHandler extends Thread {
 	 * @param name Name of new player
 	 */
 	private void addPlayer(String name) {
-		PlayerInfo p = m_data.addPlayer(name);
-		System.out.println("Setting m_playerInfo to "+ p.getId() + " " + p.getName());
-		m_playerInfo = p;
-		int id = p.getId();
-		m_pool.addToMap(id, this);
-		send(id + "\n");
+		int p = m_data.addPlayer(name);
+		System.out.println("Setting m_playerId to "+ p);
+		m_playerId = p;
+		m_pool.addToMap(m_playerId, this);
+		send(m_playerId + "\n");
 	}
 
 	/**
@@ -324,6 +326,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addPlayerToGame(int playerId, int gameId, int teamNum) {
 		if (m_data.addPlayerToGame(playerId, gameId, teamNum)) {
+			m_gameId = gameId;
 			send("GAME_JOINED\n");
 			m_pool.broadcast("BROADCAST:JOIN_GAME:" + playerId + "\t" + gameId + "\n", this);
 		} else {
@@ -358,13 +361,15 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void startGame(int gameId) {
 		// send unauthorized message if client not game owner
-		System.out.println("m_playerInfo: " + m_playerInfo.getId() + " " + m_playerInfo.getName());
-		if (m_data.getGameOwner(gameId) != m_playerInfo.getId()) {
+		if (m_data.getGameOwner(gameId) != m_playerId) {
 			send("UNAUTHORIZED:" + gameId + "\n");
 		} else if (m_data.startGame(gameId)) {
 			send("GAME_STARTED:" + gameId + "\n");
 			m_pool.broadcast("BROADCAST:GAME_STARTED:" + gameId + "\n", this);
-			send("BROADCAST:YOUR_TURN\n");
+			
+			int next = m_data.getNextTurn(gameId);
+			System.out.println("Next turn: " + next);
+			m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 		} else {
 			send("NOT_READY:" + gameId + "\n");
 		}
@@ -504,22 +509,26 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	public void quit(int playerId) {
-		System.out.println("Player #"+playerId+" quitting");
+		System.out.println("Player " + playerId + " is quitting");
 		int gameID = m_data.getCurrentGame(playerId);
 		if (gameID >= 0) {
 			boolean isOwner = m_data.getGameOwner(gameID) == playerId ? true : false;
 			boolean gameStarted = m_data.gameIsActive(gameID) ? false : true;
 			boolean roomEmpty = m_data.numPlayers(gameID) == 1 ? true : false;
 			String msg;
+			
+			System.out.println("Is owner: " + isOwner);
+			System.out.println("Game started: " + gameStarted);
+			System.out.println("Room empty: " + roomEmpty);
 					
 			if (gameStarted) {
 				// resets all players and deletes game
-				m_data.playerQuit(playerId);
+				m_data.endGame(playerId);
 				msg = String.format("BROADCAST:GAME_CANCELED:%d\n", gameID);			
 				m_pool.broadcastToGame(gameID, msg, this);
 			} else if (!gameStarted && isOwner && roomEmpty) {
 				// game becomes empty so delete from server and reset owner
-				m_data.playerQuit(playerId);
+				m_data.endGame(playerId);
 				msg = String.format("BROADCAST:GAME_DELETED:%d\n", gameID);
 				m_pool.broadcast(msg, this);
 			} else if (!gameStarted && isOwner && !roomEmpty) {
@@ -531,6 +540,8 @@ public class BughouseClientHandler extends Thread {
 			} else {
 				m_data.removePlayerFromGame(playerId);
 			}
+			
+			m_gameId = -1;
 			send("QUIT_OK\n");
 			
 			// broadcast message for everyone: BROADCAST:LEAVE_GAME:[playerId]\t[gameId]
@@ -561,6 +572,10 @@ public class BughouseClientHandler extends Thread {
 	public void kill() throws IOException {
 		//TODO: Close all the streams after the client disconnects.
 		System.out.println("Client disconnected.");
+		if (m_playerId >= 0) {
+			m_data.deletePlayer(m_playerId);
+			System.out.println("Deleted player " + m_playerId);
+		}
 		m_input.close();
 		m_output.close();
 		m_client.close();

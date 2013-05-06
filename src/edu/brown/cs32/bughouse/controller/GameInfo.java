@@ -12,7 +12,7 @@ public class GameInfo {
 	private List<PlayerInfo> m_team2; // Team 2: {white, black}
 	
 	// 0 -> Team 1 white, 1 -> Team 2 black, 2 -> Team 1 black, 3 -> Team 2 white
-	private int m_turn = 1;
+	private int m_turn = 0;
 
 	public GameInfo(int id, int ownerId, int board1Id, int board2Id) {
 		m_id = id;
@@ -262,14 +262,10 @@ public class GameInfo {
 		PlayerInfo p;
 		if (m_team1.size() == 2) {
 			p = m_team1.get(1);
+			p.setColor(true);
 		} else {
 			p = m_team2.get(0);
-			m_team2.remove(p);
-			m_team1.add(0, p);
 		}
-		
-		// set to white because game owner
-		p.setColor(true);
 		
 		// reset prev owner to remove from game
 		prev.setBoardId(-1);
