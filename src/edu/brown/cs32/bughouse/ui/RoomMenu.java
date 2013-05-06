@@ -256,6 +256,15 @@ public class RoomMenu extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				isCreator_ = false;
 				front_.displayCard("Rooms");
+				try {
+					backend_.quit();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (RequestTimedOutException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 			
 		});
