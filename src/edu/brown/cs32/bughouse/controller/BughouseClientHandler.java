@@ -169,10 +169,17 @@ public class BughouseClientHandler extends Thread {
 								System.out.println("Unknown message " + msg);
 						}
 					}
+				} else {
+					// client quit
+					kill();
 				}
-			}// MOVE:[from_x]\t[from_y]\t[to_x]\t[to_y]\n
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				kill();
+			} catch (Exception e2) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -551,6 +558,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void kill() throws IOException {
 		//TODO: Close all the streams after the client disconnects.
+		System.out.println("Client disconnected.");
 		m_input.close();
 		m_output.close();
 		m_client.close();
