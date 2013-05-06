@@ -257,7 +257,7 @@ public class ServerData {
 	 * Sets given player and all players in same game to initialized gameID, 
 	 * boardID, and teamNum values and deletes game. If given player not in game,
 	 * does nothing.
-	 * @param id
+	 * @param id ID of player ending game
 	 */
 	public void endGame(int id) {
 		synchronized (m_lock) {

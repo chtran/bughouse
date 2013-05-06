@@ -146,14 +146,12 @@ public class BughouseClientHandler extends Thread {
 								id = Integer.parseInt(headerSplit[1]);
 								quit(id);
 								break;
+							// GAME_OVER:[gameId]\t[teamId]\n
 							case "GAME_OVER":
 								msgSplit = headerSplit[1].split("\t");
 								id = Integer.parseInt(msgSplit[0]);
 								team = Integer.parseInt(msgSplit[1]);
-								List<Integer> ids = m_data.getPlayerIdsByTeam(id, team);
-								String message = "BROADCAST:GAME_OVER:"+id;
-								for (int playerId: ids) message+="\t"+m_data.getPlayerName(playerId);
-								m_pool.broadcastToGame(id,message+"\n",this);
+								gameOver(id, team);
 								break;
 							// PASS:[fromPlayerId]\t[toPlayerId]\t[chessPieceType]
 							case "PASS":
@@ -180,6 +178,23 @@ public class BughouseClientHandler extends Thread {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * Sends game over message to all players in game, removes game
+	 * from server and resets all players.
+	 * @param id gameID of game that ended
+	 * @param team Winning team
+	 */
+	private void gameOver(int id, int team) {
+		m_data.endGame(m_playerId);
+		
+		List<Integer> ids = m_data.getPlayerIdsByTeam(id, team);
+		String message = "BROADCAST:GAME_OVER:"+id;
+		for (int playerId: ids) 
+			message+="\t"+m_data.getPlayerName(playerId);
+		
+		m_pool.broadcastToGame(id,message+"\n",this);
 	}
 
 	/**
@@ -525,6 +540,8 @@ public class BughouseClientHandler extends Thread {
 			} else {
 				m_data.removePlayerFromGame(playerId);
 			}
+			
+			m_gameId = -1;
 			send("QUIT_OK\n");
 			
 			// broadcast message for everyone: BROADCAST:LEAVE_GAME:[playerId]\t[gameId]
