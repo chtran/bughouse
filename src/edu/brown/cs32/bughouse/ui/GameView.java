@@ -68,21 +68,7 @@ public class GameView extends JPanel {
 	public void notifyEndGame(List<String> winners) {
 		String message = "The game has ended. The winning team is "+winners.get(0)+ " and "+ winners.get(1);
 		System.out.println(message);
-		//JOptionPane.showMessageDialog(userBoard_, message);
-		try {
-			System.out.println("Before quit");
-			backend_.quit();
-			System.out.println("After quit");
-			CardLayout card = (CardLayout) this.getRootPane().getContentPane().getLayout();
-			System.out.println("After card");
-
-			card.show(this.getRootPane().getContentPane(),"Rooms");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RequestTimedOutException e) {
-			JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-					"Timeout Error", JOptionPane.ERROR_MESSAGE);
-		}
+		JOptionPane.showMessageDialog(userBoard_, message);
 	} 
 	
 	public void notifyUser(){
@@ -178,21 +164,21 @@ public class GameView extends JPanel {
 					try {
 						backend_.startGame();
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(null, "I/O error. Please check the server", 
-								"Failed to Start Game", JOptionPane.ERROR_MESSAGE);
-						return;
 					} catch (RequestTimedOutException e1) {
-						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+						BughouseGUI.showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+						/*JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
 								"Connection time out", JOptionPane.ERROR_MESSAGE);
-						return;
+						return;*/
 					} catch (GameNotReadyException e1) {
-						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+						BughouseGUI.showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+						/*JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
 								"Cannot start game", JOptionPane.ERROR_MESSAGE);
-						return;
+						return;*/
 					} catch (UnauthorizedException e1) {
-						JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
+						BughouseGUI.showMyPane("Time out", JOptionPane.ERROR_MESSAGE);
+						/*JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
 								"Authorization error", JOptionPane.ERROR_MESSAGE);
-						return;
+						return;*/
 					}
 					
 			}
