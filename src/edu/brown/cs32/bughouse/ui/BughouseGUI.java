@@ -3,6 +3,7 @@ package edu.brown.cs32.bughouse.ui;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.HeadlessException;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -224,19 +225,34 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void notifyNewOwner(int gameId) {
-		// TODO Auto-generated method stub
+		System.out.println("RECEIVING notifyNewOwner");
+		try {
+			if (backend_.me().getCurrentBoardId()== gameId){
+				JOptionPane.showMessageDialog(this, "You are currently the owner of the game. You can click on Start" +
+						"to begin the game once both teams are full", 
+					"Game Owner", JOptionPane.OK_OPTION);
+			}
+		} catch (HeadlessException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+					"Time out error", JOptionPane.ERROR_MESSAGE);
+		}
 		
 	}
 
 	@Override
 	public void gameCanceled() {
-		// TODO Auto-generated method stub
+		System.out.println("RECEIVED cancel game");
+		game_.cancelGame();
 		
 	}
 
 	@Override
 	public void updatePlayerList() {
-		// TODO Auto-generated method stub
+		//TO DO : update the player list
 		
 	}
 

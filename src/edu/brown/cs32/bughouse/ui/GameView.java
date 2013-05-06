@@ -67,9 +67,16 @@ public class GameView extends JPanel {
 	
 	public void notifyEndGame(List<String> winners) {
 		String message = "The game has ended. The winning team is "+winners.get(0)+ " and "+ winners.get(1);
-		JOptionPane.showMessageDialog(userBoard_, message);
+		System.out.println(message);
+		//JOptionPane.showMessageDialog(userBoard_, message);
 		try {
+			System.out.println("Before quit");
 			backend_.quit();
+			System.out.println("After quit");
+			CardLayout card = (CardLayout) this.getRootPane().getContentPane().getLayout();
+			System.out.println("After card");
+
+			card.show(this.getRootPane().getContentPane(),"Rooms");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
@@ -80,6 +87,11 @@ public class GameView extends JPanel {
 	
 	public void notifyUser(){
 		userBoard_.startTurn();
+	}
+	
+	public void cancelGame(){
+		CardLayout card = (CardLayout)this.getRootPane().getContentPane().getLayout();
+		card.show(this.getRootPane().getContentPane(), "Rooms");
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){
@@ -142,18 +154,18 @@ public class GameView extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//try {
+				try {
 					JButton container = (JButton) e.getSource();
 					CardLayout card = (CardLayout) container.getRootPane().getContentPane().getLayout();
 					card.show(container.getRootPane().getContentPane(), "Rooms");
-				//	backend_.quit();
+					backend_.quit();
 				
-			/*	} catch (IOException e1) {
+				} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (RequestTimedOutException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}*/
+				}
 				
 			}
 			
@@ -336,25 +348,24 @@ public class GameView extends JPanel {
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
 			
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
+			
 			
 		}
 		
