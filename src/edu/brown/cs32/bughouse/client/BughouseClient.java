@@ -193,6 +193,9 @@ public class BughouseClient implements Client {
 				backend.frontEnd().notifyNewOwner(gameId);
 				break;
 			case "GAME_DELETED":
+				backend.frontEnd().gameListUpdated();
+				break;
+			case "LEAVE_GAME":
 				backend.frontEnd().updatePlayerList();
 				break;
 			default:
