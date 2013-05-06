@@ -3,14 +3,18 @@ package edu.brown.cs32.bughouse.ui;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.HeadlessException;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -128,18 +132,23 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public void showEndGameMessage(List<String> winners) {
 		if (game_ != null){
 			showMyPane("End game", JOptionPane.INFORMATION_MESSAGE);
-			System.out.println("Game ended");
 		}	
 	}
 	public static void showMyPane(final String TEXT, final int type) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(null, TEXT 
-                      + "\n is on EDT: " + SwingUtilities.isEventDispatchThread(), TEXT,
-                        type);
-            }
-        });
+        try {
+			javax.swing.SwingUtilities.invokeAndWait(new Runnable() {
+			    @Override
+			    public void run() {
+			    	
+			        JOptionPane.showMessageDialog(null, TEXT 
+			              + "\n is on EDT: " + SwingUtilities.isEventDispatchThread(), TEXT,
+			                type);
+			    }
+			});
+		} catch (InvocationTargetException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 	/*
 	 * sets up the game view for the user.
