@@ -245,24 +245,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void notifyNewOwner(int gameId) {
-		System.out.println("RECEIVING notifyNewOwner");
-		try {
-			if (backend_.me().getCurrentBoardId()== gameId){
-				showMyPane(game_,"New owner", JOptionPane.OK_OPTION);
+		showMyPane(game_,"You are the new owner of game #"+gameId, JOptionPane.OK_OPTION);
 				/*JOptionPane.showMessageDialog(this, "You are currently the owner of the game. You can click on Start" +
 						"to begin the game once both teams are full", 
 					"Game Owner", JOptionPane.OK_OPTION);*/
-			}
-		} catch (HeadlessException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (RequestTimedOutException e) {
-			showMyPane(null, "time out", JOptionPane.ERROR_MESSAGE);
-			/*JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-					"Time out error", JOptionPane.ERROR_MESSAGE);*/
-		}
-		
 	}
 
 	@Override
