@@ -74,14 +74,15 @@ public class ServerData {
 	/**
 	 * Adds new user to the server data
 	 * @param name Name of new player
+	 * @return ID of new player
 	 */
-	public PlayerInfo addPlayer(String name) {
+	public int addPlayer(String name) {
 		synchronized (m_lock) {
 			int id = m_nextPlayerId;
 			m_nextPlayerId++;
 			PlayerInfo p = new PlayerInfo(name, id);
 			m_players.put(id, p);
-			return p;
+			return id;
 		}
 	}
 	

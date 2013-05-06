@@ -15,7 +15,8 @@ public class BughouseClientHandler extends Thread {
 	private PrintWriter m_output;
 	
 	private ServerData m_data;
-	private PlayerInfo m_playerInfo;
+	private int m_playerId = -1;
+	private int m_gameId = -1;
 	
 	/**
 	 * Constructs a {@link BughouseClientHandler} on the given client with the given pool.
@@ -33,7 +34,6 @@ public class BughouseClientHandler extends Thread {
 		m_pool = pool;
 		m_client = client;
 		m_data = data;
-		m_playerInfo = null;
 		
 		//TODO: Set up the buffered reader for the sockets to communicate with
 		m_input = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -54,8 +54,6 @@ public class BughouseClientHandler extends Thread {
 			while (true) {
 				if ((msg = m_input.readLine()) != null) {
 					System.out.println("RECEIVED: " + msg);
-					if (m_playerInfo != null)
-						System.out.println("m_playerInfo " + m_playerInfo.getId() + " " + m_playerInfo.getName());
 					headerSplit = msg.split(":");
 					if (msg.compareTo("GET_GAMES:") ==0)
 						sendGameList();
@@ -189,10 +187,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param msg
 	 */
 	private void sendPutMessage(String msg) {
-		int gameId = m_playerInfo.getGameId();
 		send("\n");
-		m_pool.broadcastToGame(gameId, "BROADCAST:" + msg + "\n", this);
-		int next = m_data.getNextTurn(gameId);
+		m_pool.broadcastToGame(m_gameId, "BROADCAST:" + msg + "\n", this);
+		int next = m_data.getNextTurn(m_gameId);
 		System.out.println("Next turn: " + next);
 		m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 	}
@@ -202,11 +199,7 @@ public class BughouseClientHandler extends Thread {
 	 * @return ID or -1 if m_playerInfo not set
 	 */
 	public int getGameId() {
-		System.out.println("m_playerInfo: "+m_playerInfo);
-		if (m_playerInfo != null)
-			return m_playerInfo.getGameId();
-		else
-			return -1;
+		return m_gameId;
 	}
 	
 	/**
@@ -214,10 +207,7 @@ public class BughouseClientHandler extends Thread {
 	 * @return ID or -1 if m_playerInfo not set
 	 */
 	public int getPlayerId() {
-		if (m_playerInfo != null)
-			return m_playerInfo.getId();
-		else
-			return -1;
+		return m_playerId;
 	}
 	
 	/**
@@ -228,21 +218,19 @@ public class BughouseClientHandler extends Thread {
 	 * @param msg Message to broadcast to other players in game
 	 */
 	private void move(String msg) {
-		System.out.println("Player " + m_playerInfo.getId() + " " + m_playerInfo.getName() + " moved");
-		int gameID = m_playerInfo.getGameId();
-		if (gameID > 0) {
+		if (m_gameId > 0) {
 			// MOVE:[boardID]\t[from_x]\t[from_y]\t[to_x]\t[to_y]\n
 				String ret = "BROADCAST:" + msg + "\n";
-				m_pool.broadcastToGame(gameID, ret, this);
+				m_pool.broadcastToGame(m_gameId, ret, this);
 				send("MOVE_OK\n");
 					
 				// notify player with next turn
-				int next = m_data.getNextTurn(gameID);
+				int next = m_data.getNextTurn(m_gameId);
 				System.out.println("Next turn: " + next);
 				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
 			
 		} else {
-			System.out.println("GameId incorrect: "+gameID);
+			System.out.println("GameId incorrect: "+ m_gameId);
 			send("MOVE_FAILED\n");
 		}
 	}
@@ -306,12 +294,11 @@ public class BughouseClientHandler extends Thread {
 	 * @param name Name of new player
 	 */
 	private void addPlayer(String name) {
-		PlayerInfo p = m_data.addPlayer(name);
-		System.out.println("Setting m_playerInfo to "+ p.getId() + " " + p.getName());
-		m_playerInfo = p;
-		int id = p.getId();
-		m_pool.addToMap(id, this);
-		send(id + "\n");
+		int p = m_data.addPlayer(name);
+		System.out.println("Setting m_playerId to "+ p);
+		m_playerId = p;
+		m_pool.addToMap(m_playerId, this);
+		send(m_playerId + "\n");
 	}
 
 	/**
@@ -324,6 +311,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addPlayerToGame(int playerId, int gameId, int teamNum) {
 		if (m_data.addPlayerToGame(playerId, gameId, teamNum)) {
+			m_gameId = gameId;
 			send("GAME_JOINED\n");
 			m_pool.broadcast("BROADCAST:JOIN_GAME:" + playerId + "\t" + gameId + "\n", this);
 		} else {
@@ -358,8 +346,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void startGame(int gameId) {
 		// send unauthorized message if client not game owner
-		System.out.println("m_playerInfo: " + m_playerInfo.getId() + " " + m_playerInfo.getName());
-		if (m_data.getGameOwner(gameId) != m_playerInfo.getId()) {
+		if (m_data.getGameOwner(gameId) != m_playerId) {
 			send("UNAUTHORIZED:" + gameId + "\n");
 		} else if (m_data.startGame(gameId)) {
 			send("GAME_STARTED:" + gameId + "\n");
@@ -568,9 +555,9 @@ public class BughouseClientHandler extends Thread {
 	public void kill() throws IOException {
 		//TODO: Close all the streams after the client disconnects.
 		System.out.println("Client disconnected.");
-		if (m_playerInfo != null) {
-			m_data.deletePlayer(m_playerInfo.getId());
-			System.out.println("Deleted player " + m_playerInfo.getName());
+		if (m_playerId >= 0) {
+			m_data.deletePlayer(m_playerId);
+			System.out.println("Deleted player " + m_playerId);
 		}
 		m_input.close();
 		m_output.close();
