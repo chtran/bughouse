@@ -24,6 +24,7 @@ import javax.swing.border.LineBorder;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
+import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
@@ -37,7 +38,7 @@ public class GameView extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BughouseBoard userBoard_, otherBoard_;
 	private ChessPieceImageFactory imgFactory_;
-	private JTextArea messageBox_, playerList_, whiteP_;
+	private JTextArea messageBox_, playerList_;
 	private JPanel prison_;
 	private List<ChessPiece> myPrisoners_;
 	private BackEnd backend_;
@@ -47,9 +48,9 @@ public class GameView extends JPanel {
 	public GameView(BackEnd backend) throws IOException, RequestTimedOutException, GameNotReadyException{
 		super(new BorderLayout());
 		backend_ = backend;
-		setupBoardID();
 		myPrisoners_ = new ArrayList<>();
 		imgFactory_ = new ChessPieceImageFactory();
+		this.setupBoardID();
 		this.add(this.createBoard(), BorderLayout.CENTER);
 		this.add(this.createOptionMenu(),BorderLayout.EAST);
 		this.add(this.createPieceHolder(),BorderLayout.SOUTH);
@@ -57,16 +58,24 @@ public class GameView extends JPanel {
 	}
 	
 	
+	
 	public void addPrisoner (ChessPiece prisoner){
-		JOptionPane.showMessageDialog(userBoard_, "You have received a "+prisoner.getName()+" from your teammate!");
+		JOptionPane.showMessageDialog(userBoard_, "You have received a "+prisoner.getName()+" " +
+				"from your teammate!");
 
 	}
 	
-	public void notifyEndGame(){
-		System.out.println("The game has ended");
-		JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-				"Timeout Error", JOptionPane.ERROR_MESSAGE);
-		
+	public void notifyEndGame(List<String> winners) {
+		String message = "The game has ended. The winning team is "+winners.get(0)+ " and "+ winners.get(1);
+		JOptionPane.showMessageDialog(userBoard_, message);
+		try {
+			backend_.quit();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
+					"Timeout Error", JOptionPane.ERROR_MESSAGE);
+		}
 	} 
 	
 	public void notifyUser(){
@@ -113,7 +122,77 @@ public class GameView extends JPanel {
 		
 	}
 	
+	private JComponent createDummyBoard(){
+		JTabbedPane boardContainer = new JTabbedPane();
+		boardContainer.addTab("Your Game", new BughouseBoard());
+		boardContainer.addTab("Other Game", new BughouseBoard());
+		return boardContainer;
+	}
 	
+	private JComponent createDummyOptionMenu(){
+		JPanel options = new JPanel(new BorderLayout());
+		JPanel optionMiddle = new JPanel(new BorderLayout());
+		options.setPreferredSize(new Dimension(250,190));
+		playerList_ = new JTextArea();
+		playerList_.setEditable(false);
+		playerList_.setPreferredSize(new Dimension(200,150));
+		playerList_.setBorder(new LineBorder(Color.BLACK,1));
+		JButton quit  = new JButton("Quit Game");
+		quit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//try {
+					JButton container = (JButton) e.getSource();
+					CardLayout card = (CardLayout) container.getRootPane().getContentPane().getLayout();
+					card.show(container.getRootPane().getContentPane(), "Rooms");
+				//	backend_.quit();
+				
+			/*	} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (RequestTimedOutException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}*/
+				
+			}
+			
+		});
+		quit.setPreferredSize(new Dimension(100,60));
+		JButton start = new JButton("Start Game");
+		start.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+					try {
+						backend_.startGame();
+					} catch (IOException e1) {
+						JOptionPane.showMessageDialog(null, "I/O error. Please check the server", 
+								"Failed to Start Game", JOptionPane.ERROR_MESSAGE);
+						return;
+					} catch (RequestTimedOutException e1) {
+						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						return;
+					} catch (GameNotReadyException e1) {
+						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
+								"Cannot start game", JOptionPane.ERROR_MESSAGE);
+						return;
+					} catch (UnauthorizedException e1) {
+						JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
+								"Authorization error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+			}
+		});
+		start.setPreferredSize(new Dimension(100,60));
+		optionMiddle.add(start,BorderLayout.CENTER);
+		optionMiddle.add(quit, BorderLayout.SOUTH);
+		options.add(optionMiddle,BorderLayout.CENTER);
+		options.add(playerList_, BorderLayout.NORTH);
+		return options;
+		
+	}
 	
 	/*
 	 * creates the initial board for both the user's game and the user's team

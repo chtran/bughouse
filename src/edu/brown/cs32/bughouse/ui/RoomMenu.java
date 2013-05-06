@@ -4,7 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -17,6 +20,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
@@ -56,6 +60,7 @@ public class RoomMenu extends JPanel {
 		this.backend_ = backend;
 		this.lockScreen_= false;
 		this.isCreator_ = false;
+		//this.add(listOfRooms(),BorderLayout.CENTER);
 		try {
 			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
@@ -67,6 +72,13 @@ public class RoomMenu extends JPanel {
 					"Connection time out", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+	}
+	
+	public JScrollPane listOfRooms(){
+		JTable table = new JTable(100,5);
+		table.getTableHeader().setReorderingAllowed(false);
+		rooms_ = new JScrollPane(table);
+		return rooms_;
 	}
 	
 	public Box gameInfo() {
@@ -172,7 +184,7 @@ public class RoomMenu extends JPanel {
 		header.setFont(new Font("Serif", Font.PLAIN,24));
 		roomList_.add(header,BorderLayout.NORTH);
 		rooms_ = new JScrollPane();
-		roomPanel_ = new JPanel();
+		roomPanel_ = new JPanel(new GridBagLayout());
 		rooms_.setViewportView(roomPanel_);
 		roomList_.add(rooms_,BorderLayout.CENTER);
 		if (!backend_.getActiveGames().isEmpty()){
@@ -187,13 +199,18 @@ public class RoomMenu extends JPanel {
 		}
 		activeGames_ = backend_.getActiveGames();
 		roomPanel_.removeAll();
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 2;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.insets = new Insets(4, 2, 4, 2);
 		for (Game game : activeGames_){
 			int gameID = game.getId();
 			System.out.println("Adding game id "+gameID + " to the list");
 			JButton room =  new JButton("Room "+Integer.toString(gameID));
 			room.setFont(new Font("Serif", Font.PLAIN,20));
 			room.addActionListener(new ChooseRoomListener(game));
-			roomPanel_.add(room);
+			c.gridy = activeGames_.indexOf(game);
+			roomPanel_.add(room,c);
 			System.out.println("Adding room to display for client named "+backend_.me().getName());
 		}
 		System.out.println("Refreshing view "+backend_.me().getName());

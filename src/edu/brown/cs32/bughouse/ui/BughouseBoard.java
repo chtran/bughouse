@@ -63,13 +63,32 @@ public class BughouseBoard extends JPanel {
 		}
 	}
 	
+	/*
+	 * Dummy constructor for a view-only board with no pieces
+	 */
+	public BughouseBoard(){
+		super(new GridLayout(8,8,1,0));
+		isManipulable_ = false;
+		this.setPreferredSize(new Dimension(400,400));
+		for (int i = 0; i<8;i++){
+			for (int j = 0; j<8;j++){
+				JPanel box = new JPanel();
+				Color background = ((i+j)%2==0) ? Color.WHITE : Color.GRAY;
+				box.setBackground(background);
+				box.setBorder(null);
+				this.add(box);		
+			}
+		}
+	}
+	
 	public void startTurn(){
 		turn_ = true;
+		this.requestFocusInWindow();
 	JOptionPane.showMessageDialog(this, "Your turn");
 		if (turn_){
 			System.out.println("ITS YOUR TURN");
 		}
-		this.requestFocusInWindow();
+		
 	}
 	
 	public void piecePut(Icon piece,int playerId, int x, int y){

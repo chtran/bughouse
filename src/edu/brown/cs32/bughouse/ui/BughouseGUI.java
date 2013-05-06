@@ -60,7 +60,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setVisible(true);
 	}
 	
-	
 	public static void main(final String[] argv){
 		Runnable r1 = new Runnable() {
 
@@ -109,7 +108,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void showEndGameMessage(List<String> winners) {
 		if (game_ != null){
-		//	game_.notifyEndGame();
+			game_.notifyEndGame(winners);
 		}	
 	}
 	
