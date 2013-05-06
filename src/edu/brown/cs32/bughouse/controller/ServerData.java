@@ -267,7 +267,7 @@ public class ServerData {
 					GameInfo g = m_games.get(gameID);
 					if (g != null) {
 						g.resetPlayers();
-						m_games.remove(g);
+						m_games.remove(gameID);
 					}
 				}
 			}
@@ -377,5 +377,13 @@ public class ServerData {
 			p.setGameId(-1);
 			p.setTeamId(-1);
 		}
+	}
+
+	/**
+	 * Removes player from server
+	 * @param id
+	 */
+	public void deletePlayer(int id) {
+		m_players.remove(id);
 	}
 }

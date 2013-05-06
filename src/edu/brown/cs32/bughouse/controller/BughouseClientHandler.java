@@ -504,13 +504,17 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	public void quit(int playerId) {
-		System.out.println("Player #"+playerId+" quitting");
+		System.out.println("Player " + playerId + " is quitting");
 		int gameID = m_data.getCurrentGame(playerId);
 		if (gameID >= 0) {
 			boolean isOwner = m_data.getGameOwner(gameID) == playerId ? true : false;
 			boolean gameStarted = m_data.gameIsActive(gameID) ? false : true;
 			boolean roomEmpty = m_data.numPlayers(gameID) == 1 ? true : false;
 			String msg;
+			
+			System.out.println("Is owner: " + isOwner);
+			System.out.println("Game started: " + gameStarted);
+			System.out.println("Room empty: " + roomEmpty);
 					
 			if (gameStarted) {
 				// resets all players and deletes game
@@ -561,6 +565,10 @@ public class BughouseClientHandler extends Thread {
 	public void kill() throws IOException {
 		//TODO: Close all the streams after the client disconnects.
 		System.out.println("Client disconnected.");
+		if (m_playerInfo != null) {
+			m_data.deletePlayer(m_playerInfo.getId());
+			System.out.println("Deleted player " + m_playerInfo.getName());
+		}
 		m_input.close();
 		m_output.close();
 		m_client.close();
