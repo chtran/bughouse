@@ -340,6 +340,7 @@ public class BughouseClientHandler extends Thread {
 	 */
 	public void addGame(int ownerId) {
 		int id = m_data.addGame(ownerId);
+		m_gameId = id;
 		send(id + "\n");
 		
 		if (id != -1)
