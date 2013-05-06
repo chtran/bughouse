@@ -169,7 +169,6 @@ public class BughouseClientHandler extends Thread {
 							default:
 								System.out.println("Unknown message " + msg);
 						}
-						System.out.println("Unknown message " + msg);
 					}
 				} else {
 					// client quit

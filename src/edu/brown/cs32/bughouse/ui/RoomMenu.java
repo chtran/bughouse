@@ -143,21 +143,19 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public void reset(){
-		this.lockScreen_ = false;
-		this.cteam1_.setText(" ");
-		this.cteam2_.setText(" ");
-		this.team1_.setText(" ");
-		this.team2_.setText(" ");
-		this.team1_.getParent().setVisible(false);
-		this.selectedGameID_ = -1;
-		this.selectedTeamID_ = -1;
+		this.removeAll();
 		try {
-			this.getRooms();
-		} catch (IOException e) {
+			this.add(gameInfo(), BorderLayout.EAST);
+			this.add(getRooms(), BorderLayout.CENTER);
+			this.add(userControl(), BorderLayout.SOUTH);	
+			this.revalidate();
+			this.repaint();
+		}catch (IOException e){
 			e.printStackTrace();
-		} catch (RequestTimedOutException e) {
-			JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+		}catch (RequestTimedOutException e){
+			JOptionPane.showMessageDialog(this, "The connection to the server timed out", 
 					"Connection time out", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
 	}
 	
@@ -255,7 +253,7 @@ public class RoomMenu extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				isCreator_ = false;
-				front_.displayCard("Rooms");
+				reset();
 				try {
 					backend_.quit();
 				} catch (IOException e1) {
@@ -349,7 +347,7 @@ public class RoomMenu extends JPanel {
 				selectedTeamID_ = teamID_;
 				try {
 					backend_.joinGame(selectedGameID_, selectedTeamID_);
-					lockScreen_ = true;
+					displayLockedRoom();
 				} catch (IOException e1){
 					e1.printStackTrace();
 				}catch (RequestTimedOutException e1){
