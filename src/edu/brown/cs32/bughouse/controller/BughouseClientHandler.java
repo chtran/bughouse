@@ -173,6 +173,7 @@ public class BughouseClientHandler extends Thread {
 			}
 		} catch (Exception e) {
 			try {
+				e.printStackTrace();
 				kill();
 			} catch (Exception e2) {
 				e.printStackTrace();
@@ -187,14 +188,13 @@ public class BughouseClientHandler extends Thread {
 	 * @param team Winning team
 	 */
 	private void gameOver(int id, int team) {
-		m_data.endGame(m_playerId);
-		
 		List<Integer> ids = m_data.getPlayerIdsByTeam(id, team);
 		String message = "BROADCAST:GAME_OVER:"+id;
 		for (int playerId: ids) 
 			message+="\t"+m_data.getPlayerName(playerId);
 		
 		m_pool.broadcastToGame(id,message+"\n",this);
+		m_data.endGame(m_playerId);
 	}
 
 	/**

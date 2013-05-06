@@ -86,7 +86,8 @@ public class ChessPiece extends Model {
 	}
 	
 	public boolean canMove(int from_x, int from_y, int to_x, int to_y, ChessBoard board) {
-		//TODO: fill
+		return true; // for easy testing
+		/*//TODO: fill
 		if (to_x>=8 || to_y>=8 || to_x<0 || to_y<0) return false;
 		if (from_x==to_x && from_y==to_y) return false;
 		int x_dist = Math.abs(to_x-from_x);
@@ -107,7 +108,7 @@ public class ChessPiece extends Model {
 			default:
 				return false;
 			
-		}
+		}*/
 	}
 	private int sign(int n) {
 		if (n==0) return 0;
