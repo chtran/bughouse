@@ -514,12 +514,12 @@ public class BughouseClientHandler extends Thread {
 					
 			if (gameStarted) {
 				// resets all players and deletes game
-				m_data.playerQuit(playerId);
+				m_data.endGame(playerId);
 				msg = String.format("BROADCAST:GAME_CANCELED:%d\n", gameID);			
 				m_pool.broadcastToGame(gameID, msg, this);
 			} else if (!gameStarted && isOwner && roomEmpty) {
 				// game becomes empty so delete from server and reset owner
-				m_data.playerQuit(playerId);
+				m_data.endGame(playerId);
 				msg = String.format("BROADCAST:GAME_DELETED:%d\n", gameID);
 				m_pool.broadcast(msg, this);
 			} else if (!gameStarted && isOwner && !roomEmpty) {
