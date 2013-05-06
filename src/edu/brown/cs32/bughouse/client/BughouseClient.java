@@ -184,6 +184,17 @@ public class BughouseClient implements Client {
 			case "GAME_OVER":
 				notifyGameOver(message);
 				break;
+			case "GAME_CANCELED":
+				backend.frontEnd().gameCanceled();
+				break;
+			case "NEW_OWNER":
+				String body = message.split(":")[2];
+				int gameId = Integer.parseInt(body.split("\t")[0]);
+				backend.frontEnd().notifyNewOwner(gameId);
+				break;
+			case "GAME_DELETED":
+				backend.frontEnd().updatePlayerList();
+				break;
 			default:
 				System.out.println("Unknown broadcast message: "+message);
 				return;

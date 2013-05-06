@@ -255,4 +255,12 @@ public class CommandLine implements FrontEnd{
 		System.out.println("You are now the owner of game #"+gameId);
 		
 	}
+	@Override
+	public void gameCanceled() {
+		System.out.println("Your game has been canceled");
+	}
+	@Override
+	public void updatePlayerList() {
+		
+	}
 }

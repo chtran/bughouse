@@ -18,4 +18,6 @@ public interface FrontEnd {
 	public void prisonersUpdated();
 	public void piecePut(int boardId, int playerId, ChessPiece piece, int x, int y);
 	public void notifyNewOwner(int gameId);
+	public void gameCanceled(); //call when the game is playing and one player quits
+	public void updatePlayerList(); //call when a player joins/quits the game
 }

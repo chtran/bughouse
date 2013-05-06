@@ -169,7 +169,6 @@ public class BughouseClientHandler extends Thread {
 							default:
 								System.out.println("Unknown message " + msg);
 						}
-						System.out.println("Unknown message " + msg);
 					}
 				} else {
 					// client quit
@@ -505,6 +504,7 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	public void quit(int playerId) {
+		System.out.println("Player #"+playerId+" quitting");
 		int gameID = m_data.getCurrentGame(playerId);
 		if (gameID >= 0) {
 			boolean isOwner = m_data.getGameOwner(gameID) == playerId ? true : false;
