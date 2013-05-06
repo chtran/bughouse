@@ -3,6 +3,8 @@ package edu.brown.cs32.bughouse.ui;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -55,10 +57,24 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		this.setPreferredSize(new Dimension(800,700));
 		this.setResizable(false);
 		content_.add(setupJoinServerMenu(),"Join");
-		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing (WindowEvent e){
+				try {
+					backend_.quit();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (RequestTimedOutException e1) {
+					JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
+							"Connection timed out", JOptionPane.ERROR_MESSAGE);
+				}
+				System.exit(0);
+			}
+		});
 		this.pack();
 		this.setVisible(true);
 	}
+	
 	
 	public static void main(final String[] argv){
 		Runnable r1 = new Runnable() {
