@@ -146,7 +146,7 @@ public class RoomMenu extends JPanel {
 			lobby_.updateLobbyInfo();
 		}
 		System.out.println("Revalidating and repainting "+backend_.me().getName());
-		//roomPanel_.revalidate();
+		roomPanel_.revalidate();
 		System.out.println("Revalidated panel, now repainting");
 		roomPanel_.repaint();
 		System.out.println("repainted, requesting focus");
