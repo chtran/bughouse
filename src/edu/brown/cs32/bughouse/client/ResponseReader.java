@@ -36,9 +36,13 @@ public class ResponseReader {
 		return input.readLine();
 	}
 	public void close() throws IOException {
+		System.out.println("Closing input");
 		input.close();
+		System.out.println("Closing inputStream");
 		inputStream.close();
+		System.out.println("Closing output");
 		output.close();
+		System.out.println("Closing outputStram");
 		outputStream.close();
 	}
 }
