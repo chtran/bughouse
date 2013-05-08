@@ -7,9 +7,11 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
+import javax.swing.JOptionPane;
+
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.interfaces.Client;
+import edu.brown.cs32.bughouse.ui.BughouseGUI;
 
 
 /**
@@ -101,9 +103,10 @@ public class ClientSocket{
 		running = false;
 		input.close();
 		output.close();
-		foreground.close();
-		background.close();
+		//foreground.close();
+		//background.close();
 		socket.close();
+
 	}
 	/**
 	 * The thread that reads everything from the server and forwards the response to the corresponding stream.
@@ -130,7 +133,9 @@ public class ClientSocket{
 	        		}
 	        		if (line == null) {
 	        			System.out.println("Server disconnected");
+	        			JOptionPane.showMessageDialog(null, "Server disconnected. Press OK to close the program", "Server disconnected", JOptionPane.ERROR_MESSAGE);
 	        			kill();
+	        			System.exit(0);
 	        		}
 				} catch (IOException e) {
 					e.printStackTrace();
