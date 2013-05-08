@@ -1,7 +1,9 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -27,11 +29,12 @@ public class GameLobby extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private BackEnd backend_;
-	private Box infoArea_;
+	private JPanel infoArea_;
 	private JTextArea team1_;
 	private JTextArea team2_;
 	private BughouseGUI front_;
 	private boolean isDisplayed_;
+	private ChessPieceImageFactory imgFactory_;
 	
 	
 	public GameLobby(BackEnd backend, BughouseGUI front){
@@ -40,11 +43,20 @@ public class GameLobby extends JPanel {
 		this.front_ = front;
 		this.backend_ =backend;
 		this.isDisplayed_ =true;
-		JLabel label = new JLabel ("Waiting for other players to join");
+		JLabel label = new JLabel ("Waiting for other players to join....");
 		label.setFont(new Font ("Serif", Font.PLAIN,28));
-		this.add(label, BorderLayout.NORTH);
-		this.add(this.setupInfoArea(),BorderLayout.CENTER);
-		this.add(this.setupButtonPanel(),BorderLayout.SOUTH);
+		try {
+			this.add(label, BorderLayout.NORTH);
+			this.add(new BughouseBoard(),BorderLayout.CENTER);
+			this.add(this.setupInfoArea(),BorderLayout.EAST);
+			this.add(this.setupButtonPanel(),BorderLayout.SOUTH);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RequestTimedOutException e) {
+			BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+					, JOptionPane.ERROR_MESSAGE);
+		}
+		
 	}
 	
 	
@@ -77,14 +89,27 @@ public class GameLobby extends JPanel {
 		isDisplayed_ = flag;
 	}
 	
-	private Box setupInfoArea(){
-		infoArea_ = Box.createVerticalBox();
+	private JPanel setupInfoArea() throws IOException, RequestTimedOutException{
+		infoArea_ = new JPanel(new BorderLayout());
+		JPanel info = new JPanel(new GridLayout(0,1));
+		info.setPreferredSize(new Dimension(200,200));
 		team1_ = new JTextArea(3,20);
 		team2_ = new JTextArea(3,20);
 		team1_.setEditable(false);
 		team2_.setEditable(false);
-		infoArea_.add(team1_);
-		infoArea_.add(team2_);
+		info.add(team1_);
+		info.add(team2_);
+		JPanel personal = new JPanel();
+		JTextArea message = new JTextArea();
+		message.setLineWrap(true);
+		message.setPreferredSize(new Dimension(200,100));
+		message.setWrapStyleWord(true);
+		message.append("Hi there "+ backend_.me().getName()+ " !\n");
+		message.append("Hang in there as we wait for 4 players to join the game and " +
+				"then the owner will start the game");
+		infoArea_.add(info,BorderLayout.NORTH);
+		personal.add(message);
+		infoArea_.add(personal,BorderLayout.CENTER);
 		return infoArea_;
 	}
 	
@@ -119,13 +144,13 @@ public class GameLobby extends JPanel {
 					
 			}
 		});
-		JButton cancel = new JButton("Cancel Game");
+		JButton cancel = new JButton("Leave Game");
 		cancel.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					isDisplayed_ = false;
-					backend_.quit();  // --> client disconnects? Once fixed, just uncomment the two lines below
+					backend_.quit(); 
 					front_.gameListUpdated();
 					front_.displayCard("Rooms");
 				} catch (IOException e1) {

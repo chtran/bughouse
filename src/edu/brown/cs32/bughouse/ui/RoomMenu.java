@@ -95,32 +95,6 @@ public class RoomMenu extends JPanel {
 		team2_.repaint();
 	}
 	
-	/*public void displayGameInfo() throws IOException, RequestTimedOutException{
-		System.out.println("Displaying info for client named "+backend_.me().getName());
-		if (gameinfo_.isVisible()){
-			team1_.setText(" ");
-			team2_.setText(" ");
-			team1_.append("Team 1 :"+"\n");
-			team2_.append("Team 2 :"+"\n");
-			System.out.println("Printing team 1 for client named "+backend_.me().getName());
-			System.out.println("Printing players for team 1 for game "+backend_.me().getCurrentGame().getId());
-			List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
-			System.out.println("TEAM SIZE: "+team.size());
-			for (Player player : team){
-				System.out.println("Printing player's name "+player.getName());
-				team1_.append(player.getName()+"\n");
-			}
-			team1_.repaint();
-			System.out.println("Printing team 2 for client named "+backend_.me().getName());
-			team = backend_.me().getCurrentGame().getPlayersByTeam(2);
-			for (Player player2: team){
-				System.out.println("Printing player's name "+player2.getName());
-				team2_.append(player2.getName()+"\n");
-			}
-			team2_.repaint();
-		}
-		System.out.println("Finished rendering text info for client named "+backend_.me().getName());
-	}*/
 	
 	public void displayPanel(boolean flag){
 		if (lobby_!= null){

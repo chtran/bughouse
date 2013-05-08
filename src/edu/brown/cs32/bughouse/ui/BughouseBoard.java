@@ -6,6 +6,8 @@ import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
@@ -13,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
+
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
@@ -25,7 +28,7 @@ public class BughouseBoard extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private ChessBoard chessBoard_;
-	private boolean isManipulable_,turn_, isPuttingPrisoner_,isMovingPiece_;
+	private boolean isManipulable_,turn_, isPuttingPrisoner_,isMovingPiece_, isHintOn_;
 	private JLabel source_, current_;
 	private Icon piece_;
 	private int originX_, originY_, destX_, destY_, index_;
@@ -34,6 +37,7 @@ public class BughouseBoard extends JPanel {
 	private JLabel [][] board_;
 	private ChessPiece selectedPrisoner_;
 	private JCheckBox hint_;
+	private List<JLabel> suggestions_;
 
 
 	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable,ChessBoard chessBoard){
@@ -44,6 +48,7 @@ public class BughouseBoard extends JPanel {
 		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.isPuttingPrisoner_ = false;
+		this.isHintOn_ = false;
 		this.isMovingPiece_ = false;
 		this.turn_ = false;
 		this.setPreferredSize(new Dimension(400,400));
@@ -78,10 +83,6 @@ public class BughouseBoard extends JPanel {
 		}
 	}
 	
-	public void setHintButton(JCheckBox button){
-		hint_ = button;
-	}
-	
 	public void startTurn(){
 		turn_ = true;
 		this.requestFocusInWindow();
@@ -91,6 +92,21 @@ public class BughouseBoard extends JPanel {
 			System.out.println("ITS YOUR TURN");
 		}
 		
+	}
+	
+	public void notifyHintSelection() throws IOException, RequestTimedOutException{
+		if (isHintOn_){
+			isHintOn_ = false;
+			for (JLabel square: suggestions_){
+				JPanel parent = (JPanel) square.getParent();
+				parent.setBorder(null);
+			}
+			return;
+		}
+		isHintOn_ = true;
+		if (isMovingPiece_){
+			showHintedMoves();
+		}
 	}
 	
 	public void piecePut(Icon piece,int playerId, int x, int y){
@@ -115,6 +131,19 @@ public class BughouseBoard extends JPanel {
 	
 	public boolean isMyTurn(){
 		return turn_;
+	}
+	
+	private void showHintedMoves() throws IOException, RequestTimedOutException{
+		suggestions_ = new ArrayList<>();
+		for (int i =0;i<8;i++){
+			for (int j=0;j<7;j++){
+				if (backend_.canMove(backend_.me().getCurrentBoardId(), originX_, originY_, j, i)){
+					suggestions_.add(board_[i][j]);
+					JPanel parent = (JPanel) board_[i][j].getParent();
+					parent.setBorder(new LineBorder(Color.GREEN,3));
+				}
+			}
+		}
 	}
 	
 /*
@@ -214,13 +243,20 @@ public class BughouseBoard extends JPanel {
 			parent.setBorder(null);
 			originX_ = -1;
 			originY_ = -1;
+			for (JLabel square: suggestions_){
+				JPanel parents = (JPanel) square.getParent();
+				parents.setBorder(null);
+			}
 		}
 		
-		private void grabPiece(){
+		private void grabPiece() throws IOException, RequestTimedOutException{
 			isMovingPiece_ = true;
 			piece_ = source_.getIcon();
 			JPanel parent = (JPanel) source_.getParent();
 			parent.setBorder(new LineBorder(Color.RED, 3));
+			if (isHintOn_){
+				showHintedMoves();
+			}
 		}
 		
 		private void movePiece(){
@@ -254,6 +290,10 @@ public class BughouseBoard extends JPanel {
 					originPanel.setBorder(null);
 					destPanel.setBorder(null);
 					isMovingPiece_ = false;
+					for (JLabel square: suggestions_){
+						JPanel parent = (JPanel) square.getParent();
+						parent.setBorder(null);
+					}
 				}
 		}
 		
@@ -282,7 +322,7 @@ public class BughouseBoard extends JPanel {
 		
 		@Override
 		public void mouseEntered(MouseEvent arg0){
-			if (turn_ && isMovingPiece_){
+			if (turn_ && isMovingPiece_ && !isHintOn_){
 				JLabel temp = (JLabel) arg0.getSource();
 				if (!temp.equals(source_)){
 					JPanel parent = (JPanel) temp.getParent();
@@ -311,7 +351,7 @@ public class BughouseBoard extends JPanel {
 
 		@Override
 		public void mouseExited(MouseEvent arg0) {
-				if (turn_ && isMovingPiece_){
+				if (turn_ && isMovingPiece_ && !isHintOn_){
 					JLabel exited = (JLabel)arg0.getSource();
 					JPanel parent = (JPanel)exited.getParent();
 					if (!exited.equals(source_)){

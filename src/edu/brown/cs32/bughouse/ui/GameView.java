@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -43,14 +45,12 @@ public class GameView extends JPanel {
 	private int myBoardID_, otherBoardID_;
 	private JPanel selectedPrisoner_;
 	private BughouseGUI front_;
-	private boolean isHintOn_;
 
 	public GameView(BackEnd backend, BughouseGUI front) throws IOException, RequestTimedOutException, GameNotReadyException{
 		super(new BorderLayout());
 		this.front_ = front;
 		this.backend_ = backend;
 		this.myPrisoners_ = new ArrayList<>();
-		this.isHintOn_ = false;
 		this.imgFactory_ = new ChessPieceImageFactory();
 		this.setupBoardID();
 		this.add(this.createBoard(), BorderLayout.CENTER);
@@ -166,10 +166,24 @@ public class GameView extends JPanel {
 			}
 			
 		});
-		//JCheckBox hints = new JCheckBox("Show me hints for moves", false);
-		//userBoard_.setHintButton(hints);
+		JCheckBox hints = new JCheckBox("Show me hints for moves", false);
+		hints.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				try {
+					userBoard_.notifyHintSelection();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (RequestTimedOutException e1) {
+					BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+							, JOptionPane.ERROR_MESSAGE);
+				}
+				
+			}
+		});
 		quit.setPreferredSize(new Dimension(100,60));
-		//optionMiddle.add(hints,BorderLayout.NORTH);
+		optionMiddle.add(hints,BorderLayout.NORTH);
 		optionMiddle.add(messageBox_, BorderLayout.CENTER);
 		optionMiddle.add(quit, BorderLayout.SOUTH);
 		options.add(optionMiddle,BorderLayout.CENTER);
