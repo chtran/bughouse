@@ -76,8 +76,7 @@ public class GameView extends JPanel {
 	}
 	
 	public void cancelGame(){
-		front_.updatePlayerList();
-		front_.displayCard("Lobby");
+		front_.displayCard("Rooms");
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){

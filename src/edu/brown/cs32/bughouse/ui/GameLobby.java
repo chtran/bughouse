@@ -31,6 +31,7 @@ public class GameLobby extends JPanel {
 	private JTextArea team1_;
 	private JTextArea team2_;
 	private BughouseGUI front_;
+	private boolean isDisplayed_;
 	
 	
 	public GameLobby(BackEnd backend, BughouseGUI front){
@@ -38,6 +39,7 @@ public class GameLobby extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.front_ = front;
 		this.backend_ =backend;
+		this.isDisplayed_ =true;
 		JLabel label = new JLabel ("Waiting for other players to join");
 		label.setFont(new Font ("Serif", Font.PLAIN,28));
 		this.add(label, BorderLayout.NORTH);
@@ -47,25 +49,32 @@ public class GameLobby extends JPanel {
 	
 	
 	public synchronized void updateLobbyInfo() throws IOException, RequestTimedOutException{
-		team1_.setText(" ");
-		team2_.setText(" ");
-		team1_.append("Team 1 :"+"\n");
-		team2_.append("Team 2 :"+"\n");
-		System.out.println("Printing team 1 for client named "+backend_.me().getName());
-		List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
-		System.out.println("TEAM SIZE: "+team.size());
-		for (Player player : team){
-			System.out.println("Printing player's name "+player.getName());
-			team1_.append(player.getName()+"\n");
+		if (isDisplayed_){
+			team1_.setText(" ");
+			team2_.setText(" ");
+			team1_.append("Team 1 :"+"\n");
+			team2_.append("Team 2 :"+"\n");
+			System.out.println("Printing in game lobby");
+			System.out.println("Printing team 1 for client named "+backend_.me().getName());
+			List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
+			System.out.println("TEAM SIZE: "+team.size());
+			for (Player player : team){
+				System.out.println("Printing player's name "+player.getName());
+				team1_.append(player.getName()+"\n");
+			}
+			team1_.repaint();
+			System.out.println("Printing team 2 for client named "+backend_.me().getName());
+			team = backend_.me().getCurrentGame().getPlayersByTeam(2);
+			for (Player player2: team){
+				System.out.println("Printing player's name "+player2.getName());
+				team2_.append(player2.getName()+"\n");
+			}
+			team2_.repaint();
 		}
-		team1_.repaint();
-		System.out.println("Printing team 2 for client named "+backend_.me().getName());
-		team = backend_.me().getCurrentGame().getPlayersByTeam(2);
-		for (Player player2: team){
-			System.out.println("Printing player's name "+player2.getName());
-			team2_.append(player2.getName()+"\n");
-		}
-		team2_.repaint();
+	}
+	
+	public void displayPanel(boolean flag){
+		isDisplayed_ = flag;
 	}
 	
 	private Box setupInfoArea(){
@@ -87,22 +96,27 @@ public class GameLobby extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 					try {
 						backend_.startGame();
+						isDisplayed_ =false;
 						backend_.frontEnd().gameStarted();
 					} catch (IOException e1) {
 						JOptionPane.showMessageDialog(null, "I/O error. Please check the server", 
 								"Failed to Start Game", JOptionPane.ERROR_MESSAGE);
+						isDisplayed_ = true;
 						return;
 					} catch (RequestTimedOutException e1) {
 						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
 								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						isDisplayed_ = true;
 						return;
 					} catch (GameNotReadyException e1) {
 						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
 								"Cannot start game", JOptionPane.ERROR_MESSAGE);
+						isDisplayed_ = true;
 						return;
 					} catch (UnauthorizedException e1) {
 						JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
 								"Authorization error", JOptionPane.ERROR_MESSAGE);
+						isDisplayed_ = true;
 						return;
 					}
 					
@@ -113,15 +127,16 @@ public class GameLobby extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
+					isDisplayed_ = false;
 					backend_.quit();  // --> client disconnects? Once fixed, just uncomment the two lines below
-			/*		front_.gameListUpdated();
-					front_.displayCard("Rooms");*/
+					front_.gameListUpdated();
+					front_.displayCard("Rooms");
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					isDisplayed_ = false;
 				} catch (RequestTimedOutException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					isDisplayed_ = false;
 				}
 			}
 			

@@ -37,9 +37,12 @@ public class BughouseBackEnd implements BackEnd {
 
 	@Override
 	public void quit() throws IOException, RequestTimedOutException {
+		System.out.println("Quitting. Making call to client.quit");
 		if (me!=null) client.quit(me.getId());
+		System.out.println("Returned from client.quit and now clearing prisoners");
 		prisoners.clear();
 		currentBoards.clear();
+		System.out.println("returning");
 	}
 
 	@Override

@@ -94,7 +94,7 @@ public class RoomMenu extends JPanel {
 	public void displayGameInfoPanel(Game selected) throws IOException, RequestTimedOutException{
 		team1_.setText(" ");
 		team2_.setText(" ");
-		team1_.getParent().setVisible(true);
+		gameinfo_.setVisible(true);
 		team1_.append("Team 1 :"+"\n");
 		team2_.append("Team 2 :"+"\n");
 		for (Player player :selected.getPlayersByTeam(1)){
@@ -109,12 +109,15 @@ public class RoomMenu extends JPanel {
 	
 	public void displayGameInfo() throws IOException, RequestTimedOutException{
 		System.out.println("Displaying info for client named "+backend_.me().getName());
-		if (team1_.getParent().isVisible()){
+		if (gameinfo_.isVisible()){
 			team1_.setText(" ");
 			team2_.setText(" ");
 			team1_.append("Team 1 :"+"\n");
 			team2_.append("Team 2 :"+"\n");
 			System.out.println("Printing team 1 for client named "+backend_.me().getName());
+			if (gameinfo_.isVisible()){
+				System.out.println("Really? This shouldn't reach here");
+			}
 			List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
 			System.out.println("TEAM SIZE: "+team.size());
 			for (Player player : team){
@@ -131,6 +134,12 @@ public class RoomMenu extends JPanel {
 			team2_.repaint();
 		}
 		System.out.println("Finished rendering text info for client named "+backend_.me().getName());
+	}
+	
+	public void displayPanel(boolean flag){
+		if (lobby_!= null){
+			lobby_.displayPanel(flag);
+		}
 	}
 	
 
@@ -185,6 +194,7 @@ public class RoomMenu extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 					try {
 						backend_.createGame();
+						gameinfo_.setVisible(false);
 						lobby_ = new GameLobby(backend_,front_);
 						front_.add(lobby_,"Lobby");
 						lobby_.updateLobbyInfo();
@@ -250,6 +260,7 @@ public class RoomMenu extends JPanel {
 				selectedTeamID_ = teamID_;
 				try {
 					backend_.joinGame(selectedGameID_, selectedTeamID_);
+					gameinfo_.setVisible(false);
 					lobby_ = new GameLobby(backend_, front_);
 					front_.add(lobby_,"Lobby");
 					lobby_.updateLobbyInfo();

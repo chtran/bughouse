@@ -174,6 +174,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void gameStarted() {
+		rooms_.displayPanel(false);
 		content_.add(setupGameView(), "Game");
 		this.displayCard("Game");
 		
@@ -232,12 +233,18 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void notifyNewOwner(int gameId) {
-		showMyPane(game_,"You are the new owner of game #"+gameId, JOptionPane.OK_OPTION);
+		showMyPane(this,"You are the new owner of game #"+gameId, JOptionPane.OK_OPTION);
 	}
 
 	@Override
 	public void gameCanceled() {
-		System.out.println("RECEIVED cancel game");
+		try {
+			System.out.println("RECEIVED cancel game"+backend_.me().getName());
+		} catch (IOException | RequestTimedOutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//rooms_.displayPanel(true);
 		game_.cancelGame();
 		
 	}
