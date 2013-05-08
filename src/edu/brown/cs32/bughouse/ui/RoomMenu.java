@@ -45,11 +45,11 @@ public class RoomMenu extends JPanel {
 	private BackEnd backend_;
 	private JTextArea team1_, team2_, cteam1_,cteam2_;
 	private List<Game> activeGames_;
-	private JPanel roomList_, roomPanel_, creatorView_;
+	private JPanel roomList_, roomPanel_;
+	private GameLobby lobby_;
 	private int selectedGameID_, selectedTeamID_;
 	private BughouseGUI front_;
 	private JScrollPane rooms_;
-	private boolean lockScreen_, isCreator_;
 	private JButton currentRoom_, joinTeam1_, joinTeam2_;
 	private Box gameinfo_;
 	
@@ -58,13 +58,11 @@ public class RoomMenu extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.front_ = frame;
 		this.backend_ = backend;
-		this.lockScreen_= false;
-		this.isCreator_ = false;
 		//this.add(listOfRooms(),BorderLayout.CENTER);
 		try {
 			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
-			this.add(userControl(), BorderLayout.SOUTH);		
+			this.add(userControl(), BorderLayout.SOUTH);	
 		}catch (IOException e){
 			e.printStackTrace();
 		}catch (RequestTimedOutException e){
@@ -72,13 +70,6 @@ public class RoomMenu extends JPanel {
 					"Connection time out", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-	}
-	
-	public JScrollPane listOfRooms(){
-		JTable table = new JTable(100,5);
-		table.getTableHeader().setReorderingAllowed(false);
-		rooms_ = new JScrollPane(table);
-		return rooms_;
 	}
 	
 	public Box gameInfo() {
@@ -142,39 +133,6 @@ public class RoomMenu extends JPanel {
 		System.out.println("Finished rendering text info for client named "+backend_.me().getName());
 	}
 	
-	public void reset(){
-		this.removeAll();
-		try {
-			this.add(gameInfo(), BorderLayout.EAST);
-			this.add(getRooms(), BorderLayout.CENTER);
-			this.add(userControl(), BorderLayout.SOUTH);	
-			this.revalidate();
-			this.repaint();
-		}catch (IOException e){
-			e.printStackTrace();
-		}catch (RequestTimedOutException e){
-			JOptionPane.showMessageDialog(this, "The connection to the server timed out", 
-					"Connection time out", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-	}
-	
-	private void displayLockedRoom() throws IOException, RequestTimedOutException{
-		this.removeAll();
-		int gameID = backend_.me().getCurrentGame().getId();
-		String headerMessage = new String("Welcome to Game # "+gameID+". Waiting for other players....");
-		JLabel header =  new JLabel(headerMessage);
-		header.setFont(new Font("Serif", Font.BOLD, 18));
-		this.add(header,BorderLayout.NORTH);
-		gameinfo_.remove(joinTeam1_);
-		gameinfo_.remove(joinTeam2_);
-		gameinfo_.setVisible(true);
-		this.add(gameinfo_,BorderLayout.CENTER);
-		this.add(creatorControl(),BorderLayout.SOUTH);
-		this.revalidate();
-		this.repaint();
-		updateGames();
-	}
 
 	public JPanel getRooms() throws IOException, RequestTimedOutException{
 		roomList_ = new JPanel(new BorderLayout());
@@ -192,9 +150,6 @@ public class RoomMenu extends JPanel {
 	}
 	
 	public void updateGames () throws IOException, RequestTimedOutException{
-		if (backend_.me()!= null ){
-			System.out.println(backend_.me().getName());
-		}
 		activeGames_ = backend_.getActiveGames();
 		roomPanel_.removeAll();
 		GridBagConstraints c = new GridBagConstraints();
@@ -212,65 +167,14 @@ public class RoomMenu extends JPanel {
 			System.out.println("Adding room to display for client named "+backend_.me().getName());
 		}
 		System.out.println("Refreshing view "+backend_.me().getName());
-		displayGameInfo();
+		this.displayGameInfo();
+		if (lobby_!= null){
+			lobby_.updateLobbyInfo();
+		}
 		System.out.println("Revalidating and repainting "+backend_.me().getName());
 		roomPanel_.revalidate();
 		roomPanel_.repaint();
 	}
-	
-	
-	private JPanel creatorControl(){
-		JPanel buttonPanel = new JPanel();
-		JButton start = new JButton("Start Game");
-		start.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-					try {
-						backend_.startGame();
-						front_.gameStarted();
-					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(null, "I/O error. Please check the server", 
-								"Failed to Start Game", JOptionPane.ERROR_MESSAGE);
-						return;
-					} catch (RequestTimedOutException e1) {
-						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-								"Connection time out", JOptionPane.ERROR_MESSAGE);
-						return;
-					} catch (GameNotReadyException e1) {
-						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
-								"Cannot start game", JOptionPane.ERROR_MESSAGE);
-						return;
-					} catch (UnauthorizedException e1) {
-						JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
-								"Authorization error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					
-			}
-		});
-		JButton cancel = new JButton("Cancel Game");
-		cancel.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				isCreator_ = false;
-				reset();
-				try {
-					backend_.quit();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (RequestTimedOutException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-			
-		});
-		buttonPanel.add(start);
-		buttonPanel.add(cancel);
-		return buttonPanel;
-	}
-	
 	
 	public JPanel userControl() {
 		JPanel buttonPanel = new JPanel();
@@ -279,19 +183,19 @@ public class RoomMenu extends JPanel {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (!(lockScreen_)){
 					try {
 						backend_.createGame();
-						displayLockedRoom();
+						lobby_ = new GameLobby(backend_,front_);
+						front_.add(lobby_,"Lobby");
+						lobby_.updateLobbyInfo();
+						front_.displayCard("Lobby");
 					} catch (IOException e2){
 						e2.printStackTrace();
 					}catch (RequestTimedOutException e1){
 						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
 								"Connection time out", JOptionPane.ERROR_MESSAGE);
 						front_.displayCard("Rooms");
-						isCreator_ = false;
 					}
-				}
 				
 			}
 		});
@@ -343,23 +247,22 @@ public class RoomMenu extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (!lockScreen_){
 				selectedTeamID_ = teamID_;
 				try {
 					backend_.joinGame(selectedGameID_, selectedTeamID_);
-					displayLockedRoom();
+					lobby_ = new GameLobby(backend_, front_);
+					front_.add(lobby_,"Lobby");
+					lobby_.updateLobbyInfo();
+					front_.displayCard("Lobby");
 				} catch (IOException e1){
 					e1.printStackTrace();
 				}catch (RequestTimedOutException e1){
 					JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
 							"Authorization error", JOptionPane.ERROR_MESSAGE);
-					lockScreen_ = false;
 				}catch(TeamFullException e1){
 					JOptionPane.showMessageDialog(null, "You can't join that team", 
 							"Team is full", JOptionPane.ERROR_MESSAGE);
-					lockScreen_ = false;	
 				}
-			}
 		}
 		
 	}

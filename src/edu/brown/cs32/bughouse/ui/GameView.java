@@ -44,12 +44,14 @@ public class GameView extends JPanel {
 	private BackEnd backend_;
 	private int myBoardID_, otherBoardID_;
 	private JPanel selectedPrisoner_;
+	private BughouseGUI front_;
 
-	public GameView(BackEnd backend) throws IOException, RequestTimedOutException, GameNotReadyException{
+	public GameView(BackEnd backend, BughouseGUI front) throws IOException, RequestTimedOutException, GameNotReadyException{
 		super(new BorderLayout());
-		backend_ = backend;
-		myPrisoners_ = new ArrayList<>();
-		imgFactory_ = new ChessPieceImageFactory();
+		this.front_ = front;
+		this.backend_ = backend;
+		this.myPrisoners_ = new ArrayList<>();
+		this.imgFactory_ = new ChessPieceImageFactory();
 		this.setupBoardID();
 		this.add(this.createBoard(), BorderLayout.CENTER);
 		this.add(this.createOptionMenu(),BorderLayout.EAST);
@@ -64,10 +66,9 @@ public class GameView extends JPanel {
 				"from your teammate!", JOptionPane.OK_CANCEL_OPTION);
 	}
 	
-	public void notifyEndGame(List<String> winners) {
-		String message = "The game has ended. The winning team is "+winners.get(0)+ " and "+ winners.get(1);
-		System.out.println(message);
-		JOptionPane.showMessageDialog(userBoard_, message);
+	public void notifyEndGame() {
+		front_.gameListUpdated();
+		front_.displayCard("Rooms");
 	} 
 	
 	public void notifyUser(){
@@ -75,8 +76,8 @@ public class GameView extends JPanel {
 	}
 	
 	public void cancelGame(){
-		CardLayout card = (CardLayout)this.getRootPane().getContentPane().getLayout();
-		card.show(this.getRootPane().getContentPane(), "Rooms");
+		front_.updatePlayerList();
+		front_.displayCard("Lobby");
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){
@@ -118,79 +119,6 @@ public class GameView extends JPanel {
 		}
 		
 	}
-	
-	private JComponent createDummyBoard(){
-		JTabbedPane boardContainer = new JTabbedPane();
-		boardContainer.addTab("Your Game", new BughouseBoard());
-		boardContainer.addTab("Other Game", new BughouseBoard());
-		return boardContainer;
-	}
-	
-	private JComponent createDummyOptionMenu(){
-		JPanel options = new JPanel(new BorderLayout());
-		JPanel optionMiddle = new JPanel(new BorderLayout());
-		options.setPreferredSize(new Dimension(250,190));
-		playerList_ = new JTextArea();
-		playerList_.setEditable(false);
-		playerList_.setPreferredSize(new Dimension(200,150));
-		playerList_.setBorder(new LineBorder(Color.BLACK,1));
-		JButton quit  = new JButton("Quit Game");
-		quit.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					JButton container = (JButton) e.getSource();
-					CardLayout card = (CardLayout) container.getRootPane().getContentPane().getLayout();
-					card.show(container.getRootPane().getContentPane(), "Rooms");
-					backend_.quit();
-				
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (RequestTimedOutException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-			}
-			
-		});
-		quit.setPreferredSize(new Dimension(100,60));
-		JButton start = new JButton("Start Game");
-		start.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-					try {
-						backend_.startGame();
-					} catch (IOException e1) {
-					} catch (RequestTimedOutException e1) {
-						BughouseGUI.showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
-						/*JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-								"Connection time out", JOptionPane.ERROR_MESSAGE);
-						return;*/
-					} catch (GameNotReadyException e1) {
-						BughouseGUI.showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
-						/*JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
-								"Cannot start game", JOptionPane.ERROR_MESSAGE);
-						return;*/
-					} catch (UnauthorizedException e1) {
-						BughouseGUI.showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
-						/*JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
-								"Authorization error", JOptionPane.ERROR_MESSAGE);
-						return;*/
-					}
-					
-			}
-		});
-		start.setPreferredSize(new Dimension(100,60));
-		optionMiddle.add(start,BorderLayout.CENTER);
-		optionMiddle.add(quit, BorderLayout.SOUTH);
-		options.add(optionMiddle,BorderLayout.CENTER);
-		options.add(playerList_, BorderLayout.NORTH);
-		return options;
-		
-	}
-	
 	/*
 	 * creates the initial board for both the user's game and the user's team
 	 * mate's game. Needs to check what color the player is playing as to get 
@@ -225,18 +153,16 @@ public class GameView extends JPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//try {
-					JButton container = (JButton) e.getSource();
-					CardLayout card = (CardLayout) container.getRootPane().getContentPane().getLayout();
-					card.show(container.getRootPane().getContentPane(), "Rooms");
-				//	backend_.quit();
-				
-			/*	} catch (IOException e1) {
+				try {
+					backend_.quit(); // --> disconnects client? Fix this and uncomment the code below
+					/*front_.gameListUpdated();
+					front_.displayCard("Rooms");*/
+			} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (RequestTimedOutException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}*/
+				}
 				
 			}
 			
