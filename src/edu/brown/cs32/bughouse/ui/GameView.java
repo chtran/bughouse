@@ -10,8 +10,10 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -41,12 +43,14 @@ public class GameView extends JPanel {
 	private int myBoardID_, otherBoardID_;
 	private JPanel selectedPrisoner_;
 	private BughouseGUI front_;
+	private boolean isHintOn_;
 
 	public GameView(BackEnd backend, BughouseGUI front) throws IOException, RequestTimedOutException, GameNotReadyException{
 		super(new BorderLayout());
 		this.front_ = front;
 		this.backend_ = backend;
 		this.myPrisoners_ = new ArrayList<>();
+		this.isHintOn_ = false;
 		this.imgFactory_ = new ChessPieceImageFactory();
 		this.setupBoardID();
 		this.add(this.createBoard(), BorderLayout.CENTER);
@@ -138,7 +142,7 @@ public class GameView extends JPanel {
 		options.setPreferredSize(new Dimension(250,190));
 		playerList_ = new JTextArea();
 		playerList_.setEditable(false);
-		playerList_.setPreferredSize(new Dimension(200,150));
+		playerList_.setPreferredSize(new Dimension(200,110));
 		playerList_.setBorder(new LineBorder(Color.BLACK,1));
 		messageBox_ = new JTextArea();
 		messageBox_.setPreferredSize(new Dimension(200,190));
@@ -162,7 +166,10 @@ public class GameView extends JPanel {
 			}
 			
 		});
+		//JCheckBox hints = new JCheckBox("Show me hints for moves", false);
+		//userBoard_.setHintButton(hints);
 		quit.setPreferredSize(new Dimension(100,60));
+		//optionMiddle.add(hints,BorderLayout.NORTH);
 		optionMiddle.add(messageBox_, BorderLayout.CENTER);
 		optionMiddle.add(quit, BorderLayout.SOUTH);
 		options.add(optionMiddle,BorderLayout.CENTER);

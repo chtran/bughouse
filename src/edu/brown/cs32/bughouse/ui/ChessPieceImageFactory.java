@@ -6,18 +6,18 @@ import javax.swing.ImageIcon;
 
 public class ChessPieceImageFactory {
 
-	private final java.net.URL W_PAWN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wp.png");
-	private final java.net.URL W_KNIGHT = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wn.png");
-	private final java.net.URL W_BISHOP = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wb.png");
-	private final java.net.URL W_ROOK = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wr.png");
-	private final java.net.URL W_KING = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wk.png");
-	private final java.net.URL W_QUEEN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/wq.png");
-	private final java.net.URL B_PAWN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bp.png");
-	private final java.net.URL B_KNIGHT = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bn.png");
-	private final java.net.URL B_BISHOP = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bb.png");
-	private final java.net.URL B_ROOK = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/br.png");
-	private final java.net.URL B_KING = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bk.png");
-	private final java.net.URL B_QUEEN = getClass().getResource("/edu/brown/cs32/bughouse/global/img/48/bq.png");
+	private final java.net.URL W_PAWN = Thread.currentThread().getContextClassLoader().getResource("rsrc/wp.png");
+	private final java.net.URL W_KNIGHT = Thread.currentThread().getContextClassLoader().getResource("rsrc/wn.png");
+	private final java.net.URL W_BISHOP = Thread.currentThread().getContextClassLoader().getResource("rsrc/wb.png");
+	private final java.net.URL W_ROOK =Thread.currentThread().getContextClassLoader().getResource("rsrc/wr.png");
+	private final java.net.URL W_KING = Thread.currentThread().getContextClassLoader().getResource("rsrc/wk.png");
+	private final java.net.URL W_QUEEN = Thread.currentThread().getContextClassLoader().getResource("rsrc/wq.png");
+	private final java.net.URL B_PAWN = Thread.currentThread().getContextClassLoader().getResource("rsrc/bp.png");
+	private final java.net.URL B_KNIGHT = Thread.currentThread().getContextClassLoader().getResource("rsrc/bn.png");
+	private final java.net.URL B_BISHOP = Thread.currentThread().getContextClassLoader().getResource("rsrc/bb.png");
+	private final java.net.URL B_ROOK = Thread.currentThread().getContextClassLoader().getResource("rsrc/br.png");
+	private final java.net.URL B_KING = Thread.currentThread().getContextClassLoader().getResource("rsrc/bk.png");
+	private final java.net.URL B_QUEEN =Thread.currentThread().getContextClassLoader().getResource("rsrc/bq.png");
 	
 	
 	public  ChessPieceImageFactory(){
