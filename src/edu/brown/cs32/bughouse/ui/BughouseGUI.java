@@ -129,7 +129,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void showEndGameMessage(List<String> winners) {
 		if (game_ != null){
-			showMyPane(game_,"End game", JOptionPane.INFORMATION_MESSAGE);
+			String message = new String("The game has ended. The winning team is "+ winners.get(0)+ 
+					" and "+winners.get(1));
+			JOptionPane.showMessageDialog(this, message, "Game over",
+                    JOptionPane.INFORMATION_MESSAGE);
 			game_.notifyEndGame();
 			System.out.println("Game ended");
 		}	

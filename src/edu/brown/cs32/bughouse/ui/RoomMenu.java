@@ -79,7 +79,7 @@ public class RoomMenu extends JPanel {
 		
 	}
 	
-	public void displayGameInfoPanel(Game selected) throws IOException, RequestTimedOutException{
+	public synchronized void displayGameInfoPanel(Game selected) throws IOException, RequestTimedOutException{
 		team1_.setText(" ");
 		team2_.setText(" ");
 		gameinfo_.setVisible(true);
@@ -95,7 +95,7 @@ public class RoomMenu extends JPanel {
 		team2_.repaint();
 	}
 	
-	public void displayGameInfo() throws IOException, RequestTimedOutException{
+	/*public void displayGameInfo() throws IOException, RequestTimedOutException{
 		System.out.println("Displaying info for client named "+backend_.me().getName());
 		if (gameinfo_.isVisible()){
 			team1_.setText(" ");
@@ -103,8 +103,7 @@ public class RoomMenu extends JPanel {
 			team1_.append("Team 1 :"+"\n");
 			team2_.append("Team 2 :"+"\n");
 			System.out.println("Printing team 1 for client named "+backend_.me().getName());
-			if (gameinfo_.isVisible()){
-			}
+			System.out.println("Printing players for team 1 for game "+backend_.me().getCurrentGame().getId());
 			List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
 			System.out.println("TEAM SIZE: "+team.size());
 			for (Player player : team){
@@ -121,7 +120,7 @@ public class RoomMenu extends JPanel {
 			team2_.repaint();
 		}
 		System.out.println("Finished rendering text info for client named "+backend_.me().getName());
-	}
+	}*/
 	
 	public void displayPanel(boolean flag){
 		if (lobby_!= null){
@@ -147,6 +146,9 @@ public class RoomMenu extends JPanel {
 	
 	public void updateGames () throws IOException, RequestTimedOutException{
 		activeGames_ = backend_.getActiveGames();
+		if (activeGames_.isEmpty()){
+			gameinfo_.setVisible(false);
+		}
 		roomPanel_.removeAll();
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 2;
@@ -160,10 +162,13 @@ public class RoomMenu extends JPanel {
 			room.addActionListener(new ChooseRoomListener(game));
 			c.gridy = activeGames_.indexOf(game);
 			roomPanel_.add(room,c);
+			if  (gameID == selectedGameID_){
+				displayGameInfoPanel(game);
+			}
 			System.out.println("Adding room to display for client named "+backend_.me().getName());
 		}
 		System.out.println("Refreshing view "+backend_.me().getName());
-		this.displayGameInfo();
+		//this.displayGameInfo();
 		if (lobby_!= null){
 			lobby_.updateLobbyInfo();
 		}

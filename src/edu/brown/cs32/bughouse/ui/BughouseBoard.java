@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -32,6 +33,7 @@ public class BughouseBoard extends JPanel {
 	private BackEnd backend_;
 	private JLabel [][] board_;
 	private ChessPiece selectedPrisoner_;
+	private JCheckBox hint_;
 
 
 	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable,ChessBoard chessBoard){
@@ -76,11 +78,15 @@ public class BughouseBoard extends JPanel {
 		}
 	}
 	
+	public void setHintButton(JCheckBox button){
+		hint_ = button;
+	}
+	
 	public void startTurn(){
 		turn_ = true;
 		this.requestFocusInWindow();
 		BughouseGUI.showMyPane(this, "It is your turn now"
-				, JOptionPane.ERROR_MESSAGE);
+				, JOptionPane.INFORMATION_MESSAGE);
 		if (turn_){
 			System.out.println("ITS YOUR TURN");
 		}
