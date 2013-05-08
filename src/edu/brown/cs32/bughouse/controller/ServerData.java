@@ -358,7 +358,7 @@ public class ServerData {
 	public int setNewOwner(int gameID) {
 		GameInfo g = m_games.get(gameID);
 		if (g != null) 
-			return g.setNewOwner();
+			return g.setNewOwner(g.getOwner());
 		return -1;
 	}
 

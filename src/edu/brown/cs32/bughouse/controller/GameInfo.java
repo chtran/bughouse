@@ -254,17 +254,29 @@ public class GameInfo {
 
 	/**
 	 * Sets new owner in game and removes previous owner from game
+	 * @param prevID ID of previous game owner
 	 * @return playerID of new owner
 	 */
-	public int setNewOwner() {
-		PlayerInfo prev = m_team1.get(0);
+	public int setNewOwner(int prevID) {
+		int team = -1;
+		PlayerInfo prev = null;
+		for (PlayerInfo p : m_team1) {
+			if (p.getId() == prevID) {
+				prev = p;
+				team = 1;
+				break;
+			}
+		}
 		
-		PlayerInfo p;
-		if (m_team1.size() == 2) {
-			p = m_team1.get(1);
-			p.setColor(true);
-		} else {
-			p = m_team2.get(0);
+		// only check team 2 if owner not in team 1
+		if (prev == null) {
+			for (PlayerInfo p : m_team2) {
+				if (p.getId() == prevID) {
+					prev = p;
+					team = 2;
+					break;
+				}
+			}
 		}
 		
 		// reset prev owner to remove from game
@@ -272,7 +284,30 @@ public class GameInfo {
 		prev.setGameId(-1);
 		prev.setTeamId(-1);
 		
-		m_team1.remove(prev); // remove previous owner from game
+		PlayerInfo p;
+		if (team == 1) {
+			// set to other team 1 player if still playing and change them to white
+			if (m_team1.size() == 2) {
+				p = m_team1.get(1);
+				p.setColor(true);
+			// otherwise set first player on team 2
+			} else {
+				p = m_team2.get(0);
+			}
+			m_team1.remove(prev);
+		} else if (team == 2) {
+			// set to first team 1 player if still playing
+			if (m_team1.size() > 0) {
+				p = m_team1.get(0);
+			// otherwise set as remaining player on team 2
+			} else {
+				p = m_team2.get(1);
+			}
+			m_team2.remove(prev);
+		} else {
+			return -1;
+		}
+		
 		m_ownerId = p.getId();
 		return m_ownerId;
 	}
