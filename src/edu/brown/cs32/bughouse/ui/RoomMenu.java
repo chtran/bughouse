@@ -1,37 +1,26 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.io.IOException;
 import javax.swing.Box;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
-import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
 import edu.brown.cs32.bughouse.models.Game;
 import edu.brown.cs32.bughouse.models.Player;
@@ -43,7 +32,7 @@ public class RoomMenu extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private BackEnd backend_;
-	private JTextArea team1_, team2_, cteam1_,cteam2_;
+	private JTextArea team1_, team2_;
 	private List<Game> activeGames_;
 	private JPanel roomList_, roomPanel_;
 	private GameLobby lobby_;
@@ -66,9 +55,8 @@ public class RoomMenu extends JPanel {
 		}catch (IOException e){
 			e.printStackTrace();
 		}catch (RequestTimedOutException e){
-			JOptionPane.showMessageDialog(this, "The connection to the server timed out", 
-					"Connection time out", JOptionPane.ERROR_MESSAGE);
-			return;
+			BughouseGUI.showMyPane(this, "The server timed out. Please check your connection", 
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
@@ -116,7 +104,6 @@ public class RoomMenu extends JPanel {
 			team2_.append("Team 2 :"+"\n");
 			System.out.println("Printing team 1 for client named "+backend_.me().getName());
 			if (gameinfo_.isVisible()){
-				System.out.println("Really? This shouldn't reach here");
 			}
 			List<Player> team = backend_.me().getCurrentGame().getPlayersByTeam(1);
 			System.out.println("TEAM SIZE: "+team.size());
@@ -202,8 +189,8 @@ public class RoomMenu extends JPanel {
 					} catch (IOException e2){
 						e2.printStackTrace();
 					}catch (RequestTimedOutException e1){
-						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+								, JOptionPane.ERROR_MESSAGE);
 						front_.displayCard("Rooms");
 					}
 				
@@ -238,8 +225,8 @@ public class RoomMenu extends JPanel {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			} catch (RequestTimedOutException e1) {
-				JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
-						"Authorization error", JOptionPane.ERROR_MESSAGE);
+				BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+						, JOptionPane.ERROR_MESSAGE);
 			}
 			
 		}
@@ -268,11 +255,10 @@ public class RoomMenu extends JPanel {
 				} catch (IOException e1){
 					e1.printStackTrace();
 				}catch (RequestTimedOutException e1){
-					JOptionPane.showMessageDialog(null, "You are not authorized to that action", 
-							"Authorization error", JOptionPane.ERROR_MESSAGE);
+					BughouseGUI.showMyPane(null, "The server timed out. Please check your connection",
+							JOptionPane.ERROR_MESSAGE);
 				}catch(TeamFullException e1){
-					JOptionPane.showMessageDialog(null, "You can't join that team", 
-							"Team is full", JOptionPane.ERROR_MESSAGE);
+					BughouseGUI.showMyPane(null, "You can't join that team - it's full ", JOptionPane.ERROR_MESSAGE);
 				}
 		}
 		

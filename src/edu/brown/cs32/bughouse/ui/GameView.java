@@ -1,7 +1,6 @@
 package edu.brown.cs32.bughouse.ui;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -19,14 +18,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
-import edu.brown.cs32.bughouse.exceptions.UnauthorizedException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
-import edu.brown.cs32.bughouse.models.ChessBoard;
 import edu.brown.cs32.bughouse.models.ChessPiece;
 import edu.brown.cs32.bughouse.models.Player;
 
@@ -154,13 +150,13 @@ public class GameView extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					backend_.quit(); // --> disconnects client? Fix this and uncomment the code below
-					/*front_.gameListUpdated();
-					front_.displayCard("Rooms");*/
+					front_.gameListUpdated();
+					front_.displayCard("Rooms");
 			} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (RequestTimedOutException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+							, JOptionPane.ERROR_MESSAGE);
 				}
 				
 			}

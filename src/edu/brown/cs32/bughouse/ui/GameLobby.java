@@ -99,23 +99,20 @@ public class GameLobby extends JPanel {
 						isDisplayed_ =false;
 						backend_.frontEnd().gameStarted();
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(null, "I/O error. Please check the server", 
-								"Failed to Start Game", JOptionPane.ERROR_MESSAGE);
-						isDisplayed_ = true;
-						return;
+						e1.printStackTrace();
 					} catch (RequestTimedOutException e1) {
-						JOptionPane.showMessageDialog(null, "The connection to the server timed out", 
-								"Connection time out", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+								, JOptionPane.ERROR_MESSAGE);
 						isDisplayed_ = true;
 						return;
 					} catch (GameNotReadyException e1) {
-						JOptionPane.showMessageDialog(null, "The game does not have 4 players yet", 
-								"Cannot start game", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "The game does not have 4 players yet"
+								, JOptionPane.ERROR_MESSAGE);
 						isDisplayed_ = true;
 						return;
 					} catch (UnauthorizedException e1) {
-						JOptionPane.showMessageDialog(null, "You are not authorized to execute that action", 
-								"Authorization error", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "Only the owner can start the game."
+								, JOptionPane.ERROR_MESSAGE);
 						isDisplayed_ = true;
 						return;
 					}
@@ -135,7 +132,8 @@ public class GameLobby extends JPanel {
 					e1.printStackTrace();
 					isDisplayed_ = false;
 				} catch (RequestTimedOutException e1) {
-					e1.printStackTrace();
+					BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+							, JOptionPane.ERROR_MESSAGE);
 					isDisplayed_ = false;
 				}
 			}

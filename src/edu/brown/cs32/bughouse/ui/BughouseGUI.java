@@ -68,7 +68,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (RequestTimedOutException e1) {
-					showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
+					showMyPane(content_, "The server timed out. Please check your connection",
+							JOptionPane.ERROR_MESSAGE);
 
 				}
 				System.exit(0);
@@ -137,9 +138,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(parent, text 
-                      + "\n is on EDT: " + SwingUtilities.isEventDispatchThread(), text,
-                        type);
+                JOptionPane.showMessageDialog(parent, text, text,
+                       type);
             }
         });
     }
@@ -154,10 +154,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 			e.printStackTrace();
 			return null;
 		} catch (RequestTimedOutException e) {
-			showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
+			showMyPane(game_, "The server timed out. Please check your connection", JOptionPane.ERROR_MESSAGE);
 			return null;
 		} catch (GameNotReadyException e) {
-			showMyPane(null, "not enough players", JOptionPane.ERROR_MESSAGE);
+			showMyPane(game_, "The game does not have 4 players yet", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
 	}
@@ -210,7 +210,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
-			showMyPane(null, "Time out", JOptionPane.ERROR_MESSAGE);
+			showMyPane(game_, "The server timed out. Please check your connection", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 	}
@@ -241,10 +241,8 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		try {
 			System.out.println("RECEIVED cancel game"+backend_.me().getName());
 		} catch (IOException | RequestTimedOutException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//rooms_.displayPanel(true);
 		game_.cancelGame();
 		
 	}
@@ -257,7 +255,7 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
-			e.printStackTrace();
+			showMyPane(game_, "The server timed out. Please check your connection", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

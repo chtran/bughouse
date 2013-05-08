@@ -5,18 +5,13 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
-import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.MouseInputListener;
-
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
 import edu.brown.cs32.bughouse.exceptions.IllegalPlacementException;
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
@@ -84,7 +79,8 @@ public class BughouseBoard extends JPanel {
 	public void startTurn(){
 		turn_ = true;
 		this.requestFocusInWindow();
-	JOptionPane.showMessageDialog(this, "Your turn");
+		BughouseGUI.showMyPane(this, "It is your turn now"
+				, JOptionPane.ERROR_MESSAGE);
 		if (turn_){
 			System.out.println("ITS YOUR TURN");
 		}
@@ -193,9 +189,8 @@ public class BughouseBoard extends JPanel {
 							return;
 						}
 					}catch (RequestTimedOutException e){
-						BughouseGUI.showMyPane(null,"Time out", JOptionPane.ERROR_MESSAGE);
-						/*JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-								"Timeout Error", JOptionPane.ERROR_MESSAGE);*/
+						BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+								, JOptionPane.ERROR_MESSAGE);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -235,27 +230,18 @@ public class BughouseBoard extends JPanel {
 					System.out.println("Sent move to backend");
 				} catch (IllegalMoveException e) {
 					turn_ = true;
-					e.printStackTrace();
-					BughouseGUI.showMyPane(null,"That is an illegal move. Consider choosing another move", JOptionPane.ERROR_MESSAGE);
-/*					JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
-							"Illegal Move Error", JOptionPane.ERROR_MESSAGE);	*/				
+					BughouseGUI.showMyPane(null,"That is an illegal move. Consider choosing another move",
+							JOptionPane.ERROR_MESSAGE);			
 				} catch (IOException e) {
 					e.printStackTrace();
 				} catch (RequestTimedOutException e) {
-					e.printStackTrace();
-					BughouseGUI.showMyPane(null,"Time out", JOptionPane.ERROR_MESSAGE);
-					/*JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-							"Timeout Error", JOptionPane.ERROR_MESSAGE);*/
+					BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+							, JOptionPane.ERROR_MESSAGE);
 				}catch (WrongColorException e) {
-					// TODO Auto-generated catch block
 					turn_ = true;
 					e.printStackTrace();
-
-					BughouseGUI.showMyPane(null,"Wrong color", JOptionPane.ERROR_MESSAGE);
-					/*JOptionPane.showMessageDialog(null, "You've attempted to move " +
-							"your opponent's piece. Please " +
-							"move another chess piece of yours", 
-							"Piece Error", JOptionPane.ERROR_MESSAGE);*/
+					BughouseGUI.showMyPane(null,"You've attemped to move your opponent's piece. Please" +
+							"move another chess piece that is you own", JOptionPane.ERROR_MESSAGE);
 				}finally {
 					JPanel originPanel = (JPanel)source_.getParent();
 					JPanel destPanel = (JPanel) current_.getParent();
@@ -274,9 +260,8 @@ public class BughouseBoard extends JPanel {
 			} catch (IllegalPlacementException e) {
 				isPuttingPrisoner_ = true;
 				turn_ = true;
-				BughouseGUI.showMyPane(null,"Time out", JOptionPane.ERROR_MESSAGE);
-				/*JOptionPane.showMessageDialog(null, "That is an illegal move. Consider choosing another move", 
-						"Illegal Move Error", JOptionPane.ERROR_MESSAGE);		*/
+				BughouseGUI.showMyPane(null,"That is an illegal move. Consider making another move.",
+						JOptionPane.ERROR_MESSAGE);
 			} catch (IOException e) {
 				e.printStackTrace();
 				isPuttingPrisoner_ = true;
@@ -284,9 +269,8 @@ public class BughouseBoard extends JPanel {
 			} catch (RequestTimedOutException e) {
 				isPuttingPrisoner_ = true;
 				turn_ = true;
-				BughouseGUI.showMyPane(null,"Time out", JOptionPane.ERROR_MESSAGE);
-				/*JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-						"Timeout Error", JOptionPane.ERROR_MESSAGE);*/
+				BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+						, JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		
@@ -307,9 +291,8 @@ public class BughouseBoard extends JPanel {
 					} catch (IOException e) {
 						e.printStackTrace();
 					} catch (RequestTimedOutException e) {
-						BughouseGUI.showMyPane(null,"Time out", JOptionPane.ERROR_MESSAGE);
-//						JOptionPane.showMessageDialog(null, "Connection to the server timed out", 
-//								"Timeout Error", JOptionPane.ERROR_MESSAGE);
+						BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+								, JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
