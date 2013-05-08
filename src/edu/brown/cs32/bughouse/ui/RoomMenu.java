@@ -145,7 +145,7 @@ public class RoomMenu extends JPanel {
 		return roomList_;
 	}
 	
-	public void updateGames () throws IOException, RequestTimedOutException{
+	public synchronized void updateGames () throws IOException, RequestTimedOutException{
 		activeGames_ = backend_.getActiveGames();
 		roomPanel_.removeAll();
 		GridBagConstraints c = new GridBagConstraints();
