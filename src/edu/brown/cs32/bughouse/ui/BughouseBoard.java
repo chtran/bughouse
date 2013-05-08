@@ -136,7 +136,7 @@ public class BughouseBoard extends JPanel {
 	private void showHintedMoves() throws IOException, RequestTimedOutException{
 		suggestions_ = new ArrayList<>();
 		for (int i =0;i<8;i++){
-			for (int j=0;j<7;j++){
+			for (int j=0;j<8;j++){
 				if (backend_.canMove(backend_.me().getCurrentBoardId(), originX_, originY_, j, i)){
 					suggestions_.add(board_[i][j]);
 					JPanel parent = (JPanel) board_[i][j].getParent();

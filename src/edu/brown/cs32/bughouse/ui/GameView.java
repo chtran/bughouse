@@ -76,7 +76,9 @@ public class GameView extends JPanel {
 	}
 	
 	public void cancelGame(){
+		System.out.println("Received cancel request. Will now quit to the room menu");
 		front_.displayCard("Rooms");
+		System.out.println("displaying room menu");
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){
@@ -153,9 +155,7 @@ public class GameView extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					backend_.quit(); // --> disconnects client? Fix this and uncomment the code below
-					front_.gameListUpdated();
-					front_.displayCard("Rooms");
+					backend_.quit(); 
 			} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (RequestTimedOutException e1) {

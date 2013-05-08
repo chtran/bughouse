@@ -142,13 +142,16 @@ public class RoomMenu extends JPanel {
 			System.out.println("Adding room to display for client named "+backend_.me().getName());
 		}
 		System.out.println("Refreshing view "+backend_.me().getName());
-		//this.displayGameInfo();
 		if (lobby_!= null){
 			lobby_.updateLobbyInfo();
 		}
 		System.out.println("Revalidating and repainting "+backend_.me().getName());
-		roomPanel_.revalidate();
+		//roomPanel_.revalidate();
+		System.out.println("Revalidated panel, now repainting");
 		roomPanel_.repaint();
+		System.out.println("repainted, requesting focus");
+		this.requestFocusInWindow();
+		System.out.println("Refreshed room menu. User should interact with UI now");
 	}
 	
 	public JPanel userControl() {

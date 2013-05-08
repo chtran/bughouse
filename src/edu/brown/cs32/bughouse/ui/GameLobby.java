@@ -113,37 +113,40 @@ public class GameLobby extends JPanel {
 		return infoArea_;
 	}
 	
-	private JPanel setupButtonPanel(){
+	private JPanel setupButtonPanel() throws IOException, RequestTimedOutException{
 		JPanel buttonPanel = new JPanel();
-		JButton start = new JButton("Start Game");
-		start.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-					try {
-						backend_.startGame();
-						isDisplayed_ =false;
-						backend_.frontEnd().gameStarted();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					} catch (RequestTimedOutException e1) {
-						BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
-								, JOptionPane.ERROR_MESSAGE);
-						isDisplayed_ = true;
-						return;
-					} catch (GameNotReadyException e1) {
-						BughouseGUI.showMyPane(null, "The game does not have 4 players yet"
-								, JOptionPane.ERROR_MESSAGE);
-						isDisplayed_ = true;
-						return;
-					} catch (UnauthorizedException e1) {
-						BughouseGUI.showMyPane(null, "Only the owner can start the game."
-								, JOptionPane.ERROR_MESSAGE);
-						isDisplayed_ = true;
-						return;
-					}
-					
-			}
-		});
+		if (backend_.me().getCurrentGame().getOwnerId() == backend_.me().getId()){
+			JButton start = new JButton("Start Game");
+			start.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e) {
+						try {
+							backend_.startGame();
+							isDisplayed_ =false;
+							backend_.frontEnd().gameStarted();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						} catch (RequestTimedOutException e1) {
+							BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
+									, JOptionPane.ERROR_MESSAGE);
+							isDisplayed_ = true;
+							return;
+						} catch (GameNotReadyException e1) {
+							BughouseGUI.showMyPane(null, "The game does not have 4 players yet"
+									, JOptionPane.ERROR_MESSAGE);
+							isDisplayed_ = true;
+							return;
+						} catch (UnauthorizedException e1) {
+							BughouseGUI.showMyPane(null, "Only the owner can start the game."
+									, JOptionPane.ERROR_MESSAGE);
+							isDisplayed_ = true;
+							return;
+						}
+						
+				}
+			});
+			buttonPanel.add(start);
+		}
 		JButton cancel = new JButton("Leave Game");
 		cancel.addActionListener(new ActionListener(){
 			@Override
@@ -164,7 +167,7 @@ public class GameLobby extends JPanel {
 			}
 			
 		});
-		buttonPanel.add(start);
+		
 		buttonPanel.add(cancel);
 		return buttonPanel;
 	}

@@ -184,8 +184,15 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	}
 	
 	public void displayCard(String cardName){
+		System.out.println("Request to change menu to " +cardName);
 		CardLayout cards = (CardLayout) content_.getLayout();
+		System.out.println("Getting layout");
+		if (cardName.equals("Rooms")){
+			cards.show(content_,cardName);
+			cards.first(content_);
+		}
 		cards.show(content_,cardName);
+		System.out.println("Displayed " +cardName);
 	}
 	
 	public void joinServer(){
