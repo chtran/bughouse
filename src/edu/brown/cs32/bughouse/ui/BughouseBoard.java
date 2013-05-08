@@ -243,9 +243,11 @@ public class BughouseBoard extends JPanel {
 			parent.setBorder(null);
 			originX_ = -1;
 			originY_ = -1;
-			for (JLabel square: suggestions_){
-				JPanel parents = (JPanel) square.getParent();
-				parents.setBorder(null);
+			if (suggestions_!= null){
+				for (JLabel square: suggestions_){
+					JPanel parents = (JPanel) square.getParent();
+					parents.setBorder(null);
+				}
 			}
 		}
 		
@@ -290,9 +292,11 @@ public class BughouseBoard extends JPanel {
 					originPanel.setBorder(null);
 					destPanel.setBorder(null);
 					isMovingPiece_ = false;
-					for (JLabel square: suggestions_){
-						JPanel parent = (JPanel) square.getParent();
-						parent.setBorder(null);
+					if (suggestions_!= null){
+						for (JLabel square: suggestions_){
+							JPanel parent = (JPanel) square.getParent();
+							parent.setBorder(null);
+						}
 					}
 				}
 		}
