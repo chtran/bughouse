@@ -190,6 +190,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param team Winning team
 	 */
 	private void gameOver(int id, int team) {
+		if (id < 0 || team < 0)
+			send("\n");
+		
 		List<Integer> ids = m_data.getPlayerIdsByTeam(id, team);
 		String message = "BROADCAST:GAME_OVER:"+id;
 		for (int playerId: ids) 
@@ -258,6 +261,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	private void sendCurrentBoard(int id) {
+		if (id < 0)
+			send("\n");
+		
 		int board = m_data.getPlayerBoard(id);
 		if (board > 0)
 			send(board + "\n");
@@ -270,6 +276,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	private void sendPlayerTeam(int id) {
+		if (id < 0)
+			send("\n");
+		
 		int team = m_data.getPlayerTeam(id);
 		if (team == 1)
 			send("1\n");
@@ -287,6 +296,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	private void sendIsWhite(int id) {
+		if (id < 0)
+			send("\n");
+		
 		if (m_data.isWhite(id))
 			send("true\n");
 		else
@@ -299,6 +311,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	private void sendPlayerName(int id) {
+		if (id < 0)
+			send("\n");
+		
 		String name = m_data.getPlayerName(id);
 		if (name == null)
 			send("ERROR: player with id " + id + " does not exist\n");
@@ -327,6 +342,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param teamNum
 	 */
 	public void addPlayerToGame(int playerId, int gameId, int teamNum) {
+		if (playerId < 0 || gameId < 0 || teamNum < 0)
+			send("\n");
+		
 		if (m_data.addPlayerToGame(playerId, gameId, teamNum)) {
 			m_gameId = gameId;
 			send("GAME_JOINED\n");
@@ -341,6 +359,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param ownerId ID of game owner/client
 	 */
 	public void addGame(int ownerId) {
+		if (ownerId < 0)
+			send("\n");
+		
 		int id = m_data.addGame(ownerId);
 		m_gameId = id;
 		send(id + "\n");
@@ -363,6 +384,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	public void startGame(int gameId) {
+		if (gameId < 0)
+			send("\n");
+		
 		// send unauthorized message if client not game owner
 		if (m_data.getGameOwner(gameId) != m_playerId) {
 			send("UNAUTHORIZED:" + gameId + "\n");
@@ -446,6 +470,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	public void sendPlayerIdList(int gameId,int team) {
+		if (gameId < 0 || team < 0)
+			send("\n");
+		
 		List<Integer> ids = m_data.getPlayerIdsByTeam(gameId, team);
 		String msg="";
 		for (Integer id : ids) {
@@ -460,6 +487,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	public void sendBoards(int gameId) {
+		if (gameId < 0)
+			send("\n");
+		
 		int[] boards = m_data.getBoards(gameId);
 		if (boards != null)
 			send(boards[0] + "\t" + boards[1] + "\n");
@@ -472,6 +502,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	private void sendIsActive(int gameId) {
+		if (gameId < 0)
+			send("\n");
+		
 		boolean isActive = m_data.gameIsActive(gameId);
 		if (isActive)
 			send("true\n");
@@ -484,6 +517,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	private void sendGameOwner(int gameId) {
+		if (gameId < 0)
+			send("\n");
+		
 		int owner = m_data.getGameOwner(gameId);
 		send(owner + "\n");
 	}
@@ -492,13 +528,10 @@ public class BughouseClientHandler extends Thread {
 	 * @param gameId
 	 */
 	private void sendCurrentGame(int playerId) {
-		//chtran: Sometimes, m_playerInfo just returns null =.=
-		//int gameId;
-		//if (playerId == m_playerInfo.getId()) {
-			//gameId = m_playerInfo.getGameId();
-		//} else {
-			int gameId = m_data.getCurrentGame(playerId);
-		//}
+		if (playerId < 0)
+			send("\n");
+		
+		int gameId = m_data.getCurrentGame(playerId);
 		send(gameId + "\n");
 	}
 	
@@ -512,6 +545,9 @@ public class BughouseClientHandler extends Thread {
 	 * @param id
 	 */
 	public void quit(int playerId) {
+		if (playerId < 0)
+			send("\n");
+		
 		System.out.println("Player " + playerId + " is quitting");
 		int gameID = m_data.getCurrentGame(playerId);
 		if (gameID >= 0) {
