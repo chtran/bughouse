@@ -187,10 +187,6 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		System.out.println("Request to change menu to " +cardName);
 		CardLayout cards = (CardLayout) content_.getLayout();
 		System.out.println("Getting layout");
-		if (cardName.equals("Rooms")){
-			cards.show(content_,cardName);
-			cards.first(content_);
-		}
 		cards.show(content_,cardName);
 		System.out.println("Displayed " +cardName);
 	}
@@ -253,7 +249,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		} catch (IOException | RequestTimedOutException e) {
 			e.printStackTrace();
 		}
-		game_.cancelGame();
+		if (game_!= null){
+			game_.cancelGame();
+		}
 		
 	}
 
@@ -261,7 +259,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public void updatePlayerList() {
 		System.out.println("Call to update the player list in lobby");
 		try {
-			rooms_.updateGames();
+			if(rooms_!= null){
+				rooms_.updateGames();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
