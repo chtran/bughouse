@@ -79,6 +79,12 @@ public class RoomMenu extends JPanel {
 		
 	}
 	
+	public void showStartButton(){
+		if (lobby_!= null){
+			lobby_.showStartButton();
+		}
+	}
+	
 	public synchronized void displayGameInfoPanel(Game selected) throws IOException, RequestTimedOutException{
 		team1_.setText(" ");
 		team2_.setText(" ");

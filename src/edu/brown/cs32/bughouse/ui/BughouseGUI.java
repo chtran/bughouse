@@ -239,6 +239,17 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void notifyNewOwner(int gameId) {
+		if (rooms_!= null){
+			try {
+				if (backend_.me().getCurrentGame().getOwnerId()== backend_.me().getId()){
+					rooms_.showStartButton();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (RequestTimedOutException e) {
+
+			}
+		}
 		showMyPane(this,"You are the new owner of game #"+gameId, JOptionPane.OK_OPTION);
 	}
 
