@@ -20,4 +20,5 @@ public interface FrontEnd {
 	public void notifyNewOwner(int gameId);
 	public void gameCanceled(); //call when the game is playing and one player quits
 	public void updatePlayerList(); //call when a player joins/quits the game
+	public void switchBoard(int boardId);
 }

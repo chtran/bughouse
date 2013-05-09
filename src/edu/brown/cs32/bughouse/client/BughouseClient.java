@@ -156,6 +156,7 @@ public class BughouseClient implements Client {
 	@Override
 	public void receive(String message) throws NumberFormatException, IOException, RequestTimedOutException {
 		String[] splitted = message.split(":");
+		String body;
 		switch (splitted[1]) {
 			case "MOVE":
 				broadcastMove(message);
@@ -188,7 +189,7 @@ public class BughouseClient implements Client {
 				backend.frontEnd().gameCanceled();
 				break;
 			case "NEW_OWNER":
-				String body = message.split(":")[2];
+				body = message.split(":")[2];
 				int gameId = Integer.parseInt(body.split("\t")[0]);
 				backend.frontEnd().notifyNewOwner(gameId);
 				break;
@@ -197,6 +198,11 @@ public class BughouseClient implements Client {
 				break;
 			case "LEAVE_GAME":
 				backend.frontEnd().updatePlayerList();
+				break;
+			case "NEXT_BOARD":
+				body = message.split(":")[2];
+				int boardId = Integer.parseInt(body.split("\t")[0]);
+				backend.frontEnd().switchBoard(boardId);
 				break;
 			default:
 				System.out.println("Unknown broadcast message: "+message);

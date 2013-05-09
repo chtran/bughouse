@@ -280,4 +280,10 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		}
 	}
 
+
+	@Override
+	public void switchBoard(int boardId) {
+		
+	}
+
 }

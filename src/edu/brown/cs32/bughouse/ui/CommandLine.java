@@ -263,4 +263,9 @@ public class CommandLine implements FrontEnd{
 	public void updatePlayerList() {
 		
 	}
+	
+	@Override
+	public void switchBoard(int boardId) {
+		
+	}
 }
