@@ -88,6 +88,7 @@ public class BughouseBoard extends JPanel {
 		}
 	}
 	
+	
 	public void startTurn() throws IOException, RequestTimedOutException{
 		turn_ = true;
 		this.requestFocusInWindow();

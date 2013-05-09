@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 
@@ -19,8 +21,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
@@ -45,7 +50,7 @@ public class RoomMenu extends JPanel {
 	private JScrollPane rooms_;
 	private JButton currentRoom_, joinTeam1_, joinTeam2_;
 	private Box gameinfo_;
-	private TableModel model_;
+	private DefaultTableModel model_;
 	private JTable table_;
 	
 	public RoomMenu(BughouseGUI frame,BackEnd backend){
@@ -53,7 +58,7 @@ public class RoomMenu extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.front_ = frame;
 		this.backend_ = backend;
-		//listOfRooms();
+		listOfRooms();
 		try {
 			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
@@ -66,19 +71,72 @@ public class RoomMenu extends JPanel {
 		}
 	}
 	
-/*	public void listOfRooms(){
-		table_ = new JTable(0,2){
+	public void listOfRooms(){
+		table_ = new JTable(0,3){
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public boolean isCellEditable(int row, int column){
 				return false;
 			}
 		};
 		table_.getTableHeader().setReorderingAllowed(false);
-		model_ = table_.getModel();
+		table_.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int row = table_.getSelectedRow();
+				if (row>=0){
+					selectedGameID_ = (int) table_.getValueAt(row, 0);
+					for (Game game : activeGames_){
+						if (game.getId()==selectedGameID_){
+							try {
+								displayGameInfoPanel(game);
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							} catch (RequestTimedOutException e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+				}
+				
+			}
+		});
+		model_ = (DefaultTableModel) table_.getModel();
+		DefaultTableCellRenderer cellRen = new DefaultTableCellRenderer();
+		cellRen.setHorizontalAlignment(SwingConstants.CENTER);
+		table_.setRowHeight(20);
 		table_.getColumnModel().getColumn(0).setHeaderValue("Game Number");
+		table_.getColumnModel().getColumn(0).setCellRenderer(cellRen);
 		table_.getColumnModel().getColumn(1).setHeaderValue("No. of players");
+		table_.getColumnModel().getColumn(1).setCellRenderer(cellRen);
+		table_.getColumnModel().getColumn(2).setHeaderValue("Status");
+		table_.getColumnModel().getColumn(2).setCellRenderer(cellRen);
 		
-	}*/
+	}
 	
 	public Box gameInfo() {
 		gameinfo_ = Box.createVerticalBox(); 
@@ -134,11 +192,10 @@ public class RoomMenu extends JPanel {
 		JLabel header =  new JLabel("Welcome "+ backend_.me().getName()+". Here is a list of active games to join.");
 		header.setFont(new Font("Serif", Font.PLAIN,18));
 		roomList_.add(header,BorderLayout.NORTH);
-		rooms_ = new JScrollPane();
-	/*	rooms_ = new JScrollPane(table_);
-		roomList_.add(rooms_, BorderLayout.CENTER);*/
-		roomPanel_ = new JPanel(new GridBagLayout());
-		rooms_.setViewportView(roomPanel_);
+		rooms_ = new JScrollPane(table_);
+		roomList_.add(rooms_, BorderLayout.CENTER);
+	/*	rooms_ = new JScrollPane();
+		roomPanel_ = new JPanel(new GridBagLayout());*/
 		roomList_.add(rooms_,BorderLayout.CENTER);
 		if (!backend_.getActiveGames().isEmpty()){
 			updateGames();
@@ -148,25 +205,45 @@ public class RoomMenu extends JPanel {
 	
 	public synchronized void updateGames () throws IOException, RequestTimedOutException{
 		activeGames_ = backend_.getActiveGames();
+		model_.setRowCount(0);
+		int gameNumber = 0;
 		if (activeGames_.isEmpty()){
 			gameinfo_.setVisible(false);
 		}
-		roomPanel_.removeAll();
+		/*roomPanel_.removeAll();
+		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 2;
 		c.fill = GridBagConstraints.HORIZONTAL;
-		c.insets = new Insets(4, 2, 4, 2);
+		c.insets = new Insets(4, 2, 4, 2);*/
 		for (Game game : activeGames_){
 			int gameID = game.getId();
-			System.out.println("Adding game id "+gameID + " to the list");
+			Object[] empty = new Object[3];
+			model_.insertRow(gameNumber, empty);
+			model_.setValueAt(gameID , gameNumber, 0);
+			JButton joinTeam1 = new JButton ("Join Team 1");
+			joinTeam1.addActionListener(new JoinTeamListener(1));
+			List<Player> team1 = game.getPlayersByTeam(1);
+			List<Player> team2 = game.getPlayersByTeam(2);
+			int numOfPlayer = team1.size() + team2.size();
+			model_.setValueAt(numOfPlayer, gameNumber, 1);
+			if (gameID == selectedGameID_){
+				displayGameInfoPanel(game);
+			}
+			model_.setValueAt("Open", gameNumber, 2);
+			gameNumber++;
+			/*System.out.println("Adding game id "+gameID + " to the list");
 			JButton room =  new JButton("Room "+Integer.toString(gameID));
 			room.setFont(new Font("Serif", Font.PLAIN,20));
 			room.addActionListener(new ChooseRoomListener(game));
 			c.gridy = activeGames_.indexOf(game);
 			roomPanel_.add(room,c);
+			JPanel buttonContainer = new JPanel(new BorderLayout(0,0));
+			buttonContainer.add(room);
+			roomPanel_.add(room);
 			if  (gameID == selectedGameID_){
 				displayGameInfoPanel(game);
-			}
+			}*/
 			System.out.println("Adding room to display for client named "+backend_.me().getName());
 		}
 		System.out.println("Refreshing view "+backend_.me().getName());
@@ -174,9 +251,9 @@ public class RoomMenu extends JPanel {
 			lobby_.updateLobbyInfo();
 		}
 		System.out.println("Revalidating and repainting "+backend_.me().getName());
-		roomPanel_.revalidate();
+	//	roomPanel_.revalidate();
 		System.out.println("Revalidated panel, now repainting");
-		roomPanel_.repaint();
+	//	roomPanel_.repaint();
 		System.out.println("repainted, requesting focus");
 		this.requestFocusInWindow();
 		System.out.println("Refreshed room menu. User should interact with UI now");
