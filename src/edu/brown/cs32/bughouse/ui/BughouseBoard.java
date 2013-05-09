@@ -14,6 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 
 import edu.brown.cs32.bughouse.exceptions.IllegalMoveException;
@@ -37,7 +38,8 @@ public class BughouseBoard extends JPanel {
 	private JLabel [][] board_;
 	private ChessPiece selectedPrisoner_;
 	private JCheckBox hint_;
-	private List<JLabel> suggestions_;
+	private List<JLabel> suggestions_, myPieces_;
+	private Border userPieces_;
 
 
 	public BughouseBoard(BackEnd backend, ChessPieceImageFactory imgFactory, boolean isManipulable,ChessBoard chessBoard){
@@ -50,7 +52,10 @@ public class BughouseBoard extends JPanel {
 		this.isPuttingPrisoner_ = false;
 		this.isHintOn_ = true;
 		this.isMovingPiece_ = false;
+		this.suggestions_ = new ArrayList<>();
 		this.turn_ = false;
+		this.myPieces_ = new ArrayList<>();
+		this.userPieces_ = new LineBorder(Color.BLUE, 3);
 		this.setPreferredSize(new Dimension(400,400));
 		for (int i = 0; i<8;i++){
 			for (int j = 0; j<8;j++){
@@ -83,15 +88,30 @@ public class BughouseBoard extends JPanel {
 		}
 	}
 	
-	public void startTurn(){
+	public void startTurn() throws IOException, RequestTimedOutException{
 		turn_ = true;
 		this.requestFocusInWindow();
 		BughouseGUI.showMyPane(this, "It is your turn now"
 				, JOptionPane.INFORMATION_MESSAGE);
+		this.showMyPieces();
 		if (turn_){
 			System.out.println("ITS YOUR TURN");
 		}
 		
+	}
+	
+	private void showMyPieces() throws IOException, RequestTimedOutException{
+		for (int i =0; i< 8; i++){
+			for (int j=0;j<8;j++){
+				if (board_[i][j].getIcon() != null){
+					if (backend_.isMine(j, i)){
+						myPieces_.add(board_[i][j]);
+						JPanel parent = (JPanel)board_[i][j].getParent();
+						parent.setBorder(userPieces_);
+					}
+				}
+			}
+		}
 	}
 	
 	public void notifyHintSelection() throws IOException, RequestTimedOutException{
@@ -240,7 +260,7 @@ public class BughouseBoard extends JPanel {
 			isMovingPiece_ = false;
 			piece_ = null;
 			JPanel parent = (JPanel) source_.getParent();
-			parent.setBorder(null);
+			parent.setBorder(userPieces_);
 			originX_ = -1;
 			originY_ = -1;
 			if (suggestions_!= null){
@@ -269,7 +289,6 @@ public class BughouseBoard extends JPanel {
 				 try {
 					turn_ = false;
 					System.out.println("Turn is false");
-
 					backend_.me().move(originX_, originY_, destX_, destY_);
 					System.out.println("Sent move to backend");
 				} catch (IllegalMoveException e) {
@@ -277,8 +296,10 @@ public class BughouseBoard extends JPanel {
 					BughouseGUI.showMyPane(null,"That is an illegal move. Consider choosing another move",
 							JOptionPane.ERROR_MESSAGE);			
 				} catch (IOException e) {
+					turn_ = true;
 					e.printStackTrace();
 				} catch (RequestTimedOutException e) {
+					turn_ = true;
 					BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
 							, JOptionPane.ERROR_MESSAGE);
 				}catch (WrongColorException e) {
@@ -289,12 +310,23 @@ public class BughouseBoard extends JPanel {
 				}finally {
 					JPanel originPanel = (JPanel)source_.getParent();
 					JPanel destPanel = (JPanel) current_.getParent();
-					originPanel.setBorder(null);
-					destPanel.setBorder(null);
+					originPanel.setBorder(userPieces_);
+					if (!myPieces_.contains(current_)){
+						destPanel.setBorder(null);
+					}
+					else {
+						destPanel.setBorder(userPieces_);
+					}
 					isMovingPiece_ = false;
 					if (suggestions_!= null){
 						for (JLabel square: suggestions_){
 							JPanel parent = (JPanel) square.getParent();
+							parent.setBorder(null);
+						}
+					}
+					if (turn_ ==false){
+						for (JLabel myPiece : myPieces_){
+							JPanel parent = (JPanel) myPiece.getParent();
 							parent.setBorder(null);
 						}
 					}
@@ -321,6 +353,13 @@ public class BughouseBoard extends JPanel {
 				turn_ = true;
 				BughouseGUI.showMyPane(null, "The server timed out.Please check your connection"
 						, JOptionPane.ERROR_MESSAGE);
+			}finally {
+				if (turn_ == false){
+					for (JLabel myPiece : myPieces_){
+						JPanel parent = (JPanel) myPiece.getParent();
+						parent.setBorder(null);
+					}
+				}
 			}
 		}
 		
