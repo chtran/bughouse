@@ -289,6 +289,15 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void switchBoard(int boardId) {
+		if (game_!= null){
+			try {
+				game_.switchBoard(boardId);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (RequestTimedOutException e) {
+				e.printStackTrace();
+			}
+		}
 		
 	}
 

@@ -44,6 +44,7 @@ public class GameView extends JPanel {
 	private BackEnd backend_;
 	private int myBoardID_, otherBoardID_;
 	private JPanel selectedPrisoner_;
+	private JTabbedPane boardContainer_;
 	private BughouseGUI front_;
 
 	public GameView(BackEnd backend, BughouseGUI front) throws IOException, RequestTimedOutException, GameNotReadyException{
@@ -59,6 +60,14 @@ public class GameView extends JPanel {
 		this.displayPlayerName();
 	}
 	
+	public void switchBoard(int boardId) throws IOException, RequestTimedOutException{
+		if (backend_.me().getCurrentBoardId() == boardId){
+			boardContainer_.setSelectedIndex(0);
+		}
+		else {
+			boardContainer_.setSelectedIndex(1);
+		}
+	}
 	
 	
 	public void addPrisoner (ChessPiece prisoner){
@@ -128,12 +137,12 @@ public class GameView extends JPanel {
 	 * the correct board
 	 */
 	private JComponent createBoard(){
-		JTabbedPane boardContainer = new JTabbedPane();
+		boardContainer_ = new JTabbedPane();
 		userBoard_ = new BughouseBoard(backend_,imgFactory_,true, backend_.getCurrentBoards().get(myBoardID_));
-		boardContainer.addTab("Your Game", userBoard_);
+		boardContainer_.addTab("Your Game", userBoard_);
 		otherBoard_ = new BughouseBoard(backend_,imgFactory_,false,backend_.getCurrentBoards().get(myBoardID_));
-		boardContainer.addTab("Other Game", otherBoard_);
-		return boardContainer;
+		boardContainer_.addTab("Other Game", otherBoard_);
+		return boardContainer_;
 	}
 	
 	/*
