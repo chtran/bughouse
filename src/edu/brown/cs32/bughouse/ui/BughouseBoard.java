@@ -48,7 +48,7 @@ public class BughouseBoard extends JPanel {
 		this.backend_ = backend;
 		this.isManipulable_ = isManipulable;
 		this.isPuttingPrisoner_ = false;
-		this.isHintOn_ = false;
+		this.isHintOn_ = true;
 		this.isMovingPiece_ = false;
 		this.turn_ = false;
 		this.setPreferredSize(new Dimension(400,400));

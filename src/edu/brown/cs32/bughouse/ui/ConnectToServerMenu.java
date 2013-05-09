@@ -84,6 +84,7 @@ public class ConnectToServerMenu extends JPanel {
 				parent_.joinServer();
 			}
 		});
+		connect.setToolTipText("Click here to connect to the server to join or create a game");
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;

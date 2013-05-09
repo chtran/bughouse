@@ -77,6 +77,8 @@ public class GameView extends JPanel {
 	
 	public void cancelGame(){
 		System.out.println("Received cancel request. Will now quit to the room menu");
+		JOptionPane.showMessageDialog(this, "This game has been canceled by the owner and will now quit", 
+				"Game Canceled", JOptionPane.ERROR_MESSAGE);
 		front_.displayCard("Rooms");
 		System.out.println("displaying room menu");
 	}
@@ -166,7 +168,7 @@ public class GameView extends JPanel {
 			}
 			
 		});
-		JCheckBox hints = new JCheckBox("Show me hints for moves", false);
+		JCheckBox hints = new JCheckBox("Show me hints for moves", true);
 		hints.addItemListener(new ItemListener() {
 			
 			@Override

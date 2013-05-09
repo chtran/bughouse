@@ -8,17 +8,21 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.io.IOException;
+import java.util.List;
+
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import javax.swing.table.TableModel;
+
 import edu.brown.cs32.bughouse.exceptions.RequestTimedOutException;
 import edu.brown.cs32.bughouse.exceptions.TeamFullException;
 import edu.brown.cs32.bughouse.interfaces.BackEnd;
@@ -41,13 +45,15 @@ public class RoomMenu extends JPanel {
 	private JScrollPane rooms_;
 	private JButton currentRoom_, joinTeam1_, joinTeam2_;
 	private Box gameinfo_;
+	private TableModel model_;
+	private JTable table_;
 	
 	public RoomMenu(BughouseGUI frame,BackEnd backend){
 		super();
 		this.setLayout(new BorderLayout());
 		this.front_ = frame;
 		this.backend_ = backend;
-		//this.add(listOfRooms(),BorderLayout.CENTER);
+		//listOfRooms();
 		try {
 			this.add(gameInfo(), BorderLayout.EAST);
 			this.add(getRooms(), BorderLayout.CENTER);
@@ -59,6 +65,20 @@ public class RoomMenu extends JPanel {
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+/*	public void listOfRooms(){
+		table_ = new JTable(0,2){
+			@Override
+			public boolean isCellEditable(int row, int column){
+				return false;
+			}
+		};
+		table_.getTableHeader().setReorderingAllowed(false);
+		model_ = table_.getModel();
+		table_.getColumnModel().getColumn(0).setHeaderValue("Game Number");
+		table_.getColumnModel().getColumn(1).setHeaderValue("No. of players");
+		
+	}*/
 	
 	public Box gameInfo() {
 		gameinfo_ = Box.createVerticalBox(); 
@@ -110,11 +130,13 @@ public class RoomMenu extends JPanel {
 	
 
 	public JPanel getRooms() throws IOException, RequestTimedOutException{
-		roomList_ = new JPanel(new BorderLayout());
-		JLabel header =  new JLabel("List of active games to join");
-		header.setFont(new Font("Serif", Font.PLAIN,24));
+		roomList_ = new JPanel(new BorderLayout()); 
+		JLabel header =  new JLabel("Welcome "+ backend_.me().getName()+". Here is a list of active games to join.");
+		header.setFont(new Font("Serif", Font.PLAIN,18));
 		roomList_.add(header,BorderLayout.NORTH);
 		rooms_ = new JScrollPane();
+	/*	rooms_ = new JScrollPane(table_);
+		roomList_.add(rooms_, BorderLayout.CENTER);*/
 		roomPanel_ = new JPanel(new GridBagLayout());
 		rooms_.setViewportView(roomPanel_);
 		roomList_.add(rooms_,BorderLayout.CENTER);
