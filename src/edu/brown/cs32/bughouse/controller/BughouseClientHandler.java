@@ -246,9 +246,11 @@ public class BughouseClientHandler extends Thread {
 					
 				// notify player with next turn
 				int next = m_data.getNextTurn(m_gameId);
+				int board = m_data.getPlayerBoard(next);
+				String m = String.format("BROADCAST:NEXT_BOARD:%d\n", board);
 				System.out.println("Next turn: " + next);
 				m_pool.sendToPlayer(next, "BROADCAST:YOUR_TURN\n");
-			
+				m_pool.broadcastToGame(m_gameId, m, this);
 		} else {
 			System.out.println("GameId incorrect: "+ m_gameId);
 			send("MOVE_FAILED\n");
