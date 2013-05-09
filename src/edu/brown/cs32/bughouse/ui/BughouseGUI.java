@@ -117,7 +117,13 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	@Override
 	public void notifyUserTurn() {
 		if (game_ != null){
-			game_.notifyUser();
+			try {
+				game_.notifyUser();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (RequestTimedOutException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

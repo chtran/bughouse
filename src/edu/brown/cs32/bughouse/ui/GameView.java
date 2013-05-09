@@ -63,7 +63,7 @@ public class GameView extends JPanel {
 	
 	public void addPrisoner (ChessPiece prisoner){
 		BughouseGUI.showMyPane(userBoard_, "You have received a "+prisoner.getName()+" " +
-				"from your teammate!", JOptionPane.OK_CANCEL_OPTION);
+				"from your teammate!", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public void notifyEndGame() {
@@ -71,12 +71,14 @@ public class GameView extends JPanel {
 		front_.displayCard("Rooms");
 	} 
 	
-	public void notifyUser(){
+	public void notifyUser() throws IOException, RequestTimedOutException{
 		userBoard_.startTurn();
 	}
 	
 	public void cancelGame(){
 		System.out.println("Received cancel request. Will now quit to the room menu");
+		JOptionPane.showMessageDialog(this, "A player has left the game. The game will now quit", 
+				"Game Canceled", JOptionPane.ERROR_MESSAGE);
 		front_.displayCard("Rooms");
 		System.out.println("displaying room menu");
 	}
@@ -166,7 +168,7 @@ public class GameView extends JPanel {
 			}
 			
 		});
-		JCheckBox hints = new JCheckBox("Show me hints for moves", false);
+		JCheckBox hints = new JCheckBox("Show me hints for moves", true);
 		hints.addItemListener(new ItemListener() {
 			
 			@Override
