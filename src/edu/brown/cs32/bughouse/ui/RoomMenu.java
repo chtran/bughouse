@@ -79,6 +79,12 @@ public class RoomMenu extends JPanel {
 		
 	}
 	
+	public void showStartButton(){
+		if (lobby_!= null){
+			lobby_.showStartButton();
+		}
+	}
+	
 	public synchronized void displayGameInfoPanel(Game selected) throws IOException, RequestTimedOutException{
 		team1_.setText(" ");
 		team2_.setText(" ");
@@ -142,13 +148,16 @@ public class RoomMenu extends JPanel {
 			System.out.println("Adding room to display for client named "+backend_.me().getName());
 		}
 		System.out.println("Refreshing view "+backend_.me().getName());
-		//this.displayGameInfo();
 		if (lobby_!= null){
 			lobby_.updateLobbyInfo();
 		}
 		System.out.println("Revalidating and repainting "+backend_.me().getName());
 		roomPanel_.revalidate();
+		System.out.println("Revalidated panel, now repainting");
 		roomPanel_.repaint();
+		System.out.println("repainted, requesting focus");
+		this.requestFocusInWindow();
+		System.out.println("Refreshed room menu. User should interact with UI now");
 	}
 	
 	public JPanel userControl() {

@@ -136,7 +136,7 @@ public class BughouseBoard extends JPanel {
 	private void showHintedMoves() throws IOException, RequestTimedOutException{
 		suggestions_ = new ArrayList<>();
 		for (int i =0;i<8;i++){
-			for (int j=0;j<7;j++){
+			for (int j=0;j<8;j++){
 				if (backend_.canMove(backend_.me().getCurrentBoardId(), originX_, originY_, j, i)){
 					suggestions_.add(board_[i][j]);
 					JPanel parent = (JPanel) board_[i][j].getParent();
@@ -243,9 +243,11 @@ public class BughouseBoard extends JPanel {
 			parent.setBorder(null);
 			originX_ = -1;
 			originY_ = -1;
-			for (JLabel square: suggestions_){
-				JPanel parents = (JPanel) square.getParent();
-				parents.setBorder(null);
+			if (suggestions_!= null){
+				for (JLabel square: suggestions_){
+					JPanel parents = (JPanel) square.getParent();
+					parents.setBorder(null);
+				}
 			}
 		}
 		
@@ -290,9 +292,11 @@ public class BughouseBoard extends JPanel {
 					originPanel.setBorder(null);
 					destPanel.setBorder(null);
 					isMovingPiece_ = false;
-					for (JLabel square: suggestions_){
-						JPanel parent = (JPanel) square.getParent();
-						parent.setBorder(null);
+					if (suggestions_!= null){
+						for (JLabel square: suggestions_){
+							JPanel parent = (JPanel) square.getParent();
+							parent.setBorder(null);
+						}
 					}
 				}
 		}

@@ -35,6 +35,7 @@ public class GameLobby extends JPanel {
 	private BughouseGUI front_;
 	private boolean isDisplayed_;
 	private ChessPieceImageFactory imgFactory_;
+	private JButton start_;
 	
 	
 	public GameLobby(BackEnd backend, BughouseGUI front){
@@ -89,6 +90,11 @@ public class GameLobby extends JPanel {
 		isDisplayed_ = flag;
 	}
 	
+	public void showStartButton(){
+		start_.setEnabled(true);
+		start_.setVisible(true);
+	}
+	
 	private JPanel setupInfoArea() throws IOException, RequestTimedOutException{
 		infoArea_ = new JPanel(new BorderLayout());
 		JPanel info = new JPanel(new GridLayout(0,1));
@@ -113,10 +119,10 @@ public class GameLobby extends JPanel {
 		return infoArea_;
 	}
 	
-	private JPanel setupButtonPanel(){
+	private JPanel setupButtonPanel() throws IOException, RequestTimedOutException{
 		JPanel buttonPanel = new JPanel();
-		JButton start = new JButton("Start Game");
-		start.addActionListener(new ActionListener(){
+		start_ = new JButton("Start Game");
+		start_.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
 					try {
@@ -144,6 +150,11 @@ public class GameLobby extends JPanel {
 					
 			}
 		});
+		buttonPanel.add(start_);
+		if (backend_.me().getCurrentGame().getOwnerId()!= backend_.me().getId()){
+			start_.setEnabled(false);
+			start_.setVisible(false);
+		}
 		JButton cancel = new JButton("Leave Game");
 		cancel.addActionListener(new ActionListener(){
 			@Override
@@ -164,7 +175,7 @@ public class GameLobby extends JPanel {
 			}
 			
 		});
-		buttonPanel.add(start);
+		
 		buttonPanel.add(cancel);
 		return buttonPanel;
 	}

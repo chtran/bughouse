@@ -184,8 +184,11 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	}
 	
 	public void displayCard(String cardName){
+		System.out.println("Request to change menu to " +cardName);
 		CardLayout cards = (CardLayout) content_.getLayout();
+		System.out.println("Getting layout");
 		cards.show(content_,cardName);
+		System.out.println("Displayed " +cardName);
 	}
 	
 	public void joinServer(){
@@ -236,6 +239,17 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 
 	@Override
 	public void notifyNewOwner(int gameId) {
+		if (rooms_!= null){
+			try {
+				if (backend_.me().getCurrentGame().getOwnerId()== backend_.me().getId()){
+					rooms_.showStartButton();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (RequestTimedOutException e) {
+
+			}
+		}
 		showMyPane(this,"You are the new owner of game #"+gameId, JOptionPane.OK_OPTION);
 	}
 
@@ -246,7 +260,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 		} catch (IOException | RequestTimedOutException e) {
 			e.printStackTrace();
 		}
-		game_.cancelGame();
+		if (game_!= null){
+			game_.cancelGame();
+		}
 		
 	}
 
@@ -254,7 +270,9 @@ public class BughouseGUI extends JFrame implements FrontEnd{
 	public void updatePlayerList() {
 		System.out.println("Call to update the player list in lobby");
 		try {
-			rooms_.updateGames();
+			if(rooms_!= null){
+				rooms_.updateGames();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (RequestTimedOutException e) {
