@@ -398,6 +398,10 @@ public class BughouseBoard extends JPanel {
 					JLabel exited = (JLabel)arg0.getSource();
 					JPanel parent = (JPanel)exited.getParent();
 					if (!exited.equals(source_)){
+						if (myPieces_.contains(exited)){
+							parent.setBorder(userPieces_);
+							return;
+						}
 						parent.setBorder(null);
 						
 					}

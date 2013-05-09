@@ -3,6 +3,7 @@ package edu.brown.cs32.bughouse.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -22,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import edu.brown.cs32.bughouse.exceptions.GameNotReadyException;
@@ -38,12 +40,11 @@ public class GameView extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BughouseBoard userBoard_, otherBoard_;
 	private ChessPieceImageFactory imgFactory_;
-	private JTextArea messageBox_, playerList_;
-	private JPanel prison_;
+	private JTextArea playerList_;
+	private JPanel prison_,selectedPrisoner_, legendBox_;
 	private List<ChessPiece> myPrisoners_;
 	private BackEnd backend_;
 	private int myBoardID_, otherBoardID_;
-	private JPanel selectedPrisoner_;
 	private JTabbedPane boardContainer_;
 	private BughouseGUI front_;
 
@@ -93,11 +94,6 @@ public class GameView extends JPanel {
 	}
 	
 	public void pieceMoved (int boardId, int from_x, int from_y, int to_x ,int to_y){
-		messageBox_.setText(" ");
-		messageBox_.setText("This board id is "+ Integer.toString(myBoardID_)+"\n");
-		messageBox_.append("This move is to update board "+ Integer.toString(boardId)+"\n");
-		messageBox_.revalidate();
-		messageBox_.repaint();
 		if (boardId == myBoardID_){
 			System.out.println("Moving piece");
 			userBoard_.updatePieceMoved(from_x, from_y, to_x, to_y);
@@ -145,6 +141,41 @@ public class GameView extends JPanel {
 		return boardContainer_;
 	}
 	
+	
+	private void createLegend(){
+		JPanel header = new JPanel();
+		JLabel headerMsg = new JLabel("Legend");
+		headerMsg.setFont(new Font("Serif",Font.BOLD,12));
+		header.add(headerMsg);
+		legendBox_.add(header);
+		JPanel row1 = new JPanel();
+		JLabel userPiece = new JLabel("Pieces owned by you");
+		JPanel square = new JPanel();
+		square.setPreferredSize(new Dimension(20,20));
+		square.setBorder(new LineBorder(Color.BLUE,2));
+		row1.add(square);
+		row1.add(userPiece);
+		legendBox_.add(row1);
+		JPanel row2 = new JPanel();
+		JLabel userPiece2 = new JLabel("Currently selected piece");
+		JPanel square2 = new JPanel();
+		square2.setPreferredSize(new Dimension(20,20));
+		square2.setBorder(new LineBorder(Color.RED,2));
+		row2.add(square2);
+		row2.add(userPiece2);
+		legendBox_.add(row2);
+		JPanel row3 = new JPanel();
+		JLabel userPiece3 = new JLabel("<html>Valid moves for the<br>currently selected piece</html>", 
+				SwingConstants.CENTER);
+		JPanel square3 = new JPanel();
+		square3.setPreferredSize(new Dimension(20,20));
+		square3.setBorder(new LineBorder(Color.GREEN,2));
+		row3.add(square3);
+		row3.add(userPiece3);
+		legendBox_.add(row3);
+		legendBox_.setBorder(new LineBorder(Color.BLACK,1));
+	}
+	
 	/*
 	 * sets up the option menu for users where information gets 
 	 * displayed
@@ -157,9 +188,9 @@ public class GameView extends JPanel {
 		playerList_.setEditable(false);
 		playerList_.setPreferredSize(new Dimension(200,110));
 		playerList_.setBorder(new LineBorder(Color.BLACK,1));
-		messageBox_ = new JTextArea();
-		messageBox_.setPreferredSize(new Dimension(200,190));
-		messageBox_.setEditable(false);
+		legendBox_ = new JPanel();
+		legendBox_.setPreferredSize(new Dimension(200,190));
+		this.createLegend();
 		JButton quit  = new JButton("Quit Game");
 		quit.addActionListener(new ActionListener() {
 
@@ -194,11 +225,11 @@ public class GameView extends JPanel {
 			}
 		});
 		quit.setPreferredSize(new Dimension(100,60));
-		optionMiddle.add(hints,BorderLayout.NORTH);
-		optionMiddle.add(messageBox_, BorderLayout.CENTER);
-		optionMiddle.add(quit, BorderLayout.SOUTH);
+		optionMiddle.add(hints,BorderLayout.CENTER);
+		optionMiddle.add(legendBox_, BorderLayout. NORTH);
 		options.add(optionMiddle,BorderLayout.CENTER);
 		options.add(playerList_, BorderLayout.NORTH);
+		options.add(quit,BorderLayout.SOUTH);
 		return options;
 	}
 	
